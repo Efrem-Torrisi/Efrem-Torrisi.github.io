@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Efrem | Portfolio</title>
+    <title>Efrem Torrisi | Technical Artist</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="is-intro">
+    <!-- Full-page Three.js particle canvas -->
+    <canvas id="hero-canvas"></canvas>
+
     <nav class="navbar">
         <div class="nav-container">
             <a href="#" class="nav-logo">Efrem Torrisi</a>
@@ -19,8 +22,9 @@
     </nav>
 
     <main>
+        <!-- Hero Section -->
         <section id="home" class="hero">
-            <div class="hero-content">
+            <div class="hero-content" data-reveal>
                 <h1>Hello, I'm Efrem</h1>
                 <p class="hero-subtitle">Technical Artist</p>
                 <p class="hero-description">Specializing in real-time graphics, procedural content generation, and visual effects.</p>
@@ -28,65 +32,382 @@
             </div>
         </section>
 
+        <!-- Featured Solo Projects -->
         <section class="pieces-section">
-            
-            <div class="piece">
-                <img src="content\piece1.png" />
-            </div>
-            <div class="piece">
-                <img src="content\piece2.png" />
-            </div>
-            <div class="piece">
-                <img src="content\piece2.png" />
+            <h2 class="section-title" data-reveal>Featured Work</h2>
+            <div class="pieces-grid">
+
+                <!-- Card 1: AutoLOD -->
+                <article class="piece"
+                         data-project="autolod"
+                         data-title="AutoLOD"
+                         role="button"
+                         tabindex="0"
+                         aria-label="View AutoLOD project details">
+                    <img src="content/piece1.png" alt="AutoLOD preview" loading="lazy" />
+                    <div class="card-icons">
+                        <img src="content/icons/houdini_badge_flat.svg" alt="Houdini" title="Houdini" />
+                        <img src="content/icons/python-logo-only.svg" alt="Python" title="Python" />
+                        <img src="content/icons/UE-Icon-2023-White.svg" alt="UE5" title="Unreal Engine 5" />
+                    </div>
+                    <div class="piece-overlay">
+                        <h3 class="piece-title">Auto LOD Tool</h3>
+                        <p class="piece-tag">Automatic LOD & Collision Mesh Generation</p>
+                    </div>
+                </article>
+
+                <!-- Card 2: Smart Fracture -->
+                <article class="piece"
+                         data-project="smart-fracture"
+                         data-title="Smart Fracture"
+                         role="button"
+                         tabindex="0"
+                         aria-label="View Smart Fracture project details">
+                    <img src="content/piece2.png" alt="Smart Fracture preview" loading="lazy" />
+                    <div class="card-icons">
+                        <img src="content/icons/houdini_badge_flat.svg" alt="Houdini" title="Houdini" />
+                        <img src="content/icons/python-logo-only.svg" alt="Python" title="Python" />
+                        <img src="content/icons/UE-Icon-2023-White.svg" alt="UE5" title="Unreal Engine 5" />
+                    </div>
+                    <div class="piece-overlay">
+                        <h3 class="piece-title">Smart Fracture</h3>
+                        <p class="piece-tag">Intelligent Mesh Fracturing Tool</p>
+                    </div>
+                </article>
+
+                <!-- Card 3: Sketch2Level -->
+                <article class="piece"
+                         data-project="sketch2level"
+                         data-title="Sketch2Level"
+                         role="button"
+                         tabindex="0"
+                         aria-label="View Sketch2Level project details">
+                    <img src="content/piece2.png" alt="Sketch2Level preview" loading="lazy" />
+                    <div class="card-icons">
+                        <img src="content/icons/python-logo-only.svg" alt="Python" title="Python" />
+                        <img src="content/icons/houdini_badge_flat.svg" alt="Houdini" title="Houdini" />
+                        <img src="content/icons/UE-Icon-2023-White.svg" alt="UE5" title="Unreal Engine 5" />
+                    </div>
+                    <div class="piece-overlay">
+                        <h3 class="piece-title">Sketch2Level</h3>
+                        <p class="piece-tag">Sketch-to-Level Design Pipeline</p>
+                    </div>
+                </article>
+
+                <!-- Card 4: Compute Grass -->
+                <article class="piece"
+                         data-project="compute-grass"
+                         data-title="Compute Grass"
+                         role="button"
+                         tabindex="0"
+                         aria-label="View Compute Grass project details">
+                    <img src="content/piece1.png" alt="Compute Grass preview" loading="lazy" />
+                    <div class="card-icons">
+                        <img src="content/icons/UE-Icon-2023-White.svg" alt="UE5" title="Unreal Engine 5" />
+                        <img src="content/icons/c.svg" alt="RenderDoc" title="RenderDoc" />
+                        <img src="content/icons/hlsl-svgrepo-com.svg" alt="HLSL" title="HLSL" />
+                        
+                    </div>
+                    <div class="piece-overlay">
+                        <h3 class="piece-title">Compute Grass</h3>
+                        <p class="piece-tag">GPU-Driven Grass via Compute Shaders</p>
+                    </div>
+                </article>
+
             </div>
         </section>
 
+        <!-- About Section -->
         <section id="about" class="about">
-            <div class="container">
-                <h2>About</h2>
-                <p>I'm a technical artist working with Unreal Engine 5, Houdini, and custom shader development. I focus on bridging the gap between art and engineering to create efficient, visually compelling real-time experiences.</p>
-                <p>My work spans compute shaders, procedural generation workflows, and rendering pipeline development.</p>
+            <div class="container about-grid" data-reveal>
+                <div class="about-left">
+                    <img src="content/profile-placeholder.png" class="about-photo" alt="Efrem Torrisi" />
+                    <h2>About</h2>
+                    <p>I'm a technical artist working with Unreal Engine 5, Houdini, and custom shader development. I focus on bridging the gap between art and engineering to create efficient, visually compelling real-time experiences.</p>
+                    <p>My work spans compute shaders, procedural generation workflows, and rendering pipeline development.</p>
+                </div>
+                <div class="about-divider"></div>
+                <div class="about-right">
+                    <h3>Skills & Tools</h3>
+                    <div class="skills-grid">
+                        <div class="skill-item">
+                            <img src="content/icons/UE-Icon-2023-White.svg" alt="Unreal Engine" />
+                            <span>Unreal Engine</span>
+                        </div>
+                        <div class="skill-item">
+                            <img src="content/icons/unity.svg" alt="Unity" />
+                            <span>Unity</span>
+                        </div>
+                        <div class="skill-item">
+                            <img src="content/icons/houdini_badge_flat.svg" alt="Houdini" />
+                            <span>Houdini</span>
+                        </div>
+                        <div class="skill-item">
+                            <img src="content/icons/hlsl-svgrepo-com.svg" alt="HLSL/GLSL" />
+                            <span>HLSL / GLSL</span>
+                        </div>
+                        <div class="skill-item">
+                            <img src="content/icons/python-logo-only.svg" alt="Python" />
+                            <span>Python</span>
+                        </div>
+                        <div class="skill-item">
+                            <img src="content/icons/substance3d.svg" alt="Substance 3D" />
+                            <span>Substance 3D</span>
+                        </div>
+                        <div class="skill-item">
+                            <img src="content/icons/photoshop.svg" alt="Photoshop" />
+                            <span>Photoshop</span>
+                        </div>
+                        <div class="skill-item">
+                            <img src="content/icons/blender.svg" alt="Blender" />
+                            <span>Blender</span>
+                        </div>
+                        <div class="skill-item">
+                            <img src="content/icons/maya.svg" alt="Maya" />
+                            <span>Maya</span>
+                        </div>
+                        <div class="skill-item">
+                            <img src="content/icons/illugen.svg" alt="Illugen" />
+                            <span>Illugen</span>
+                        </div>
+                        <div class="skill-item">
+                            <img src="content/icons/embergen.svg" alt="EmberGen" />
+                            <span>EmberGen</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section  class="projects-section">
-            <div class="project">
-                <img src="content\project3.png" />
-            </div>
-            <div class="project">
-                <img src="content\project3.png" />
-            </div>
-            <div class="project">
-                <img src="content\project3.png" />
-            </div>
-            <div class="project">
-                <img src="content\project3.png" />
-            </div>
-            <div class="project">
-                <img src="content\project3.png" />
-            </div>
-            <div class="project">
-                <img src="content\project3.png" />
+        <!-- Group Game Projects -->
+        <section class="projects-section">
+            <h2 class="section-title" data-reveal>Group Projects</h2>
+            <div class="projects-grid">
+
+                <!-- Project 1 -->
+                <article class="project"
+                         data-project="captain-hornswaggle"
+                         data-title="The Misadventures of Captain Hornswaggle"
+                         role="button"
+                         tabindex="0"
+                         aria-label="View Captain Hornswaggle project details">
+                    <img src="content/project3.png" alt="Captain Hornswaggle preview" loading="lazy" />
+                    <div class="card-icons">
+                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
+                        <img src="content/icons/blueprints.svg" alt="Blueprints" title="Blueprints" />
+                        <img src="content/icons/materials.svg" alt="Materials" title="Material Editor" />
+                    </div>
+                    <div class="project-overlay">
+                        <h3 class="project-title">Captain Hornswaggle</h3>
+                        <span class="project-role">Technical Artist</span>
+                    </div>
+                </article>
+
+                <!-- Project 2 -->
+                <article class="project"
+                         data-project="revolt-gear-by-gear"
+                         data-title="Revolt: Gear By Gear"
+                         role="button"
+                         tabindex="0"
+                         aria-label="View Revolt: Gear By Gear project details">
+                    <img src="content/project3.png" alt="Revolt: Gear By Gear preview" loading="lazy" />
+                    <div class="card-icons">
+                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
+                        <img src="content/icons/blueprints.svg" alt="Blueprints" title="Blueprints" />
+                        <img src="content/icons/materials.svg" alt="Materials" title="Material Editor" />
+                    </div>
+                    <div class="project-overlay">
+                        <h3 class="project-title">Revolt: Gear By Gear</h3>
+                        <span class="project-role">Technical Artist</span>
+                    </div>
+                </article>
+
+                <!-- Project 3 -->
+                <article class="project"
+                         data-project="last-unit"
+                         data-title="Last Unit"
+                         role="button"
+                         tabindex="0"
+                         aria-label="View Last Unit project details">
+                    <img src="content/project3.png" alt="Last Unit preview" loading="lazy" />
+                    <div class="card-icons">
+                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
+                        <img src="content/icons/blueprints.svg" alt="Blueprints" title="Blueprints" />
+                        <img src="content/icons/materials.svg" alt="Materials" title="Material Editor" />
+                    </div>
+                    <div class="project-overlay">
+                        <h3 class="project-title">Last Unit</h3>
+                        <span class="project-role">Technical Artist</span>
+                    </div>
+                </article>
+
+                <!-- Project 4 -->
+                <article class="project"
+                         data-project="spite-depth-of-darkness"
+                         data-title="Spite: The Depth of Darkness"
+                         role="button"
+                         tabindex="0"
+                         aria-label="View Spite project details">
+                    <img src="content/project3.png" alt="Spite: The Depth of Darkness preview" loading="lazy" />
+                    <div class="card-icons">
+                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
+                        <img src="content/icons/blueprints.svg" alt="Blueprints" title="Blueprints" />
+                        <img src="content/icons/niagara.svg" alt="Niagara" title="Niagara VFX" />
+                        <img src="content/icons/materials.svg" alt="Materials" title="Material Editor" />
+                    </div>
+                    <div class="project-overlay">
+                        <h3 class="project-title">Spite: The Depth of Darkness</h3>
+                        <span class="project-role">Technical Artist</span>
+                    </div>
+                </article>
+
+                <!-- Project 5 -->
+                <article class="project"
+                         data-project="cog-of-war"
+                         data-title="Cog of War"
+                         role="button"
+                         tabindex="0"
+                         aria-label="View Cog of War project details">
+                    <img src="content/project3.png" alt="Cog of War preview" loading="lazy" />
+                    <div class="card-icons">
+                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
+                        <img src="content/icons/blueprints.svg" alt="Blueprints" title="Blueprints" />
+                        <img src="content/icons/materials.svg" alt="Materials" title="Material Editor" />
+                    </div>
+                    <div class="project-overlay">
+                        <h3 class="project-title">Cog of War</h3>
+                        <span class="project-role">Technical Artist</span>
+                    </div>
+                </article>
+
+                <!-- Project 6 (Placeholder) -->
+                <article class="project"
+                         data-project="placeholder-project"
+                         data-title="Placeholder"
+                         role="button"
+                         tabindex="0"
+                         aria-label="View project details">
+                    <img src="content/project3.png" alt="Project preview" loading="lazy" />
+                    <div class="card-icons">
+                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
+                    </div>
+                    <div class="project-overlay">
+                        <h3 class="project-title">Placeholder</h3>
+                        <span class="project-role">Technical Artist</span>
+                    </div>
+                </article>
+
+                <!-- Project 7 -->
+                <article class="project"
+                         data-project="shifting-sands"
+                         data-title="Shifting Sands"
+                         role="button"
+                         tabindex="0"
+                         aria-label="View Shifting Sands project details">
+                    <img src="content/project3.png" alt="Shifting Sands preview" loading="lazy" />
+                    <div class="card-icons">
+                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
+                        <img src="content/icons/blueprints.svg" alt="Blueprints" title="Blueprints" />
+                        <img src="content/icons/materials.svg" alt="Materials" title="Material Editor" />
+                    </div>
+                    <div class="project-overlay">
+                        <h3 class="project-title">Shifting Sands</h3>
+                        <span class="project-role">Technical Artist</span>
+                    </div>
+                </article>
+
+                <!-- Project 8 -->
+                <article class="project"
+                         data-project="daidala"
+                         data-title="Daidala"
+                         role="button"
+                         tabindex="0"
+                         aria-label="View Daidala project details">
+                    <img src="content/project3.png" alt="Daidala preview" loading="lazy" />
+                    <div class="card-icons">
+                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
+                        <img src="content/icons/blueprints.svg" alt="Blueprints" title="Blueprints" />
+                        <img src="content/icons/materials.svg" alt="Materials" title="Material Editor" />
+                    </div>
+                    <div class="project-overlay">
+                        <h3 class="project-title">Daidala</h3>
+                        <span class="project-role">Technical Artist</span>
+                    </div>
+                </article>
+
+                <!-- Project 9 -->
+                <article class="project"
+                         data-project="teddys-tale"
+                         data-title="Teddy's Tale"
+                         role="button"
+                         tabindex="0"
+                         aria-label="View Teddy's Tale project details">
+                    <img src="content/project3.png" alt="Teddy's Tale preview" loading="lazy" />
+                    <div class="card-icons">
+                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
+                        <img src="content/icons/blueprints.svg" alt="Blueprints" title="Blueprints" />
+                        <img src="content/icons/materials.svg" alt="Materials" title="Material Editor" />
+                    </div>
+                    <div class="project-overlay">
+                        <h3 class="project-title">Teddy's Tale</h3>
+                        <span class="project-role">Technical Artist</span>
+                    </div>
+                </article>
+
             </div>
         </section>
 
+        <!-- Contact Section -->
         <section id="contact" class="contact">
-            <div class="container">
+            <div class="container" data-reveal>
                 <h2>Contact</h2>
                 <p>Interested in working together? Feel free to reach out.</p>
                 <ul class="contact-list">
-                    <li>Email: <a href="mailto:linkedin.com/in/efremtorrisi">Efrem.Torrisi@outlook.com</a></li>
+                    <li>Email: <a href="mailto:Efrem.Torrisi@outlook.com">Efrem.Torrisi@outlook.com</a></li>
                     <li>LinkedIn: <a href="https://www.linkedin.com/in/efremtorrisi/">linkedin.com/in/efremtorrisi/</a></li>
                     <li>GitHub: <a href="https://github.com/Efrem-Torrisi">github.com/Efrem-Torrisi</a></li>
                 </ul>
+
+                <div class="social-icons">
+                    <a href="mailto:Efrem.Torrisi@outlook.com" class="social-icon" aria-label="Email">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67z"/>
+                            <path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908z"/>
+                        </svg>
+                    </a>
+                    <a href="https://www.linkedin.com/in/efremtorrisi/" target="_blank" rel="noopener" class="social-icon" aria-label="LinkedIn">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                    </a>
+                    <a href="https://github.com/Efrem-Torrisi" target="_blank" rel="noopener" class="social-icon" aria-label="GitHub">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                        </svg>
+                    </a>
+                </div>
             </div>
         </section>
     </main>
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Efrem. All rights reserved.</p>
+            <p>&copy; 2026 Efrem. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- Modal Overlay -->
+    <div id="project-modal" class="modal-overlay" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container" role="document">
+            <button class="modal-close" aria-label="Close project details">&times;</button>
+            <div class="modal-content" id="modal-content">
+                <!-- Fetched project content injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>

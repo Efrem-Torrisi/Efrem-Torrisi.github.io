@@ -1,6 +1,4 @@
-/* ============================================
-   RESET & BASE
-   ============================================ */
+
 *,
 *::before,
 *::after {
@@ -10,7 +8,7 @@
 }
 
 :root {
-    /* Colors — Apple-inspired neutral dark palette */
+    /* Colors */
     --color-bg: #0C0C0E;
     --color-bg-elevated: #1C1C1E;
     --color-bg-elevated-2: #2C2C2E;
@@ -79,7 +77,7 @@ main {
 }
 
 /* ============================================
-   NAVBAR — Apple-style translucent
+   NAVBAR 
    ============================================ */
 .navbar {
     position: fixed;
@@ -130,7 +128,7 @@ main {
 }
 
 /* ============================================
-   PAGE INTRO ENTRANCE ANIMATION
+   PAGE INTRO 
    ============================================ */
 
 @keyframes introFadeUp {
@@ -155,12 +153,12 @@ main {
     }
 }
 
-/* Navbar slides in from above on load */
+/* Navbar slide in*/
 body.is-intro .navbar {
     animation: introFadeDown 0.7s cubic-bezier(0.23, 1, 0.32, 1) 0.1s both;
 }
 
-/* During intro, hero container overrides data-reveal (children animate individually) */
+/* intro hero container  */
 body.is-intro .hero-content[data-reveal] {
     opacity: 1;
     transform: none;
@@ -177,7 +175,7 @@ body.is-intro .hero-content .hero-subtitle  { animation-delay: 0.45s; }
 body.is-intro .hero-content .hero-description { animation-delay: 0.6s; }
 body.is-intro .hero-content .btn            { animation-delay: 0.8s; }
 
-/* Section title + cards: override data-reveal during intro so keyframes control entrance */
+/* Section title + cards: override data-reveal during intro */
 body.is-intro .section-title[data-reveal],
 body.is-intro .piece[data-reveal] {
     transition: none !important;
@@ -241,7 +239,7 @@ body.is-intro .piece[data-reveal]:nth-child(4)  { animation-delay: 1.5s; }
     margin-right: auto;
 }
 
-/* Button — Apple-style link */
+/* Button */
 .btn {
     display: inline-block;
     padding: 0.875rem 2rem;
@@ -260,7 +258,7 @@ body.is-intro .piece[data-reveal]:nth-child(4)  { animation-delay: 1.5s; }
 }
 
 /* ============================================
-   SECTION TITLES
+    TITLES
    ============================================ */
 .section-title {
     font-size: clamp(1rem, 1.5vw, 1.25rem);
@@ -284,7 +282,7 @@ body.is-intro .piece[data-reveal]:nth-child(4)  { animation-delay: 1.5s; }
 }
 
 /* ============================================
-   PIECES (Featured Solo Projects)
+   PIECES (Solo Projects)
    ============================================ */
 .pieces-section {
     padding: 0 0;
@@ -412,7 +410,7 @@ section h2 {
 }
 
 /* ============================================
-   PROJECTS (Group Game Projects)
+   GROUP GAME PROJECTS)
    ============================================ */
 .projects-section {
     padding: 0 0;
@@ -483,7 +481,7 @@ section h2 {
 }
 
 /* ============================================
-   ABOUT SECTION — elevated surface, split layout
+   ABOUT SECTION
    ============================================ */
 .about {
     background-color: var(--color-bg-elevated);
@@ -569,9 +567,10 @@ section h2 {
 }
 
 /* ============================================
-   CONTACT SECTION — centered in viewport
+   CONTACT SECTION 
    ============================================ */
 .contact {
+    scroll-margin-top: 20px;
     padding-top: clamp(4rem, 10vh, 8rem);
     padding-bottom: clamp(16rem, 70vh, 40rem);
 }
@@ -604,7 +603,7 @@ section h2 {
     color: #6CB4FF;
 }
 
-/* Social icon buttons — solid brand logos */
+/* Social icon buttons */
 .social-icons {
     justify-self: center;
     margin-right: 3rem;
@@ -672,7 +671,7 @@ section h2 {
     visibility: visible;
 }
 
-/* Backdrop — dims and desaturates the landing page */
+/* Backdrop */
 .modal-backdrop {
     position: fixed;
     inset: 0;

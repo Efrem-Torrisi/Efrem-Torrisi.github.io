@@ -2,6 +2,77 @@
  * Portfolio — Modal System + Three.js Particle Field
  * Efrem Torrisi | Technical Artist
  */
+// ── Work In Progress Gate ─────────────────────────────────────
+const WIP_MODE = true; // set to false to disable
+
+if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
+  const style = document.createElement('style');
+  style.textContent = `
+    nav, main, footer {
+      display: none;
+    }
+    #wip-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+      color: #fff;
+      background: rgba(10, 10, 10, 0.75);
+      backdrop-filter: blur(2px);
+    }
+    #wip-gate h1 {
+      font-size: clamp(2rem, 6vw, 4rem);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin: 0 0 0.5rem;
+    }
+    #wip-gate p {
+      font-size: 1.1rem;
+      color: #888;
+      margin: 0;
+      letter-spacing: 0.02em;
+    }
+    #wip-gate .dot {
+      display: inline-block;
+      animation: blink 1.4s infinite both;
+    }
+    #wip-gate .dot:nth-child(2) { animation-delay: 0.2s; }
+    #wip-gate .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0; }
+      40%            { opacity: 1; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  const gate = document.createElement('div');
+  gate.id = 'wip-gate';
+  gate.innerHTML = `
+    <h1>Work in Progress</h1>
+    <p>Stay Tuned<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></p>
+  `;
+  document.body.appendChild(gate);
+
+  const code = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+  let progress = 0;
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === code[progress]) {
+      progress++;
+      if (progress === code.length) {
+        sessionStorage.setItem('wip_unlocked', 'true');
+        location.reload();
+      }
+    } else {
+      progress = 0;
+    }
+  });
+}
+// ─────────────────────────────────────────────────────────────
 (function () {
     'use strict';
 

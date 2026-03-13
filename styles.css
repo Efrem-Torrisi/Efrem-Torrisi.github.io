@@ -373,7 +373,7 @@ body.is-intro .piece[data-reveal]:nth-child(4)  { animation-delay: 1.5s; }
 
 .card-icons img {
     width: 24px;
-    height: 24px;
+    height: 27px;
     border-radius: 4px;
     opacity: 0.85;
     transition: opacity 0.3s ease;
@@ -497,10 +497,11 @@ section h2 {
 }
 
 .about-photo {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
+    width: 210px;
+    height:210px;
+    border-radius: 100%;
     object-fit: cover;
+    object-position: center top;
     margin-bottom: 1.5rem;
     background: var(--color-bg-elevated-2);
     border: 2px solid var(--color-border);

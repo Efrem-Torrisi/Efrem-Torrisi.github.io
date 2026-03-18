@@ -3,7 +3,7 @@
  * Efrem Torrisi | Technical Artist
  */
 // ── Work In Progress Gate ─────────────────────────────────────
-const WIP_MODE = true; // set to false to disable
+const WIP_MODE = false; // set to false to disable
 
 if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
   const style = document.createElement('style');
@@ -75,6 +75,58 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 // ─────────────────────────────────────────────────────────────
 (function () {
     'use strict';
+
+    /* ========================================
+       MEDIA PREVIEW — auto-swap img→video by extension,
+       show/hide default vs hover content
+       ======================================== */
+
+    var videoExts = /\.(mp4|webm|ogg|mov)$/i;
+
+    function imgToVideo(img) {
+        var video = document.createElement('video');
+        video.src = img.src;
+        video.className = img.className;
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.preload = 'metadata';
+        video.setAttribute('loading', 'lazy');
+        img.parentNode.replaceChild(video, img);
+        return video;
+    }
+
+    // Swap any img with a video src
+    document.querySelectorAll('.piece img, .project img').forEach(function (img) {
+        if (!videoExts.test(img.getAttribute('src'))) return;
+        var isHover = img.classList.contains('preview-hover');
+        var video = imgToVideo(img);
+        // Default (non-hover) videos autoplay; hover videos wait
+        if (!isHover) {
+            video.autoplay = true;
+        }
+    });
+
+    // Hover preview: play hover media on enter, pause on leave
+    document.querySelectorAll('.piece, .project').forEach(function (card) {
+        var hoverEl = card.querySelector('.preview-hover');
+        if (!hoverEl) return;
+
+        card.addEventListener('mouseenter', function () {
+            hoverEl.classList.add('is-hover-active');
+            if (hoverEl.tagName === 'VIDEO') {
+                hoverEl.currentTime = 0;
+                hoverEl.play();
+            }
+        });
+
+        card.addEventListener('mouseleave', function () {
+            hoverEl.classList.remove('is-hover-active');
+            if (hoverEl.tagName === 'VIDEO') {
+                hoverEl.pause();
+            }
+        });
+    });
 
     /* ========================================
        PAGE INTRO ANIMATION

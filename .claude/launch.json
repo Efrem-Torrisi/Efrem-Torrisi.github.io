@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "portfolio",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8080", "--directory", "C:\\Users\\Efrem\\Documents\\GitHub\\Efrem-Torrisi.github.io"],
+      "port": 8080
+    }
+  ]
+}

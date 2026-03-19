@@ -3,7 +3,7 @@
  * Efrem Torrisi | Technical Artist
  */
 // ── Work In Progress Gate ─────────────────────────────────────
-const WIP_MODE = false; // set to false to disable
+const WIP_MODE = true; // set to false to disable
 
 if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
   const style = document.createElement('style');
@@ -69,6 +69,21 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
       }
     } else {
       progress = 0;
+    }
+  });
+
+  // Mobile unlock: tap the gate 5 times within 3 seconds
+  let tapCount = 0;
+  let tapTimer = null;
+  gate.addEventListener('click', function() {
+    tapCount++;
+    if (tapCount === 1) {
+      tapTimer = setTimeout(function() { tapCount = 0; }, 3000);
+    }
+    if (tapCount >= 5) {
+      clearTimeout(tapTimer);
+      sessionStorage.setItem('wip_unlocked', 'true');
+      location.reload();
     }
   });
 }

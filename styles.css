@@ -176,16 +176,25 @@ body.is-intro .hero-content .hero-description { animation-delay: 0.6s; }
 body.is-intro .hero-content .btn            { animation-delay: 0.8s; }
 
 /* Section title + cards: override data-reveal during intro */
-body.is-intro .section-title[data-reveal],
+body.is-intro .pieces-section .section-title[data-reveal],
 body.is-intro .piece[data-reveal] {
     transition: none !important;
     animation: introFadeUp 0.9s cubic-bezier(0.23, 1, 0.32, 1) both;
 }
-body.is-intro .section-title[data-reveal]       { animation-delay: 1.0s; }
+body.is-intro .pieces-section .section-title[data-reveal] { animation-delay: 1.0s; }
 body.is-intro .piece[data-reveal]:nth-child(1)  { animation-delay: 1.2s; }
 body.is-intro .piece[data-reveal]:nth-child(2)  { animation-delay: 1.3s; }
 body.is-intro .piece[data-reveal]:nth-child(3)  { animation-delay: 1.4s; }
 body.is-intro .piece[data-reveal]:nth-child(4)  { animation-delay: 1.5s; }
+
+/* Group projects section: title then carousel */
+body.is-intro .projects-section .section-title[data-reveal],
+body.is-intro .projects-carousel[data-reveal] {
+    transition: none !important;
+    animation: introFadeUp 0.9s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+body.is-intro .projects-section .section-title[data-reveal] { animation-delay: 1.7s; }
+body.is-intro .projects-carousel[data-reveal]                { animation-delay: 1.9s; }
 
 /* ============================================
    HERO SECTION
@@ -332,13 +341,17 @@ body.is-intro .piece[data-reveal]:nth-child(4)  { animation-delay: 1.5s; }
     top: 0;
     left: 0;
     opacity: 0;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.6s ease;
     z-index: 0;
 }
 
-.piece .preview-hover.is-hover-active,
+.piece .preview-hover.is-hover-active {
+    opacity: 1;
+}
+
 .project .preview-hover.is-hover-active {
     opacity: 1;
+    transition: opacity 0.8s ease 0.3s;
 }
 
 /* Title overlay on piece cards */
@@ -406,7 +419,6 @@ body.is-intro .piece[data-reveal]:nth-child(4)  { animation-delay: 1.5s; }
 /* Icons on project cards */
 .project .card-icons {
     border-radius: 0 0 var(--card-radius) var(--card-radius);
-    padding: 0.75rem 1.25rem;
 }
 
 /* ============================================
@@ -430,29 +442,37 @@ section h2 {
     padding: 0 0;
 }
 
-.projects-grid {
-    display: flex;
-    flex-direction: column;
+/* Horizontal accordion */
+.projects-carousel {
+    position: relative;
     margin: 0 5%;
-    gap: clamp(0.75rem, 1.5vw, 1.25rem);
+}
+
+.carousel-track {
+    display: flex;
+    height: clamp(300px, 45vw, 550px);
+    gap: 4px;
+}
+
+.carousel-nav {
+    display: none;
 }
 
 .project {
     position: relative;
-    width: 100%;
+    flex: 1 1 0;
+    min-width: 0;
     cursor: pointer;
     overflow: hidden;
     border-radius: var(--card-radius);
-    transition: transform 0.3s ease, filter 0.3s ease;
+    transition: flex 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                filter 0.5s ease;
+    filter: brightness(0.55) grayscale(20%);
 }
 
-.project:hover {
-    transform: scale(1.01);
-    z-index: 2;
-}
-
-.projects-grid:has(.project:hover) .project:not(:hover) {
-    filter: brightness(0.6);
+.project.is-focused {
+    flex: 6 1 0;
+    filter: brightness(1) grayscale(0%);
 }
 
 .project > img,
@@ -462,14 +482,13 @@ section h2 {
     object-fit: cover;
     display: block;
     border-radius: var(--card-radius);
-    aspect-ratio: 16 / 5;
 }
 
 .project .preview-hover {
     border-radius: var(--card-radius);
 }
 
-/* Title overlay on project cards */
+/* Title overlay — visible only when focused */
 .project-overlay {
     position: absolute;
     bottom: 0;
@@ -478,12 +497,12 @@ section h2 {
     padding: 2rem 2rem 1.5rem;
     background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.4s ease 0.15s;
     border-radius: 0 0 var(--card-radius) var(--card-radius);
     pointer-events: none;
 }
 
-.project:hover .project-overlay {
+.project.is-focused .project-overlay {
     opacity: 1;
 }
 
@@ -636,9 +655,8 @@ section h2 {
 
 /* Social icon buttons */
 .social-icons {
-    justify-self: center;
-    margin-right: 3rem;
     display: flex;
+    justify-content: center;
     gap: 1.5rem;
     margin-top: 3rem;
 }
@@ -802,7 +820,32 @@ section h2 {
 }
 
 .project-detail-header {
-    padding: 3rem 3rem 2rem;
+    padding: 1.5rem 3rem;
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background-color: var(--color-modal-bg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.project-header-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.project-header-image {
+    flex: 0 0 auto;
+    max-width: 280px;
+}
+
+.project-header-image img {
+    width: 100%;
+    border-radius: var(--card-radius-sm);
+    display: block;
+    object-fit: scale-down;
 }
 
 .project-detail-title {
@@ -816,7 +859,7 @@ section h2 {
 .project-detail-subtitle {
     font-size: clamp(0.95rem, 1.5vw, 1.1rem);
     color: var(--color-text-muted);
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.75rem;
 }
 
 .project-detail-meta {
@@ -834,17 +877,18 @@ section h2 {
     color: var(--color-text);
 }
 
-/* Hero image in project detail */
-.project-detail-hero {
-    width: 100%;
-    overflow: hidden;
+/* YouTube trailer embed */
+.project-detail-trailer {
+    width: 60%;
+    margin: 0 auto;
+    padding: 4rem 0 0.5rem;
+    aspect-ratio: 16 / 9;
 }
 
-.project-detail-hero img {
+.project-detail-trailer iframe {
     width: 100%;
-    display: block;
-    object-fit: cover;
-    max-height: 450px;
+    height: 100%;
+    border-radius: var(--card-radius-sm);
 }
 
 /* Body sections */
@@ -880,7 +924,8 @@ section h2 {
     gap: 0.75rem;
 }
 
-.project-gallery img {
+.project-gallery img,
+.project-gallery video {
     width: 100%;
     border-radius: 8px;
     display: block;
@@ -890,7 +935,8 @@ section h2 {
     transition: border-color 0.3s ease;
 }
 
-.project-gallery img:hover {
+.project-gallery img:hover,
+.project-gallery video:hover {
     border-color: rgba(235, 235, 245, 0.3);
 }
 
@@ -918,6 +964,50 @@ section h2 {
     height: 18px;
     border-radius: 3px;
     flex-shrink: 0;
+}
+
+/* Project external links (repo, itch.io, etc.) */
+.project-detail-links-section {
+    text-align: center;
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+}
+
+.project-detail-links-section h2 {
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.project-detail-links {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.project-detail-links a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.project-detail-links a:hover {
+    color: var(--color-text);
+    transform: scale(1.15);
+}
+
+.project-detail-links img {
+    width: 32px;
+    height: 32px;
+    filter: brightness(0.5);
+    transition: filter 0.3s ease;
+}
+
+.project-detail-links a:hover img {
+    filter: brightness(1);
 }
 
 /* Links inside project detail */
@@ -959,8 +1049,7 @@ section h2 {
 }
 
 /* Cards get reveal via JS — staggered delays */
-.piece[data-reveal],
-.project[data-reveal] {
+.piece[data-reveal] {
     transition: opacity 0.6s ease, transform 0.6s ease, filter 0.7s ease-in-out;
 }
 
@@ -995,7 +1084,16 @@ section h2 {
     }
 
     .project-detail-header {
-        padding: 2rem 1.5rem 1.5rem;
+        padding: 1rem 1.5rem;
+        flex-direction: column;
+    }
+
+    .project-header-image {
+        max-width: 200px;
+    }
+
+    .project-detail-trailer {
+        padding: 0 1.5rem;
     }
 
     .project-detail-body {
@@ -1023,16 +1121,16 @@ section h2 {
         gap: 1rem;
     }
 
-    .projects-grid {
-        margin: 0 2%;
+    .projects-carousel {
+        margin: 0 3%;
+    }
+
+    .carousel-track {
+        height: clamp(250px, 40vw, 400px);
     }
 
     .pieces-section .section-title {
         margin-left: 3%;
-    }
-
-    .projects-grid {
-        margin: 0 3%;
     }
 
     .projects-section .section-title {
@@ -1055,8 +1153,8 @@ section h2 {
         font-size: 2rem;
     }
 
-    .project-detail-hero img {
-        max-height: 250px;
+    .project-detail-trailer {
+        padding: 0 1rem;
     }
 
     .project-gallery {
@@ -1067,7 +1165,11 @@ section h2 {
         margin: 0 2%;
     }
 
-    .projects-grid {
+    .projects-carousel {
         margin: 0 2%;
+    }
+
+    .carousel-track {
+        height: clamp(200px, 50vw, 300px);
     }
 }

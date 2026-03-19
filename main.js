@@ -107,8 +107,8 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         }
     });
 
-    // Hover preview: play hover media on enter, pause on leave
-    document.querySelectorAll('.piece, .project').forEach(function (card) {
+    // Hover preview: play hover media on enter, pause on leave (pieces only; projects use carousel focus)
+    document.querySelectorAll('.piece').forEach(function (card) {
         var hoverEl = card.querySelector('.preview-hover');
         if (!hoverEl) return;
 
@@ -139,7 +139,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
     // letting the scroll-reveal system take over.
     setTimeout(function () {
         document.body.classList.remove('is-intro');
-    }, 2600);
+    }, 3200);
 
     /* ========================================
        MODAL SYSTEM
@@ -167,9 +167,20 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         modalOverlay._previousFocus = document.activeElement;
         modalClose.focus();
 
+        function swapModalVideos() {
+            modalContent.querySelectorAll('.project-gallery img').forEach(function (img) {
+                if (!videoExts.test(img.getAttribute('src'))) return;
+                var video = imgToVideo(img);
+                video.autoplay = true;
+                video.muted = true;
+                video.loop = true;
+            });
+        }
+
         if (contentCache[projectSlug]) {
             modalContent.innerHTML = contentCache[projectSlug];
             modalContainer().scrollTop = 0;
+            swapModalVideos();
         } else {
             fetch('projects/' + projectSlug + '.html')
                 .then(function (res) {
@@ -181,6 +192,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                     if (modalOverlay.classList.contains('is-active')) {
                         modalContent.innerHTML = html;
                         modalContainer().scrollTop = 0;
+                        swapModalVideos();
                     }
                 })
                 .catch(function () {
@@ -300,17 +312,17 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
     (function initScrollReveal() {
         // Also apply data-reveal to each card with staggered delays
         var pieces = document.querySelectorAll('.piece');
-        var projects = document.querySelectorAll('.project');
 
         pieces.forEach(function (el, i) {
             el.setAttribute('data-reveal', '');
             el.style.transitionDelay = (i * 0.1) + 's';
         });
 
-        projects.forEach(function (el, i) {
-            el.setAttribute('data-reveal', '');
-            el.style.transitionDelay = (i * 0.06) + 's';
-        });
+        // Reveal the carousel as a whole unit
+        var carousel = document.querySelector('.projects-carousel');
+        if (carousel) {
+            carousel.setAttribute('data-reveal', '');
+        }
 
         var revealElements = document.querySelectorAll('[data-reveal]');
 
@@ -342,6 +354,73 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         revealElements.forEach(function (el) {
             observer.observe(el);
         });
+    })();
+
+
+    /* ========================================
+       PROJECTS ACCORDION
+       ======================================== */
+
+    (function initAccordion() {
+        var cards = document.querySelectorAll('.carousel-track .project');
+        if (!cards.length) return;
+
+        function setFocused(focusedCard) {
+            cards.forEach(function (card) {
+                var wasFocused = card.classList.contains('is-focused');
+                var isFocused = card === focusedCard;
+
+                if (isFocused) {
+                    card.classList.add('is-focused');
+                } else {
+                    card.classList.remove('is-focused');
+                }
+
+                // Handle focus preview video
+                var hoverEl = card.querySelector('.preview-hover');
+                if (hoverEl) {
+                    if (isFocused && !wasFocused) {
+                        hoverEl.classList.add('is-hover-active');
+                        if (hoverEl.tagName === 'VIDEO') {
+                            hoverEl.currentTime = 0;
+                            hoverEl.play();
+                        }
+                    } else if (!isFocused && wasFocused) {
+                        hoverEl.classList.remove('is-hover-active');
+                        if (hoverEl.tagName === 'VIDEO') {
+                            hoverEl.pause();
+                        }
+                    }
+                }
+            });
+        }
+
+        // Hover to expand
+        cards.forEach(function (card) {
+            card.addEventListener('mouseenter', function () {
+                setFocused(card);
+            });
+        });
+
+        // Reset to first card when mouse leaves the whole track
+        var track = document.querySelector('.carousel-track');
+        track.addEventListener('mouseleave', function () {
+            setFocused(cards[0]);
+        });
+
+        // Only open modal if card is focused
+        cards.forEach(function (card) {
+            card.addEventListener('click', function (e) {
+                if (!card.classList.contains('is-focused')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setFocused(card);
+                }
+            });
+        });
+
+        // Initialize first card as focused
+        setFocused(cards[0]);
     })();
 
 

@@ -15,6 +15,7 @@
             <a href="#" class="nav-logo">Efrem Torrisi</a>
             <ul class="nav-links">
                 <li><a href="#home">Home</a></li>
+                <li><a href="#projects">Projects</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
@@ -28,13 +29,14 @@
                 <h1>Hello, I'm Efrem</h1>
                 <p class="hero-subtitle">Technical Artist</p>
                 <p class="hero-description">Specializing in real-time graphics, procedural content generation, and visual effects.</p>
-                <a href="#contact" class="btn">Get in Touch</a>
+                <a href="#about" class="btn">Get in Touch</a>
             </div>
         </section>
 
-        <!-- Featured Solo Projects -->
+        <!-- Individual Projects -->
+        <div id="projects" style="height:0; margin-bottom:.5rem;"></div>
         <section class="pieces-section">
-            <h2 class="section-title" data-reveal>Featured Work</h2>
+            <h2 class="section-title" data-reveal>Individual Projects</h2>
             <div class="pieces-grid">
 
                 <!-- Card 1: AutoLOD -->
@@ -120,184 +122,205 @@
 
         <!-- Group Game Projects -->
         <section class="projects-section">
-            <h2 class="section-title" data-reveal>Group Projects</h2>
-            <div class="projects-grid">
+            <h2 class="section-title" data-reveal>Game Projects</h2>
+            <div class="projects-carousel">
+                <div class="carousel-track">
 
-                <!-- Project 1 -->
-                <article class="project"
-                         data-project="captain-hornswaggle"
-                         data-title="The Misadventures of Captain Hornswaggle"
-                         role="button"
-                         tabindex="0"
-                         aria-label="View Captain Hornswaggle project details">
-                    <img src="content/project3.png" alt="Captain Hornswaggle preview" loading="lazy" />
-                    <div class="card-icons">
-                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
-                        <img src="content/icons/blueprints.svg" alt="Blueprints" title="Blueprints" />
-                        <img src="content/icons/materials.svg" alt="Materials" title="Material Editor" />
-                    </div>
-                    <div class="project-overlay">
-                        <h3 class="project-title">Captain Hornswaggle</h3>
-                        <span class="project-role">Technical Artist</span>
-                    </div>
-                </article>
+                    <!-- Project 1 (captain-hornswaggle)-->
+                    <article class="project"
+                             data-project="captain-hornswaggle"
+                             data-title="The Misadventures of Captain Hornswaggle"
+                             role="button"
+                             tabindex="0"
+                             aria-label="View Captain Hornswaggle project details">
+                        <img src="content/GameProjects/Hornswaggle_Thumbnail_Default.png" alt="Captain Hornswaggle preview" loading="lazy" />
+                        <img src="content/GameProjects/Hornswaggle_Thumbnail_Default.png" class="preview-hover" loading="lazy" />
+                        <div class="card-icons">
+                            <img src="content/icons/tgalogowhite.svg" alt="Custom DX11 Engine" title="Custom DX11 Engine" />
+                            <img src="content/icons/hlsl.svg" alt="Shaders" title="Shaders" />
+                            <img src="content/icons/blender.svg" alt="Rigs and Animations" title="Rigs and Animations" />
+                        </div>
+                        <div class="project-overlay">
+                            <h3 class="project-title">Captain Hornswaggle</h3>
+                            <span class="project-role">Technical Artist</span>
+                        </div>
+                    </article>
 
-                <!-- Project 2 -->
-                <article class="project"
-                         data-project="revolt-gear-by-gear"
-                         data-title="Revolt: Gear By Gear"
-                         role="button"
-                         tabindex="0"
-                         aria-label="View Revolt: Gear By Gear project details">
-                    <img src="content/project3.png" alt="Revolt: Gear By Gear preview" loading="lazy" />
-                    <div class="card-icons">
-                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
-                        <img src="content/icons/blueprints.svg" alt="Blueprints" title="Blueprints" />
-                        <img src="content/icons/materials.svg" alt="Materials" title="Material Editor" />
-                    </div>
-                    <div class="project-overlay">
-                        <h3 class="project-title">Revolt: Gear By Gear</h3>
-                        <span class="project-role">Technical Artist</span>
-                    </div>
-                </article>
+                    <!-- Project 2 (revolt-gear-by-gear)-->
+                    <article class="project"
+                             data-project="revolt-gear-by-gear"
+                             data-title="Revolt: Gear By Gear"
+                             role="button"
+                             tabindex="0"
+                             aria-label="View Revolt: Gear By Gear project details">
+                        <img src="content/GameProjects/Revolt_Thumbnail_Default.jpg" alt="Revolt: Gear By Gear preview" loading="lazy" />
+                        <img src="content/GameProjects/Revolt_Thumbnail_Default.jpg" class="preview-hover" loading="lazy" />
+                        <div class="card-icons">
+                            <img src="content/icons/Unity.svg" alt="Unity - Shaders and VFX" title="Unity - Shaders and VFX" />
+                            <img src="content/icons/blender.svg" alt="Rigs and Animations" title="Rigs and Animations" />
+                        </div>
+                        <div class="project-overlay">
+                            <h3 class="project-title">Revolt: Gear By Gear</h3>
+                            <span class="project-role">Technical Artist</span>
+                        </div>
+                    </article>
 
-                <!-- Project 3 -->
-                <article class="project"
-                         data-project="last-unit"
-                         data-title="Last Unit"
-                         role="button"
-                         tabindex="0"
-                         aria-label="View Last Unit project details">
-                    <img src="content/project3.png" alt="Last Unit preview" loading="lazy" />
-                    <div class="card-icons">
-                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
-                        <img src="content/icons/blueprints.svg" alt="Blueprints" title="Blueprints" />
-                        <img src="content/icons/materials.svg" alt="Materials" title="Material Editor" />
-                    </div>
-                    <div class="project-overlay">
-                        <h3 class="project-title">Last Unit</h3>
-                        <span class="project-role">Technical Artist</span>
-                    </div>
-                </article>
+                    <!-- Project 3 (last-unit) -->
+                    <article class="project"
+                             data-project="last-unit"
+                             data-title="Last Unit"
+                             role="button"
+                             tabindex="0"
+                             aria-label="View Last Unit project details">
+                        <img src="content/GameProjects/LastUnit_Thumbnail_Default.png" alt="Last Unit preview" loading="lazy" />
+                        <img src="content/GameProjects/LastUnit_Thumbnail_Default.png" class="preview-hover" loading="lazy" />
+                        <div class="card-icons">
+                            <img src="content/icons/Unity.svg" alt="Unity" title="Unity" />
+                            <img src="content/icons/blender.svg" alt="3D Modeling" title="3D Modeling" />
+                            <img src="content/icons/substanceDesigner.svg" alt="Materials" title="Materials" />
+                        </div>
+                        <div class="project-overlay">
+                            <h3 class="project-title">Last Unit</h3>
+                            <span class="project-role">Technical Artist</span>
+                        </div>
+                    </article>
 
-                <!-- Project 4 -->
-                <article class="project"
-                         data-project="spite-depth-of-darkness"
-                         data-title="Spite: The Depth of Darkness"
-                         role="button"
-                         tabindex="0"
-                         aria-label="View Spite project details">
-                    <img src="content/project3.png" alt="Spite: The Depth of Darkness preview" loading="lazy" />
-                    <div class="card-icons">
-                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
-                        <img src="content/icons/blueprints.svg" alt="Blueprints" title="Blueprints" />
-                        <img src="content/icons/niagara.svg" alt="Niagara" title="Niagara VFX" />
-                        <img src="content/icons/materials.svg" alt="Materials" title="Material Editor" />
-                    </div>
-                    <div class="project-overlay">
-                        <h3 class="project-title">Spite: The Depth of Darkness</h3>
-                        <span class="project-role">Technical Artist</span>
-                    </div>
-                </article>
+                    <!-- Project 4 (spite-depth-of-darkness) -->
+                    <article class="project"
+                             data-project="spite-depth-of-darkness"
+                             data-title="Spite: The Depth of Darkness"
+                             role="button"
+                             tabindex="0"
+                             aria-label="View Spite project details">
+                        <img src="content/GameProjects/Hornswaggle_Thumbnail_Default.png" alt="Spite: The Depth of Darkness preview" loading="lazy" />
+                        <img src="content/GameProjects/Hornswaggle_Thumbnail_Default.png" class="preview-hover" loading="lazy" />
+                        <div class="card-icons">
+                            <img src="content/icons/tgalogowhite.svg" alt="Custom DX11 Engine" title="Custom DX11 Engine" />
+                            <img src="content/icons/hlsl.svg" alt="Shaders and VFX" title="Shaders and VFX" />
+                            <img src="content/icons/blender.svg" alt="Rigs and Animations" title="Rigs and Animations" />
+                            <img src="content/icons/illugen.svg" alt="Textures and VFX" title="Textures and VFX" />
+                            <img src="content/icons/houdini_badge_flat.svg" alt="Destruction Simulations" title="Destruction Simulations" />
+                        </div>
+                        <div class="project-overlay">
+                            <h3 class="project-title">Spite: The Depth of Darkness</h3>
+                            <span class="project-role">Technical Artist</span>
+                        </div>
+                    </article>
 
-                <!-- Project 5 -->
-                <article class="project"
-                         data-project="cog-of-war"
-                         data-title="Cog of War"
-                         role="button"
-                         tabindex="0"
-                         aria-label="View Cog of War project details">
-                    <img src="content/project3.png" alt="Cog of War preview" loading="lazy" />
-                    <div class="card-icons">
-                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
-                        <img src="content/icons/blueprints.svg" alt="Blueprints" title="Blueprints" />
-                        <img src="content/icons/materials.svg" alt="Materials" title="Material Editor" />
-                    </div>
-                    <div class="project-overlay">
-                        <h3 class="project-title">Cog of War</h3>
-                        <span class="project-role">Technical Artist</span>
-                    </div>
-                </article>
+                    <!-- Project 5 (Bot Ops)-->
+                    <article class="project"
+                             data-project="cog-of-war"
+                             data-title="Cog of War"
+                             role="button"
+                             tabindex="0"
+                             aria-label="View Cog of War project details">
+                        <img src="content/GameProjects/Hornswaggle_Thumbnail_Default.png" alt="Cog of War preview" loading="lazy" />
+                        <img src="content/GameProjects/Hornswaggle_Thumbnail_Default.png" class="preview-hover" loading="lazy" />
+                        <div class="card-icons">
+                            <img src="content/icons/tgalogowhite.svg" alt="Custom DX11 Engine" title="Custom DX11 Engine" />
+                            <img src="content/icons/hlsl.svg" alt="Shaders and VFX" title="Shaders and VFX" />
+                            <img src="content/icons/blender.svg" alt="Rigs and Animations" title="Rigs and Animations" />
+                            <img src="content/icons/houdini_badge_flat.svg" alt="Mesh Fracturing" title="Mesh Fracturing" />
+                        </div>
+                        <div class="project-overlay">
+                            <h3 class="project-title">Cog of War</h3>
+                            <span class="project-role">Technical Artist</span>
+                        </div>
+                    </article>
 
-                <!-- Project 6 (Placeholder) -->
-                <article class="project"
-                         data-project="placeholder-project"
-                         data-title="Placeholder"
-                         role="button"
-                         tabindex="0"
-                         aria-label="View project details">
-                    <img src="content/project3.png" alt="Project preview" loading="lazy" />
-                    <div class="card-icons">
-                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
-                    </div>
-                    <div class="project-overlay">
-                        <h3 class="project-title">Placeholder</h3>
-                        <span class="project-role">Technical Artist</span>
-                    </div>
-                </article>
+                    <!-- Project 6 (Placeholder) -->
+                    <article class="project"
+                             data-project="placeholder-project"
+                             data-title="Placeholder"
+                             role="button"
+                             tabindex="0"
+                             aria-label="View project details">
+                        <img src="content/GameProjects/Hornswaggle_Thumbnail_Default.png" alt="Project preview" loading="lazy" />
+                        <img src="content/GameProjects/Hornswaggle_Thumbnail_Default.png" class="preview-hover" loading="lazy" />
+                        <div class="card-icons">
+                            <img src="content/icons/tgalogowhite.svg" alt="Custom DX11 Engine" title="Custom DX11 Engine" />
+                            <img src="content/icons/hlsl.svg" alt="Shaders and VFX" title="Shaders and VFX" />
+                            <img src="content/icons/blender.svg" alt="Rigs and Animations" title="Rigs and Animations" />
+                            <img src="content/icons/houdini_badge_flat.svg" alt="Mesh Fracturing" title="Mesh Fracturing" />
+                        </div>
+                        <div class="project-overlay">
+                            <h3 class="project-title">SP7</h3>
+                            <span class="project-role">Technical Artist</span>
+                        </div>
+                    </article>
 
-                <!-- Project 7 -->
-                <article class="project"
-                         data-project="shifting-sands"
-                         data-title="Shifting Sands"
-                         role="button"
-                         tabindex="0"
-                         aria-label="View Shifting Sands project details">
-                    <img src="content/project3.png" alt="Shifting Sands preview" loading="lazy" />
-                    <div class="card-icons">
-                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
-                        <img src="content/icons/blueprints.svg" alt="Blueprints" title="Blueprints" />
-                        <img src="content/icons/materials.svg" alt="Materials" title="Material Editor" />
-                    </div>
-                    <div class="project-overlay">
-                        <h3 class="project-title">Shifting Sands</h3>
-                        <span class="project-role">Technical Artist</span>
-                    </div>
-                </article>
+                    <!-- Project 7 (Shifting Sands) -->
+                    <article class="project"
+                             data-project="shifting-sands"
+                             data-title="Shifting Sands"
+                             role="button"
+                             tabindex="0"
+                             aria-label="View Shifting Sands project details">
+                        <img src="content/GameProjects/SS_Thumbnail_Default.jpg" alt="Shifting Sands preview" loading="lazy" />
+                        <img src="content/GameProjects/SS_Thumbnail_Default.jpg" class="preview-hover" loading="lazy" />
+                        <div class="card-icons">
+                            <img src="content/icons/Unity.svg" alt="Unity - Shaders VFX and Lighting" title="Unity - Shaders VFX and Lighting" />
+                            <img src="content/icons/zbrush-svgrepo-com.svg" alt="Sculpting" title="Sculpting" />
+                            <img src="content/icons/maya.svg" alt="3D Modeling" title="3D Modeling" />
+                            <img src="content/icons/substancePainter.svg" alt="Texturing" title="Texturing" />
+                            <img src="content/icons/substanceDesigner.svg" alt="Materials" title="Materials" />
+                            
 
-                <!-- Project 8 -->
-                <article class="project"
-                         data-project="daidala"
-                         data-title="Daidala"
-                         role="button"
-                         tabindex="0"
-                         aria-label="View Daidala project details">
-                    <img src="content/project3.png" alt="Daidala preview" loading="lazy" />
-                    <div class="card-icons">
-                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
-                        <img src="content/icons/blueprints.svg" alt="Blueprints" title="Blueprints" />
-                        <img src="content/icons/materials.svg" alt="Materials" title="Material Editor" />
-                    </div>
-                    <div class="project-overlay">
-                        <h3 class="project-title">Daidala</h3>
-                        <span class="project-role">Technical Artist</span>
-                    </div>
-                </article>
+                        </div>
+                        <div class="project-overlay">
+                            <h3 class="project-title">Shifting Sands</h3>
+                            <span class="project-role">Technical Artist, 3D Artist</span>
+                        </div>
+                    </article>
 
-                <!-- Project 9 -->
-                <article class="project"
-                         data-project="teddys-tale"
-                         data-title="Teddy's Tale"
-                         role="button"
-                         tabindex="0"
-                         aria-label="View Teddy's Tale project details">
-                    <img src="content/project3.png" alt="Teddy's Tale preview" loading="lazy" />
-                    <div class="card-icons">
-                        <img src="content/icons/ue5.svg" alt="UE5" title="Unreal Engine 5" />
-                        <img src="content/icons/blueprints.svg" alt="Blueprints" title="Blueprints" />
-                        <img src="content/icons/materials.svg" alt="Materials" title="Material Editor" />
-                    </div>
-                    <div class="project-overlay">
-                        <h3 class="project-title">Teddy's Tale</h3>
-                        <span class="project-role">Technical Artist</span>
-                    </div>
-                </article>
+                    <!-- Project 8 (Daidala) -->
+                    <article class="project"
+                             data-project="daidala"
+                             data-title="Daidala"
+                             role="button"
+                             tabindex="0"
+                             aria-label="View Daidala project details">
+                        <img src="content/GameProjects/Daidala_Thumbnail_Default.png" alt="Daidala preview" loading="lazy" />
+                        <img src="content/GameProjects/Daidala_Thumbnail_Default.png" class="preview-hover" loading="lazy" />
+                        <div class="card-icons">
+                            <img src="content/icons/Unity.svg" alt="Unity - VFX and Animations" title="Unity - VFX and Animations" />
+                            <img src="content/icons/photoshop.svg" alt="2D Art" title="2D Art" />
+                            
+                        </div>
+                        <div class="project-overlay">
+                            <h3 class="project-title">Daidala</h3>
+                            <span class="project-role">VFX Artist, 2D artist, Game Designer</span>
+                        </div>
+                    </article>
 
+                    <!-- Project 9 (Teddy's Tale)-->
+                    <article class="project"
+                             data-project="teddys-tale"
+                             data-title="Teddy's Tale"
+                             role="button"
+                             tabindex="0"
+                             aria-label="View Teddy's Tale project details">
+                        <img src="content/GameProjects/TT_DefaultThumbnail.jpg" alt="Teddy's Tale preview" loading="lazy" />
+                        <img src="content/GameProjects/TT_DefaultThumbnail.jpg" class="preview-hover" loading="lazy" />
+                        <div class="card-icons">
+                            <img src="content/icons/UE-Icon-2023-White.svg" alt="UE4-Shaders and Lighting" title="Unreal Engine 4" />
+                            <img src="content/icons/substancePainter.svg" alt="Textures" title="Textures" />
+                            <img src="content/icons/substanceDesigner.svg" alt="Materials" title="Materials" />
+                            <img src="content/icons/maya.svg" alt="3D Modeling" title="3D Modeling" />
+                        </div>
+                        <div class="project-overlay">
+                            <h3 class="project-title">Teddy's Tale</h3>
+                            <span class="project-role">Technical Artist</span>
+                        </div>
+                    </article>
+
+                </div>
             </div>
         </section>
 
         <!-- About Section -->
-        <section id="about" class="about">
+        <div id="about" style="scroll-margin-top:0; margin-bottom:-6.5rem; height:0;"></div>
+        <section class="about">
             <div class="about-photo-wrapper" data-reveal>
                 <img src="content/pfp3.jpg" class="about-photo" alt="Efrem Torrisi" />
             </div>

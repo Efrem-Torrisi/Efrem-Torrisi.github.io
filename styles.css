@@ -127,8 +127,23 @@ main {
     color: var(--color-text);
 }
 
+.nav-cv-btn {
+    padding: 0.45rem 1rem;
+    border: 1px solid rgba(235, 235, 245, 0.3);
+    border-radius: 6px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    transition: background 0.25s ease, border-color 0.25s ease, color 0.3s ease;
+    white-space: nowrap;
+}
+
+.nav-cv-btn:hover {
+    background: rgba(235, 235, 245, 0.1);
+    border-color: rgba(235, 235, 245, 0.6);
+}
+
 /* ============================================
-   PAGE INTRO 
+   PAGE INTRO
    ============================================ */
 
 @keyframes introFadeUp {
@@ -454,7 +469,7 @@ section h2 {
     gap: 4px;
 }
 
-.carousel-nav {
+.carousel-dots {
     display: none;
 }
 
@@ -1123,10 +1138,45 @@ section h2 {
 
     .projects-carousel {
         margin: 0 3%;
+        overflow: hidden;
     }
 
     .carousel-track {
-        height: clamp(250px, 40vw, 400px);
+        height: clamp(250px, 55vw, 400px);
+        gap: 0;
+        transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .carousel-track .project {
+        flex: 0 0 100%;
+        min-width: 100%;
+        filter: none;
+    }
+
+    .carousel-track .project .project-overlay {
+        opacity: 1;
+    }
+
+    .carousel-dots {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        padding: 1rem 0 0;
+    }
+
+    .carousel-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+        padding: 0;
+        transition: background 0.3s ease;
+    }
+
+    .carousel-dot.is-active {
+        background: rgba(255, 255, 255, 0.9);
     }
 
     .pieces-section .section-title {
@@ -1147,6 +1197,11 @@ section h2 {
 
     .nav-links {
         gap: 1.5rem;
+    }
+
+    .nav-cv-btn {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.85rem;
     }
 
     .hero h1 {
@@ -1170,6 +1225,6 @@ section h2 {
     }
 
     .carousel-track {
-        height: clamp(200px, 50vw, 300px);
+        height: clamp(200px, 60vw, 300px);
     }
 }

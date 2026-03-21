@@ -3,7 +3,7 @@
  * Efrem Torrisi | Technical Artist
  */
 // ── Work In Progress Gate ─────────────────────────────────────
-const WIP_MODE = true; // set to false to disable
+const WIP_MODE = false; // set to false to disable
 
 if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
   const style = document.createElement('style');
@@ -380,6 +380,15 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         var cards = document.querySelectorAll('.carousel-track .project');
         if (!cards.length) return;
 
+        var track = document.querySelector('.carousel-track');
+        var dotsContainer = document.querySelector('.carousel-dots');
+        var MOBILE_BP = 768;
+        var AUTO_INTERVAL = 4000;
+        var autoTimer = null;
+        var currentIndex = 0;
+
+        /* --- Desktop accordion (unchanged) --- */
+
         function setFocused(focusedCard) {
             cards.forEach(function (card) {
                 var wasFocused = card.classList.contains('is-focused');
@@ -391,7 +400,6 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                     card.classList.remove('is-focused');
                 }
 
-                // Handle focus preview video
                 var hoverEl = card.querySelector('.preview-hover');
                 if (hoverEl) {
                     if (isFocused && !wasFocused) {
@@ -410,23 +418,19 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             });
         }
 
-        // Hover to expand
         cards.forEach(function (card) {
             card.addEventListener('mouseenter', function () {
-                setFocused(card);
+                if (window.innerWidth > MOBILE_BP) setFocused(card);
             });
         });
 
-        // Reset to first card when mouse leaves the whole track
-        var track = document.querySelector('.carousel-track');
         track.addEventListener('mouseleave', function () {
-            setFocused(cards[0]);
+            if (window.innerWidth > MOBILE_BP) setFocused(cards[0]);
         });
 
-        // Only open modal if card is focused
         cards.forEach(function (card) {
             card.addEventListener('click', function (e) {
-                if (!card.classList.contains('is-focused')) {
+                if (window.innerWidth > MOBILE_BP && !card.classList.contains('is-focused')) {
                     e.preventDefault();
                     e.stopPropagation();
                     setFocused(card);
@@ -434,8 +438,102 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             });
         });
 
-        // Initialize first card as focused
         setFocused(cards[0]);
+
+        /* --- Mobile swipe carousel --- */
+
+        // Build dots
+        cards.forEach(function (_, i) {
+            var dot = document.createElement('button');
+            dot.className = 'carousel-dot' + (i === 0 ? ' is-active' : '');
+            dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+            dot.addEventListener('click', function () {
+                goToSlide(i);
+                resetAutoPlay();
+            });
+            dotsContainer.appendChild(dot);
+        });
+
+        var dots = dotsContainer.querySelectorAll('.carousel-dot');
+
+        function goToSlide(index) {
+            currentIndex = Math.max(0, Math.min(index, cards.length - 1));
+            track.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
+            dots.forEach(function (d, i) {
+                d.classList.toggle('is-active', i === currentIndex);
+            });
+        }
+
+        function nextSlide() {
+            goToSlide((currentIndex + 1) % cards.length);
+        }
+
+        function startAutoPlay() {
+            stopAutoPlay();
+            autoTimer = setInterval(nextSlide, AUTO_INTERVAL);
+        }
+
+        function stopAutoPlay() {
+            if (autoTimer) {
+                clearInterval(autoTimer);
+                autoTimer = null;
+            }
+        }
+
+        function resetAutoPlay() {
+            if (window.innerWidth <= MOBILE_BP) {
+                startAutoPlay();
+            }
+        }
+
+        // Touch swipe
+        var touchStartX = 0;
+        var touchDeltaX = 0;
+        var isSwiping = false;
+
+        track.addEventListener('touchstart', function (e) {
+            if (window.innerWidth > MOBILE_BP) return;
+            touchStartX = e.touches[0].clientX;
+            touchDeltaX = 0;
+            isSwiping = true;
+            track.style.transition = 'none';
+        }, { passive: true });
+
+        track.addEventListener('touchmove', function (e) {
+            if (!isSwiping || window.innerWidth > MOBILE_BP) return;
+            touchDeltaX = e.touches[0].clientX - touchStartX;
+            var offset = -(currentIndex * 100) + (touchDeltaX / track.offsetWidth) * 100;
+            track.style.transform = 'translateX(' + offset + '%)';
+        }, { passive: true });
+
+        track.addEventListener('touchend', function () {
+            if (!isSwiping || window.innerWidth > MOBILE_BP) return;
+            isSwiping = false;
+            track.style.transition = '';
+            var threshold = track.offsetWidth * 0.2;
+            if (touchDeltaX < -threshold && currentIndex < cards.length - 1) {
+                goToSlide(currentIndex + 1);
+            } else if (touchDeltaX > threshold && currentIndex > 0) {
+                goToSlide(currentIndex - 1);
+            } else {
+                goToSlide(currentIndex);
+            }
+            resetAutoPlay();
+        });
+
+        // Start auto-play on mobile
+        function handleResize() {
+            if (window.innerWidth <= MOBILE_BP) {
+                track.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
+                startAutoPlay();
+            } else {
+                track.style.transform = '';
+                stopAutoPlay();
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize();
     })();
 
 

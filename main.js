@@ -605,15 +605,12 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             if (!isSwiping || window.innerWidth > MOBILE_BP) return;
             isSwiping = false;
 
-            var threshold = track.offsetWidth * 0.15;
-            var targetIndex;
-            if (touchDeltaX < -threshold) {
-                targetIndex = (currentIndex + 1) % cards.length;
-            } else if (touchDeltaX > threshold) {
-                targetIndex = (currentIndex - 1 + cards.length) % cards.length;
-            } else {
-                targetIndex = currentIndex;
-            }
+            // Determine which card is closest to center based on drag progress
+            var dragRange = track.offsetWidth * 0.45;
+            var progress = -touchDeltaX / dragRange;
+            // Round progress to nearest integer to find the target offset
+            var offset = Math.round(progress);
+            var targetIndex = ((currentIndex + offset) % cards.length + cards.length) % cards.length;
 
             // Re-enable transitions, then snap to target
             cards.forEach(function (card) {

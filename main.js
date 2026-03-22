@@ -512,6 +512,11 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         function lerp(a, b, t) { return a + (b - a) * t; }
 
         // Compute visual props for a card at a given position offset from center
+        // Uses eased curves so the transition through the midpoint feels smooth
+        function easeInOut(t) {
+            return t * t * (3 - 2 * t); // smoothstep
+        }
+
         function getCardProps(pos) {
             var absPos = Math.abs(pos);
             if (absPos > 1.5) {
@@ -524,12 +529,14 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                 };
             }
             var t = Math.min(absPos, 1);
+            var eased = easeInOut(t);
             return {
                 tx: pos * 28,
-                sc: lerp(1, 0.82, t),
-                br: lerp(1, 0.35, t),
+                sc: lerp(1, 0.82, eased),
+                br: lerp(1, 0.35, eased),
                 op: absPos > 1 ? lerp(1, 0, (absPos - 1) * 2) : 1,
-                zi: absPos < 0.5 ? 3 : (absPos < 1 ? 2 : 1)
+                // Very late z-index swap — only the card nearly at center gets z3
+                zi: absPos < 0.15 ? 3 : (absPos < 1 ? 2 : 1)
             };
         }
 

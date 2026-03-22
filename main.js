@@ -3,7 +3,7 @@
  * Efrem Torrisi | Technical Artist
  */
 // ── Work In Progress Gate ─────────────────────────────────────
-const WIP_MODE = false; // set to false to disable
+const WIP_MODE = true; // set to false to disable
 
 if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
   const style = document.createElement('style');

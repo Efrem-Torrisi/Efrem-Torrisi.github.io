@@ -501,12 +501,67 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             }
         }
 
-        // Touch swipe
+        // Touch swipe with live drag
         var touchStartX = 0;
         var touchStartY = 0;
         var touchDeltaX = 0;
         var isSwiping = false;
-        var swipeLocked = false; // true once we know direction
+        var swipeLocked = false;
+
+        // Interpolation helpers
+        function lerp(a, b, t) { return a + (b - a) * t; }
+
+        function applyDragTransforms(progress) {
+            // progress: -1 = fully swiped left (go next), +1 = fully swiped right (go prev)
+            var p = Math.max(-1, Math.min(1, progress));
+            var totalCards = cards.length;
+
+            cards.forEach(function (card, i) {
+                var rel = i - currentIndex;
+                // Wrap around
+                if (rel > totalCards / 2) rel -= totalCards;
+                if (rel < -totalCards / 2) rel += totalCards;
+
+                // Each card's effective position shifts by progress
+                var pos = rel - p;
+
+                var tx, sc, br, op;
+
+                if (Math.abs(pos) > 1.5) {
+                    // Far off — hide
+                    card.style.transform = 'translateX(' + (pos > 0 ? '100%' : '-100%') + ') scale(0.8)';
+                    card.style.filter = 'brightness(0.3)';
+                    card.style.opacity = '0';
+                    card.style.zIndex = '0';
+                } else {
+                    // Interpolate between positions
+                    // Center: tx=0%, sc=1, br=1
+                    // Side:   tx=±28%, sc=0.82, br=0.35
+                    var absPos = Math.abs(pos);
+                    var t = Math.min(absPos, 1);
+
+                    tx = pos * 28;
+                    sc = lerp(1, 0.82, t);
+                    br = lerp(1, 0.35, t);
+                    op = absPos > 1 ? lerp(1, 0, absPos - 1) : 1;
+
+                    card.style.transform = 'translateX(' + tx + '%) scale(' + sc.toFixed(3) + ')';
+                    card.style.filter = 'brightness(' + br.toFixed(2) + ')';
+                    card.style.opacity = op.toFixed(2);
+                    card.style.zIndex = absPos < 0.5 ? '3' : '1';
+                }
+            });
+        }
+
+        function clearInlineStyles() {
+            cards.forEach(function (card) {
+                card.style.transform = '';
+                card.style.filter = '';
+                card.style.opacity = '';
+                card.style.zIndex = '';
+                card.style.transition = '';
+            });
+        }
 
         track.addEventListener('touchstart', function (e) {
             if (window.innerWidth > MOBILE_BP) return;
@@ -515,6 +570,10 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             touchDeltaX = 0;
             isSwiping = true;
             swipeLocked = false;
+            // Kill transitions for instant response
+            cards.forEach(function (card) {
+                card.style.transition = 'none';
+            });
         }, { passive: true });
 
         track.addEventListener('touchmove', function (e) {
@@ -523,15 +582,11 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             var dy = e.touches[0].clientY - touchStartY;
 
             if (!swipeLocked) {
-                // Lock direction once we move enough
                 if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
                     swipeLocked = true;
-                    if (Math.abs(dx) > Math.abs(dy)) {
-                        // Horizontal swipe — prevent page scroll
-                        isSwiping = true;
-                    } else {
-                        // Vertical scroll — bail out
+                    if (Math.abs(dx) <= Math.abs(dy)) {
                         isSwiping = false;
+                        clearInlineStyles();
                         return;
                     }
                 }
@@ -540,16 +595,24 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
             e.preventDefault();
             touchDeltaX = dx;
+            // Map drag distance to progress (-1 to 1 over ~half the track width)
+            var dragRange = track.offsetWidth * 0.45;
+            var progress = touchDeltaX / dragRange;
+            applyDragTransforms(progress);
         }, { passive: false });
 
         track.addEventListener('touchend', function () {
             if (!isSwiping || window.innerWidth > MOBILE_BP) return;
             isSwiping = false;
-            var threshold = 50;
+            // Re-enable transitions for the snap
+            clearInlineStyles();
+            var threshold = track.offsetWidth * 0.15;
             if (touchDeltaX < -threshold) {
                 goToSlide((currentIndex + 1) % cards.length);
             } else if (touchDeltaX > threshold) {
                 goToSlide((currentIndex - 1 + cards.length) % cards.length);
+            } else {
+                goToSlide(currentIndex);
             }
             resetAutoPlay();
         });

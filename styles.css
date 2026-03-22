@@ -1143,14 +1143,12 @@ section h2 {
     .projects-carousel {
         margin: 0 0;
         overflow: hidden;
-        perspective: 1000px;
     }
 
     .carousel-track {
         position: relative;
         height: clamp(250px, 55vw, 400px);
         gap: 0;
-        transform-style: preserve-3d;
     }
 
     .carousel-track .project {
@@ -1163,30 +1161,33 @@ section h2 {
         transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
                     filter 0.5s ease,
                     opacity 0.5s ease;
-        transform: translateX(100%) rotateY(-35deg) scale(0.85);
+        transform: translateX(100%) scale(0.85);
         opacity: 0;
         pointer-events: none;
+        z-index: 0;
     }
 
     .carousel-track .project.carousel-prev {
-        transform: translateX(-30%) rotateY(35deg) scale(0.85);
-        filter: brightness(0.4);
+        transform: translateX(-28%) scale(0.82);
+        filter: brightness(0.35);
         opacity: 1;
+        z-index: 1;
         pointer-events: none;
     }
 
     .carousel-track .project.carousel-active {
-        transform: translateX(0) rotateY(0deg) scale(1);
+        transform: translateX(0) scale(1);
         filter: none;
         opacity: 1;
-        z-index: 2;
+        z-index: 3;
         pointer-events: auto;
     }
 
     .carousel-track .project.carousel-next {
-        transform: translateX(30%) rotateY(-35deg) scale(0.85);
-        filter: brightness(0.4);
+        transform: translateX(28%) scale(0.82);
+        filter: brightness(0.35);
         opacity: 1;
+        z-index: 1;
         pointer-events: none;
     }
 

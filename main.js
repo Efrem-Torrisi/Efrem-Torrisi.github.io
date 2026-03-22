@@ -503,20 +503,44 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
         // Touch swipe
         var touchStartX = 0;
+        var touchStartY = 0;
         var touchDeltaX = 0;
         var isSwiping = false;
+        var swipeLocked = false; // true once we know direction
 
         track.addEventListener('touchstart', function (e) {
             if (window.innerWidth > MOBILE_BP) return;
             touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
             touchDeltaX = 0;
             isSwiping = true;
+            swipeLocked = false;
         }, { passive: true });
 
         track.addEventListener('touchmove', function (e) {
             if (!isSwiping || window.innerWidth > MOBILE_BP) return;
-            touchDeltaX = e.touches[0].clientX - touchStartX;
-        }, { passive: true });
+            var dx = e.touches[0].clientX - touchStartX;
+            var dy = e.touches[0].clientY - touchStartY;
+
+            if (!swipeLocked) {
+                // Lock direction once we move enough
+                if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+                    swipeLocked = true;
+                    if (Math.abs(dx) > Math.abs(dy)) {
+                        // Horizontal swipe — prevent page scroll
+                        isSwiping = true;
+                    } else {
+                        // Vertical scroll — bail out
+                        isSwiping = false;
+                        return;
+                    }
+                }
+                return;
+            }
+
+            e.preventDefault();
+            touchDeltaX = dx;
+        }, { passive: false });
 
         track.addEventListener('touchend', function () {
             if (!isSwiping || window.innerWidth > MOBILE_BP) return;

@@ -458,7 +458,22 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
         function goToSlide(index) {
             currentIndex = Math.max(0, Math.min(index, cards.length - 1));
-            track.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
+
+            if (window.innerWidth <= MOBILE_BP) {
+                cards.forEach(function (card, i) {
+                    card.classList.remove('carousel-prev', 'carousel-active', 'carousel-next');
+                    if (i === currentIndex) {
+                        card.classList.add('carousel-active');
+                    } else if (i === currentIndex - 1 || (currentIndex === 0 && i === cards.length - 1)) {
+                        card.classList.add('carousel-prev');
+                    } else if (i === currentIndex + 1 || (currentIndex === cards.length - 1 && i === 0)) {
+                        card.classList.add('carousel-next');
+                    }
+                });
+            } else {
+                track.style.transform = '';
+            }
+
             dots.forEach(function (d, i) {
                 d.classList.toggle('is-active', i === currentIndex);
             });
@@ -496,27 +511,21 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             touchStartX = e.touches[0].clientX;
             touchDeltaX = 0;
             isSwiping = true;
-            track.style.transition = 'none';
         }, { passive: true });
 
         track.addEventListener('touchmove', function (e) {
             if (!isSwiping || window.innerWidth > MOBILE_BP) return;
             touchDeltaX = e.touches[0].clientX - touchStartX;
-            var offset = -(currentIndex * 100) + (touchDeltaX / track.offsetWidth) * 100;
-            track.style.transform = 'translateX(' + offset + '%)';
         }, { passive: true });
 
         track.addEventListener('touchend', function () {
             if (!isSwiping || window.innerWidth > MOBILE_BP) return;
             isSwiping = false;
-            track.style.transition = '';
-            var threshold = track.offsetWidth * 0.2;
-            if (touchDeltaX < -threshold && currentIndex < cards.length - 1) {
-                goToSlide(currentIndex + 1);
-            } else if (touchDeltaX > threshold && currentIndex > 0) {
-                goToSlide(currentIndex - 1);
-            } else {
-                goToSlide(currentIndex);
+            var threshold = 50;
+            if (touchDeltaX < -threshold) {
+                goToSlide((currentIndex + 1) % cards.length);
+            } else if (touchDeltaX > threshold) {
+                goToSlide((currentIndex - 1 + cards.length) % cards.length);
             }
             resetAutoPlay();
         });
@@ -524,9 +533,12 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         // Start auto-play on mobile
         function handleResize() {
             if (window.innerWidth <= MOBILE_BP) {
-                track.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
+                goToSlide(currentIndex);
                 startAutoPlay();
             } else {
+                cards.forEach(function (card) {
+                    card.classList.remove('carousel-prev', 'carousel-active', 'carousel-next');
+                });
                 track.style.transform = '';
                 stopAutoPlay();
             }

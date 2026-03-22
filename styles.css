@@ -142,6 +142,10 @@ main {
     border-color: rgba(235, 235, 245, 0.6);
 }
 
+.cv-short {
+    display: none;
+}
+
 /* ============================================
    PAGE INTRO
    ============================================ */
@@ -1137,23 +1141,61 @@ section h2 {
     }
 
     .projects-carousel {
-        margin: 0 3%;
+        margin: 0 0;
         overflow: hidden;
+        perspective: 1000px;
     }
 
     .carousel-track {
+        position: relative;
         height: clamp(250px, 55vw, 400px);
         gap: 0;
-        transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        transform-style: preserve-3d;
     }
 
     .carousel-track .project {
-        flex: 0 0 100%;
-        min-width: 100%;
+        position: absolute;
+        top: 0;
+        left: 10%;
+        width: 80%;
+        height: 100%;
+        filter: brightness(0.5);
+        transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                    filter 0.5s ease,
+                    opacity 0.5s ease;
+        transform: translateX(100%) rotateY(-35deg) scale(0.85);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .carousel-track .project.carousel-prev {
+        transform: translateX(-30%) rotateY(35deg) scale(0.85);
+        filter: brightness(0.4);
+        opacity: 1;
+        pointer-events: none;
+    }
+
+    .carousel-track .project.carousel-active {
+        transform: translateX(0) rotateY(0deg) scale(1);
         filter: none;
+        opacity: 1;
+        z-index: 2;
+        pointer-events: auto;
+    }
+
+    .carousel-track .project.carousel-next {
+        transform: translateX(30%) rotateY(-35deg) scale(0.85);
+        filter: brightness(0.4);
+        opacity: 1;
+        pointer-events: none;
     }
 
     .carousel-track .project .project-overlay {
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .carousel-track .project.carousel-active .project-overlay {
         opacity: 1;
     }
 
@@ -1202,6 +1244,14 @@ section h2 {
     .nav-cv-btn {
         font-size: 0.75rem;
         padding: 0.4rem 0.85rem;
+    }
+
+    .cv-full {
+        display: none;
+    }
+
+    .cv-short {
+        display: inline;
     }
 
     .hero h1 {

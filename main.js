@@ -511,45 +511,52 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         // Interpolation helpers
         function lerp(a, b, t) { return a + (b - a) * t; }
 
+        // Compute visual props for a card at a given position offset from center
+        function getCardProps(pos) {
+            var absPos = Math.abs(pos);
+            if (absPos > 1.5) {
+                return {
+                    tx: pos > 0 ? 100 : -100,
+                    sc: 0.8,
+                    br: 0.3,
+                    op: 0,
+                    zi: 0
+                };
+            }
+            var t = Math.min(absPos, 1);
+            return {
+                tx: pos * 28,
+                sc: lerp(1, 0.82, t),
+                br: lerp(1, 0.35, t),
+                op: absPos > 1 ? lerp(1, 0, (absPos - 1) * 2) : 1,
+                zi: absPos < 0.5 ? 3 : (absPos < 1 ? 2 : 1)
+            };
+        }
+
+        function applyCardProps(card, props) {
+            card.style.transform = 'translateX(' + props.tx.toFixed(1) + '%) scale(' + props.sc.toFixed(3) + ')';
+            card.style.filter = 'brightness(' + props.br.toFixed(2) + ')';
+            card.style.opacity = props.op.toFixed(2);
+            card.style.zIndex = '' + props.zi;
+        }
+
+        function getRelIndex(i, center) {
+            var rel = i - center;
+            var half = cards.length / 2;
+            if (rel > half) rel -= cards.length;
+            if (rel < -half) rel += cards.length;
+            return rel;
+        }
+
         function applyDragTransforms(progress) {
-            // progress: +1 = dragged left (go to next), -1 = dragged right (go to prev)
+            // progress: +1 = next card should be at center (dragged left)
             var p = Math.max(-1, Math.min(1, progress));
-            var totalCards = cards.length;
 
             cards.forEach(function (card, i) {
-                var rel = i - currentIndex;
-                // Wrap around
-                if (rel > totalCards / 2) rel -= totalCards;
-                if (rel < -totalCards / 2) rel += totalCards;
-
-                // Each card's effective position shifts by progress
-                var pos = rel + p;
-
-                var absPos = Math.abs(pos);
-
-                if (absPos > 1.5) {
-                    // Far off — hide
-                    card.style.transform = 'translateX(' + (pos > 0 ? '100%' : '-100%') + ') scale(0.8)';
-                    card.style.filter = 'brightness(0.3)';
-                    card.style.opacity = '0';
-                    card.style.zIndex = '0';
-                } else {
-                    // Smooth interpolation between center and side positions
-                    var t = Math.min(absPos, 1);
-
-                    var tx = pos * 28;
-                    var sc = lerp(1, 0.82, t);
-                    var br = lerp(1, 0.35, t);
-                    var op = absPos > 1 ? lerp(1, 0, (absPos - 1) * 2) : 1;
-
-                    // Smooth z-index: card closest to center gets z3
-                    var zi = absPos < 0.5 ? 3 : (absPos < 1 ? 2 : 1);
-
-                    card.style.transform = 'translateX(' + tx.toFixed(1) + '%) scale(' + sc.toFixed(3) + ')';
-                    card.style.filter = 'brightness(' + br.toFixed(2) + ')';
-                    card.style.opacity = op.toFixed(2);
-                    card.style.zIndex = '' + zi;
-                }
+                var rel = getRelIndex(i, currentIndex);
+                // Subtract progress so dragging left (p>0) pulls next card (rel=1) toward center
+                var pos = rel - p;
+                applyCardProps(card, getCardProps(pos));
             });
         }
 
@@ -608,19 +615,32 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             // Determine which card is closest to center based on drag progress
             var dragRange = track.offsetWidth * 0.45;
             var progress = -touchDeltaX / dragRange;
-            // Round progress to nearest integer to find the target offset
             var offset = Math.round(progress);
+            // Clamp to ±1 so we only ever move one card at a time
+            offset = Math.max(-1, Math.min(1, offset));
             var targetIndex = ((currentIndex + offset) % cards.length + cards.length) % cards.length;
 
-            // Re-enable transitions, then snap to target
+            // Animate from current inline position to target position:
+            // 1. Re-enable transitions on all cards
+            var transVal = 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.4s ease, opacity 0.4s ease';
             cards.forEach(function (card) {
-                card.style.transition = '';
+                card.style.transition = transVal;
             });
 
-            // Small delay so the browser picks up the transition re-enable
+            // 2. Set inline styles for the final target positions
+            //    (relative to targetIndex as center)
             requestAnimationFrame(function () {
-                clearInlineStyles();
-                goToSlide(targetIndex);
+                cards.forEach(function (card, i) {
+                    var rel = getRelIndex(i, targetIndex);
+                    applyCardProps(card, getCardProps(rel));
+                });
+
+                // 3. After transition completes, clean up and hand off to CSS classes
+                setTimeout(function () {
+                    currentIndex = targetIndex;
+                    clearInlineStyles();
+                    goToSlide(targetIndex);
+                }, 420);
             });
 
             resetAutoPlay();

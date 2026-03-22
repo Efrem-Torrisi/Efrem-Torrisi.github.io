@@ -96,7 +96,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
        show/hide default vs hover content
        ======================================== */
 
-    var videoExts = /\.(mp4|webm|ogg|mov)$/i;
+    var videoExts = /\.(mp4|webm|ogg|mov|avi)$/i;
 
     function imgToVideo(img) {
         var video = document.createElement('video');

@@ -512,7 +512,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         function lerp(a, b, t) { return a + (b - a) * t; }
 
         function applyDragTransforms(progress) {
-            // progress: -1 = fully swiped left (go next), +1 = fully swiped right (go prev)
+            // progress: +1 = dragged left (go to next), -1 = dragged right (go to prev)
             var p = Math.max(-1, Math.min(1, progress));
             var totalCards = cards.length;
 
@@ -523,32 +523,32 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                 if (rel < -totalCards / 2) rel += totalCards;
 
                 // Each card's effective position shifts by progress
-                var pos = rel - p;
+                var pos = rel + p;
 
-                var tx, sc, br, op;
+                var absPos = Math.abs(pos);
 
-                if (Math.abs(pos) > 1.5) {
+                if (absPos > 1.5) {
                     // Far off — hide
                     card.style.transform = 'translateX(' + (pos > 0 ? '100%' : '-100%') + ') scale(0.8)';
                     card.style.filter = 'brightness(0.3)';
                     card.style.opacity = '0';
                     card.style.zIndex = '0';
                 } else {
-                    // Interpolate between positions
-                    // Center: tx=0%, sc=1, br=1
-                    // Side:   tx=±28%, sc=0.82, br=0.35
-                    var absPos = Math.abs(pos);
+                    // Smooth interpolation between center and side positions
                     var t = Math.min(absPos, 1);
 
-                    tx = pos * 28;
-                    sc = lerp(1, 0.82, t);
-                    br = lerp(1, 0.35, t);
-                    op = absPos > 1 ? lerp(1, 0, absPos - 1) : 1;
+                    var tx = pos * 28;
+                    var sc = lerp(1, 0.82, t);
+                    var br = lerp(1, 0.35, t);
+                    var op = absPos > 1 ? lerp(1, 0, (absPos - 1) * 2) : 1;
 
-                    card.style.transform = 'translateX(' + tx + '%) scale(' + sc.toFixed(3) + ')';
+                    // Smooth z-index: card closest to center gets z3
+                    var zi = absPos < 0.5 ? 3 : (absPos < 1 ? 2 : 1);
+
+                    card.style.transform = 'translateX(' + tx.toFixed(1) + '%) scale(' + sc.toFixed(3) + ')';
                     card.style.filter = 'brightness(' + br.toFixed(2) + ')';
                     card.style.opacity = op.toFixed(2);
-                    card.style.zIndex = absPos < 0.5 ? '3' : '1';
+                    card.style.zIndex = '' + zi;
                 }
             });
         }
@@ -595,25 +595,37 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
             e.preventDefault();
             touchDeltaX = dx;
-            // Map drag distance to progress (-1 to 1 over ~half the track width)
+            // Negate so dragging left = positive progress = next card
             var dragRange = track.offsetWidth * 0.45;
-            var progress = touchDeltaX / dragRange;
+            var progress = -touchDeltaX / dragRange;
             applyDragTransforms(progress);
         }, { passive: false });
 
         track.addEventListener('touchend', function () {
             if (!isSwiping || window.innerWidth > MOBILE_BP) return;
             isSwiping = false;
-            // Re-enable transitions for the snap
-            clearInlineStyles();
+
             var threshold = track.offsetWidth * 0.15;
+            var targetIndex;
             if (touchDeltaX < -threshold) {
-                goToSlide((currentIndex + 1) % cards.length);
+                targetIndex = (currentIndex + 1) % cards.length;
             } else if (touchDeltaX > threshold) {
-                goToSlide((currentIndex - 1 + cards.length) % cards.length);
+                targetIndex = (currentIndex - 1 + cards.length) % cards.length;
             } else {
-                goToSlide(currentIndex);
+                targetIndex = currentIndex;
             }
+
+            // Re-enable transitions, then snap to target
+            cards.forEach(function (card) {
+                card.style.transition = '';
+            });
+
+            // Small delay so the browser picks up the transition re-enable
+            requestAnimationFrame(function () {
+                clearInlineStyles();
+                goToSlide(targetIndex);
+            });
+
             resetAutoPlay();
         });
 

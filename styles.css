@@ -1152,6 +1152,10 @@ section h2 {
         gap: 1rem;
     }
 
+    .contact {
+        padding-bottom: clamp(8rem, 35vh, 20rem);
+    }
+
     .projects-carousel {
         margin: 0 0;
         overflow: hidden;

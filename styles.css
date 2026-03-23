@@ -1153,7 +1153,11 @@ section h2 {
     }
 
     .contact {
-        padding-bottom: clamp(8rem, 35vh, 20rem);
+        padding-bottom: clamp(4rem, 17vh, 10rem);
+    }
+
+    .pieces-section {
+        padding-top: 2rem;
     }
 
     .projects-carousel {

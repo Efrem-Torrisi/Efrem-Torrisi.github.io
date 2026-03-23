@@ -51,6 +51,7 @@ body {
     color: var(--color-text);
     background-color: var(--color-bg);
     overflow-x: hidden;
+    overscroll-behavior-x: none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -1103,25 +1104,36 @@ section h2 {
     }
 
     .project-detail-header {
-        padding: 1rem 1.5rem;
-        flex-direction: column;
+        padding: 0.75rem 1rem;
+        flex-direction: row;
+        position: relative; /* Not sticky on mobile — let it scroll away */
+        gap: 1rem;
     }
 
     .project-header-image {
-        max-width: 200px;
+        max-width: 80px;
+    }
+
+    .project-detail-title {
+        font-size: 1.1rem;
+    }
+
+    .project-detail-subtitle {
+        font-size: 0.85rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .project-detail-meta {
+        font-size: 0.8rem;
     }
 
     .project-detail-trailer {
-        padding: 0 1.5rem;
+        width: 100%;
+        padding: 0.5rem 1rem;
     }
 
     .project-detail-body {
         padding: 1.5rem;
-    }
-
-    .project-detail-meta {
-        flex-direction: column;
-        gap: 0.5rem;
     }
 
     .about-grid {
@@ -1149,6 +1161,7 @@ section h2 {
         position: relative;
         height: clamp(250px, 55vw, 400px);
         gap: 0;
+        touch-action: pan-y pinch-zoom;
     }
 
     .carousel-track .project {

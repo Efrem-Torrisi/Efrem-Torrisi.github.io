@@ -105,8 +105,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         video.muted = true;
         video.loop = true;
         video.playsInline = true;
-        video.preload = 'metadata';
-        video.setAttribute('loading', 'lazy');
+        video.preload = 'auto';
         img.parentNode.replaceChild(video, img);
         return video;
     }

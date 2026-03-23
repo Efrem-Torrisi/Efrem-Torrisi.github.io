@@ -607,40 +607,41 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
         var dots = dotsContainer.querySelectorAll('.carousel-dot');
 
-        // Mobile: show/hide hover video on the active carousel card
+        // Show/hide hover video on the active carousel card (mobile)
         var mobileVideoTimer = null;
         var carouselInView = true; // assume visible until observer says otherwise
+        var carouselVideoPlaying = false; // tracks if a video preview is actively playing
 
-        // Only play carousel videos when the carousel is actually in the viewport
+        // Mobile only: play carousel videos only when the carousel is the focus of the viewport
         if ('IntersectionObserver' in window) {
             var carouselEl = document.querySelector('.projects-carousel');
             if (carouselEl) {
                 carouselInView = false;
                 var carouselObserver = new IntersectionObserver(function (entries) {
+                    if (window.innerWidth > MOBILE_BP) return;
                     entries.forEach(function (entry) {
                         var wasInView = carouselInView;
                         carouselInView = entry.isIntersecting;
                         if (!carouselInView && wasInView) {
-                            // Scrolled out of view — stop all videos
-                            mobileCarouselVideo(null);
-                        } else if (carouselInView && !wasInView && window.innerWidth <= MOBILE_BP) {
-                            // Scrolled into view — play active card's video
+                            // Left focus — stop all videos and cancel pending timers, allow auto-swipe
+                            stopCarouselVideos();
+                            resetAutoPlay();
+                        } else if (carouselInView && !wasInView) {
+                            // Entered focus — start the delayed video play
                             mobileCarouselVideo(cards[currentIndex]);
                         }
                     });
-                }, { threshold: 0.3 });
+                }, { threshold: 0.6 });
                 carouselObserver.observe(carouselEl);
             }
         }
 
-        function mobileCarouselVideo(activeCard) {
-            if (window.innerWidth > MOBILE_BP) return;
-            // Clear any pending timer
+        function stopCarouselVideos() {
             if (mobileVideoTimer) {
                 clearTimeout(mobileVideoTimer);
                 mobileVideoTimer = null;
             }
-            // Pause all project hover videos
+            carouselVideoPlaying = false;
             cards.forEach(function (card) {
                 var hoverEl = card.querySelector('.preview-hover');
                 if (hoverEl) {
@@ -648,10 +649,27 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                     if (hoverEl.tagName === 'VIDEO') hoverEl.pause();
                 }
             });
+        }
+
+        // Check if a card has a real video (not just a duplicate static image)
+        function cardHasVideo(card) {
+            var hoverEl = card.querySelector('.preview-hover');
+            if (!hoverEl) return false;
+            if (hoverEl.tagName === 'VIDEO') return true;
+            // If it's still an img, check if src is a video extension
+            var src = hoverEl.getAttribute('src') || '';
+            return videoExts.test(src);
+        }
+
+        function mobileCarouselVideo(activeCard) {
+            if (window.innerWidth > MOBILE_BP) return;
+            stopCarouselVideos();
             if (!activeCard || !carouselInView) return;
             // Priority load and play the active card's video after a delay
             var hoverEl = activeCard.querySelector('.preview-hover');
             if (!hoverEl) return;
+            // Only do video preview if this card actually has a video
+            if (!cardHasVideo(activeCard)) return;
             priorityLoadCard(activeCard);
             mobileVideoTimer = setTimeout(function () {
                 if (!activeCard.classList.contains('carousel-active')) return;
@@ -660,6 +678,9 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                 if (hoverEl.tagName === 'VIDEO') {
                     hoverEl.currentTime = 0;
                     hoverEl.play();
+                    carouselVideoPlaying = true;
+                    // Stop auto-swipe while video is playing
+                    stopAutoPlay();
                 }
             }, 600);
         }
@@ -707,6 +728,8 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
         function resetAutoPlay() {
             if (window.innerWidth <= MOBILE_BP) {
+                // Don't auto-swipe if a video preview is playing
+                if (carouselVideoPlaying) return;
                 startAutoPlay();
             }
         }

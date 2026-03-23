@@ -191,25 +191,56 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
     }, 1000);
 
     // Hover preview: play hover media on enter, pause on leave (pieces)
-    document.querySelectorAll('.piece').forEach(function (card) {
-        var hoverEl = card.querySelector('.preview-hover');
-        if (!hoverEl) return;
+    var activePiece = null;
 
-        card.addEventListener('mouseenter', function () {
+    function focusPiece(card) {
+        if (card === activePiece) return;
+        // Deactivate previous
+        if (activePiece) {
+            var prevHover = activePiece.querySelector('.preview-hover');
+            if (prevHover) {
+                prevHover.classList.remove('is-hover-active');
+                if (prevHover.tagName === 'VIDEO') prevHover.pause();
+            }
+        }
+        activePiece = card;
+        if (!card) return;
+        var hoverEl = card.querySelector('.preview-hover');
+        if (hoverEl) {
             hoverEl.classList.add('is-hover-active');
             if (hoverEl.tagName === 'VIDEO') {
                 hoverEl.currentTime = 0;
                 hoverEl.play();
             }
-        });
+        }
+    }
 
-        card.addEventListener('mouseleave', function () {
+    function unfocusPiece(card) {
+        if (activePiece !== card) return;
+        activePiece = null;
+        var hoverEl = card.querySelector('.preview-hover');
+        if (hoverEl) {
             hoverEl.classList.remove('is-hover-active');
-            if (hoverEl.tagName === 'VIDEO') {
-                hoverEl.pause();
-            }
-        });
+            if (hoverEl.tagName === 'VIDEO') hoverEl.pause();
+        }
+    }
+
+    document.querySelectorAll('.piece').forEach(function (card) {
+        // Desktop: mouse events
+        card.addEventListener('mouseenter', function () { focusPiece(card); });
+        card.addEventListener('mouseleave', function () { unfocusPiece(card); });
+
+        // Mobile: touch events
+        card.addEventListener('touchstart', function () { focusPiece(card); }, { passive: true });
     });
+
+    // When touching outside any piece, deactivate the current one
+    document.addEventListener('touchstart', function (e) {
+        if (!activePiece) return;
+        if (!e.target.closest('.piece')) {
+            focusPiece(null);
+        }
+    }, { passive: true });
 
     /* ========================================
        PAGE INTRO ANIMATION

@@ -192,9 +192,15 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
     // Hover preview: play hover media on enter, pause on leave (pieces)
     var activePiece = null;
+    var pieceVideoTimer = null;
 
     function focusPiece(card) {
         if (card === activePiece) return;
+        // Clear pending timer
+        if (pieceVideoTimer) {
+            clearTimeout(pieceVideoTimer);
+            pieceVideoTimer = null;
+        }
         // Deactivate previous
         if (activePiece) {
             var prevHover = activePiece.querySelector('.preview-hover');
@@ -206,17 +212,24 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         activePiece = card;
         if (!card) return;
         var hoverEl = card.querySelector('.preview-hover');
-        if (hoverEl) {
+        if (!hoverEl) return;
+        // Delay video playback by 600ms
+        pieceVideoTimer = setTimeout(function () {
+            if (activePiece !== card) return;
             hoverEl.classList.add('is-hover-active');
             if (hoverEl.tagName === 'VIDEO') {
                 hoverEl.currentTime = 0;
                 hoverEl.play();
             }
-        }
+        }, 600);
     }
 
     function unfocusPiece(card) {
         if (activePiece !== card) return;
+        if (pieceVideoTimer) {
+            clearTimeout(pieceVideoTimer);
+            pieceVideoTimer = null;
+        }
         activePiece = null;
         var hoverEl = card.querySelector('.preview-hover');
         if (hoverEl) {
@@ -596,6 +609,29 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
         // Mobile: show/hide hover video on the active carousel card
         var mobileVideoTimer = null;
+        var carouselInView = true; // assume visible until observer says otherwise
+
+        // Only play carousel videos when the carousel is actually in the viewport
+        if ('IntersectionObserver' in window) {
+            var carouselEl = document.querySelector('.projects-carousel');
+            if (carouselEl) {
+                carouselInView = false;
+                var carouselObserver = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        var wasInView = carouselInView;
+                        carouselInView = entry.isIntersecting;
+                        if (!carouselInView && wasInView) {
+                            // Scrolled out of view — stop all videos
+                            mobileCarouselVideo(null);
+                        } else if (carouselInView && !wasInView && window.innerWidth <= MOBILE_BP) {
+                            // Scrolled into view — play active card's video
+                            mobileCarouselVideo(cards[currentIndex]);
+                        }
+                    });
+                }, { threshold: 0.3 });
+                carouselObserver.observe(carouselEl);
+            }
+        }
 
         function mobileCarouselVideo(activeCard) {
             if (window.innerWidth > MOBILE_BP) return;
@@ -612,19 +648,20 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                     if (hoverEl.tagName === 'VIDEO') hoverEl.pause();
                 }
             });
-            if (!activeCard) return;
-            // Priority load and play the active card's video after a short delay
+            if (!activeCard || !carouselInView) return;
+            // Priority load and play the active card's video after a delay
             var hoverEl = activeCard.querySelector('.preview-hover');
             if (!hoverEl) return;
             priorityLoadCard(activeCard);
             mobileVideoTimer = setTimeout(function () {
                 if (!activeCard.classList.contains('carousel-active')) return;
+                if (!carouselInView) return;
                 hoverEl.classList.add('is-hover-active');
                 if (hoverEl.tagName === 'VIDEO') {
                     hoverEl.currentTime = 0;
                     hoverEl.play();
                 }
-            }, 500);
+            }, 600);
         }
 
         function goToSlide(index) {

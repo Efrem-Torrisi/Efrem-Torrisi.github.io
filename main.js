@@ -98,28 +98,97 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
     var videoExts = /\.(mp4|webm|ogg|mov|avi)$/i;
 
-    function imgToVideo(img) {
+    function imgToVideo(img, preload) {
         var video = document.createElement('video');
         video.src = img.src;
         video.className = img.className;
         video.muted = true;
         video.loop = true;
         video.playsInline = true;
-        video.preload = 'auto';
+        video.preload = preload || 'metadata';
         img.parentNode.replaceChild(video, img);
         return video;
     }
 
-    // Swap any img with a video src
-    document.querySelectorAll('.piece img, .project img').forEach(function (img) {
+    // Solo projects (.piece) — force preload immediately
+    document.querySelectorAll('.piece img').forEach(function (img) {
         if (!videoExts.test(img.getAttribute('src'))) return;
         var isHover = img.classList.contains('preview-hover');
-        var video = imgToVideo(img);
-        // Default (non-hover) videos autoplay; hover videos wait
+        var video = imgToVideo(img, 'auto');
         if (!isHover) {
             video.autoplay = true;
         }
     });
+
+    // Game projects (.project) — lazy load videos sequentially, but prioritize hovered card
+    var projectVideoMap = new Map(); // card element -> array of video elements
+    document.querySelectorAll('.project').forEach(function (card) {
+        var videos = [];
+        card.querySelectorAll('img').forEach(function (img) {
+            if (!videoExts.test(img.getAttribute('src'))) return;
+            var isHover = img.classList.contains('preview-hover');
+            var video = imgToVideo(img, 'none');
+            if (!isHover) {
+                video.autoplay = true;
+            }
+            videos.push(video);
+        });
+        if (videos.length) projectVideoMap.set(card, videos);
+    });
+
+    var seqIndex = 0;
+    var seqCards = Array.from(projectVideoMap.keys());
+    var loadedCards = new Set();
+    var seqPaused = false;
+
+    function loadCardVideos(card, callback) {
+        if (loadedCards.has(card)) { if (callback) callback(); return; }
+        loadedCards.add(card);
+        var videos = projectVideoMap.get(card);
+        if (!videos || !videos.length) { if (callback) callback(); return; }
+        var remaining = videos.length;
+        videos.forEach(function (video) {
+            video.preload = 'auto';
+            video.load();
+            var done = false;
+            function onDone() {
+                if (done) return;
+                done = true;
+                remaining--;
+                if (remaining <= 0 && callback) callback();
+            }
+            video.addEventListener('canplaythrough', onDone, { once: true });
+            setTimeout(onDone, 5000);
+        });
+    }
+
+    function runSequentialLoad() {
+        if (seqPaused) return;
+        // Skip already-loaded cards
+        while (seqIndex < seqCards.length && loadedCards.has(seqCards[seqIndex])) {
+            seqIndex++;
+        }
+        if (seqIndex >= seqCards.length) return;
+        loadCardVideos(seqCards[seqIndex], function () {
+            seqIndex++;
+            runSequentialLoad();
+        });
+    }
+
+    // Priority load: called when a game project card is hovered
+    function priorityLoadCard(card) {
+        if (loadedCards.has(card)) return;
+        seqPaused = true;
+        loadCardVideos(card, function () {
+            seqPaused = false;
+            runSequentialLoad();
+        });
+    }
+
+    // Start sequential loading after a short delay to prioritize solo projects
+    setTimeout(function () {
+        runSequentialLoad();
+    }, 1000);
 
     // Hover preview: play hover media on enter, pause on leave (pieces only; projects use carousel focus)
     document.querySelectorAll('.piece').forEach(function (card) {
@@ -421,6 +490,9 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
             // Only start hover video when triggered by actual user interaction
             if (!fromUser) return;
+
+            // Priority-load this card's videos if not yet loaded
+            priorityLoadCard(focusedCard);
 
             var hoverEl = focusedCard.querySelector('.preview-hover');
             if (!hoverEl) return;

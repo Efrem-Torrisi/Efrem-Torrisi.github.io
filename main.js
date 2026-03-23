@@ -387,9 +387,17 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         var autoTimer = null;
         var currentIndex = 0;
 
-        /* --- Desktop accordion (unchanged) --- */
+        /* --- Desktop accordion --- */
 
-        function setFocused(focusedCard) {
+        var hoverVideoTimer = null;   // delay before video starts
+        var userHasInteracted = false; // suppress video on initial load
+
+        function setFocused(focusedCard, fromUser) {
+            if (hoverVideoTimer) {
+                clearTimeout(hoverVideoTimer);
+                hoverVideoTimer = null;
+            }
+
             cards.forEach(function (card) {
                 var wasFocused = card.classList.contains('is-focused');
                 var isFocused = card === focusedCard;
@@ -401,31 +409,59 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                 }
 
                 var hoverEl = card.querySelector('.preview-hover');
-                if (hoverEl) {
-                    if (isFocused && !wasFocused) {
-                        hoverEl.classList.add('is-hover-active');
-                        if (hoverEl.tagName === 'VIDEO') {
-                            hoverEl.currentTime = 0;
-                            hoverEl.play();
-                        }
-                    } else if (!isFocused && wasFocused) {
-                        hoverEl.classList.remove('is-hover-active');
-                        if (hoverEl.tagName === 'VIDEO') {
-                            hoverEl.pause();
-                        }
+                if (!hoverEl) return;
+
+                if (!isFocused && wasFocused) {
+                    // Leaving this card — hide video immediately
+                    hoverEl.classList.remove('is-hover-active');
+                    if (hoverEl.tagName === 'VIDEO') {
+                        hoverEl.pause();
                     }
                 }
             });
+
+            // Only start hover video when triggered by actual user interaction
+            if (!fromUser) return;
+
+            var hoverEl = focusedCard.querySelector('.preview-hover');
+            if (!hoverEl) return;
+
+            // Delay video playback to match the CSS transition
+            hoverVideoTimer = setTimeout(function () {
+                // Verify the card is still focused
+                if (!focusedCard.classList.contains('is-focused')) return;
+                hoverEl.classList.add('is-hover-active');
+                if (hoverEl.tagName === 'VIDEO') {
+                    hoverEl.currentTime = 0;
+                    hoverEl.play();
+                }
+            }, 600);
         }
 
         cards.forEach(function (card) {
             card.addEventListener('mouseenter', function () {
-                if (window.innerWidth > MOBILE_BP) setFocused(card);
+                if (window.innerWidth > MOBILE_BP) {
+                    userHasInteracted = true;
+                    setFocused(card, true);
+                }
             });
         });
 
         track.addEventListener('mouseleave', function () {
-            if (window.innerWidth > MOBILE_BP) setFocused(cards[0]);
+            if (window.innerWidth > MOBILE_BP) {
+                // Keep the last focused card, just stop the video
+                if (hoverVideoTimer) {
+                    clearTimeout(hoverVideoTimer);
+                    hoverVideoTimer = null;
+                }
+                cards.forEach(function (card) {
+                    var hoverEl = card.querySelector('.preview-hover');
+                    if (hoverEl) {
+                        hoverEl.classList.remove('is-hover-active');
+                        if (hoverEl.tagName === 'VIDEO') hoverEl.pause();
+                    }
+                });
+            }
         });
 
         cards.forEach(function (card) {
@@ -433,12 +469,12 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                 if (window.innerWidth > MOBILE_BP && !card.classList.contains('is-focused')) {
                     e.preventDefault();
                     e.stopPropagation();
-                    setFocused(card);
+                    setFocused(card, true);
                 }
             });
         });
 
-        setFocused(cards[0]);
+        setFocused(cards[0], false);
 
         /* --- Mobile swipe carousel --- */
 

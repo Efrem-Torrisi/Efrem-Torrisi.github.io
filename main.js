@@ -190,12 +190,15 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         runSequentialLoad();
     }, 1000);
 
-    // Hover preview: play hover media on enter, pause on leave (pieces only; projects use carousel focus)
+    // Hover preview: play hover media on enter, pause on leave (pieces — desktop only)
+    var MOBILE_BP_MEDIA = 768;
+
     document.querySelectorAll('.piece').forEach(function (card) {
         var hoverEl = card.querySelector('.preview-hover');
         if (!hoverEl) return;
 
         card.addEventListener('mouseenter', function () {
+            if (window.innerWidth <= MOBILE_BP_MEDIA) return;
             hoverEl.classList.add('is-hover-active');
             if (hoverEl.tagName === 'VIDEO') {
                 hoverEl.currentTime = 0;
@@ -204,12 +207,40 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         });
 
         card.addEventListener('mouseleave', function () {
+            if (window.innerWidth <= MOBILE_BP_MEDIA) return;
             hoverEl.classList.remove('is-hover-active');
             if (hoverEl.tagName === 'VIDEO') {
                 hoverEl.pause();
             }
         });
     });
+
+    // Mobile: solo projects autoplay video when card is in center of viewport
+    if ('IntersectionObserver' in window) {
+        var pieceObserver = new IntersectionObserver(function (entries) {
+            if (window.innerWidth > MOBILE_BP_MEDIA) return;
+            entries.forEach(function (entry) {
+                var hoverEl = entry.target.querySelector('.preview-hover');
+                if (!hoverEl) return;
+                if (entry.isIntersecting) {
+                    hoverEl.classList.add('is-hover-active');
+                    if (hoverEl.tagName === 'VIDEO') {
+                        hoverEl.currentTime = 0;
+                        hoverEl.play();
+                    }
+                } else {
+                    hoverEl.classList.remove('is-hover-active');
+                    if (hoverEl.tagName === 'VIDEO') {
+                        hoverEl.pause();
+                    }
+                }
+            });
+        }, { threshold: 0.6 }); // 60% visible = "in focus"
+
+        document.querySelectorAll('.piece').forEach(function (card) {
+            pieceObserver.observe(card);
+        });
+    }
 
     /* ========================================
        PAGE INTRO ANIMATION
@@ -563,6 +594,39 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
         var dots = dotsContainer.querySelectorAll('.carousel-dot');
 
+        // Mobile: show/hide hover video on the active carousel card
+        var mobileVideoTimer = null;
+
+        function mobileCarouselVideo(activeCard) {
+            if (window.innerWidth > MOBILE_BP) return;
+            // Clear any pending timer
+            if (mobileVideoTimer) {
+                clearTimeout(mobileVideoTimer);
+                mobileVideoTimer = null;
+            }
+            // Pause all project hover videos
+            cards.forEach(function (card) {
+                var hoverEl = card.querySelector('.preview-hover');
+                if (hoverEl) {
+                    hoverEl.classList.remove('is-hover-active');
+                    if (hoverEl.tagName === 'VIDEO') hoverEl.pause();
+                }
+            });
+            if (!activeCard) return;
+            // Priority load and play the active card's video after a short delay
+            var hoverEl = activeCard.querySelector('.preview-hover');
+            if (!hoverEl) return;
+            priorityLoadCard(activeCard);
+            mobileVideoTimer = setTimeout(function () {
+                if (!activeCard.classList.contains('carousel-active')) return;
+                hoverEl.classList.add('is-hover-active');
+                if (hoverEl.tagName === 'VIDEO') {
+                    hoverEl.currentTime = 0;
+                    hoverEl.play();
+                }
+            }, 500);
+        }
+
         function goToSlide(index) {
             currentIndex = Math.max(0, Math.min(index, cards.length - 1));
 
@@ -577,6 +641,8 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                         card.classList.add('carousel-next');
                     }
                 });
+                // Play video on newly active card
+                mobileCarouselVideo(cards[currentIndex]);
             } else {
                 track.style.transform = '';
             }
@@ -691,6 +757,8 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             touchDeltaX = 0;
             isSwiping = true;
             swipeLocked = false;
+            // Hide all hover videos during drag — show static thumbnails
+            mobileCarouselVideo(null);
             // Kill transitions for instant response
             cards.forEach(function (card) {
                 card.style.transition = 'none';

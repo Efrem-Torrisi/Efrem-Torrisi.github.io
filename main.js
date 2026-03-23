@@ -190,15 +190,12 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         runSequentialLoad();
     }, 1000);
 
-    // Hover preview: play hover media on enter, pause on leave (pieces — desktop only)
-    var MOBILE_BP_MEDIA = 768;
-
+    // Hover preview: play hover media on enter, pause on leave (pieces)
     document.querySelectorAll('.piece').forEach(function (card) {
         var hoverEl = card.querySelector('.preview-hover');
         if (!hoverEl) return;
 
         card.addEventListener('mouseenter', function () {
-            if (window.innerWidth <= MOBILE_BP_MEDIA) return;
             hoverEl.classList.add('is-hover-active');
             if (hoverEl.tagName === 'VIDEO') {
                 hoverEl.currentTime = 0;
@@ -207,40 +204,12 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         });
 
         card.addEventListener('mouseleave', function () {
-            if (window.innerWidth <= MOBILE_BP_MEDIA) return;
             hoverEl.classList.remove('is-hover-active');
             if (hoverEl.tagName === 'VIDEO') {
                 hoverEl.pause();
             }
         });
     });
-
-    // Mobile: solo projects autoplay video when card is in center of viewport
-    if ('IntersectionObserver' in window) {
-        var pieceObserver = new IntersectionObserver(function (entries) {
-            if (window.innerWidth > MOBILE_BP_MEDIA) return;
-            entries.forEach(function (entry) {
-                var hoverEl = entry.target.querySelector('.preview-hover');
-                if (!hoverEl) return;
-                if (entry.isIntersecting) {
-                    hoverEl.classList.add('is-hover-active');
-                    if (hoverEl.tagName === 'VIDEO') {
-                        hoverEl.currentTime = 0;
-                        hoverEl.play();
-                    }
-                } else {
-                    hoverEl.classList.remove('is-hover-active');
-                    if (hoverEl.tagName === 'VIDEO') {
-                        hoverEl.pause();
-                    }
-                }
-            });
-        }, { threshold: 0.6 }); // 60% visible = "in focus"
-
-        document.querySelectorAll('.piece').forEach(function (card) {
-            pieceObserver.observe(card);
-        });
-    }
 
     /* ========================================
        PAGE INTRO ANIMATION

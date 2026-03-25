@@ -5,7 +5,7 @@
             <p class="project-detail-subtitle">Automated per-material mesh pre-fracturing for Houdini</p>
             <div class="project-detail-meta">
                 <span class="meta-item"><strong>Role:</strong> Solo Developer</span>
-                <span class="meta-item"><strong>Tools:</strong> Houdini + Python</span>
+                <span class="meta-item"><strong>Tools:</strong> Houdini, Python, Unreal Engine 5</span>
                 <span class="meta-item"><strong>Year:</strong> 2025</span>
             </div>
         </div>
@@ -15,7 +15,7 @@
         <!-- Overview -->
         <section class="project-detail-section">
             <h2>Overview & Technical Breakdown</h2>
-            <p>Smart Mesh Fracturing Tool is a Houdini HDA tool that automates the pre-fracturing pipeline for FBX meshes. It auto-detects materials on an imported mesh via naming convention through a Python SOP, applies per-material fracturing methods, then reassembles the fractured parts with correct naming conventions for hassle-free export back to a game engine or alternatively for use with RBD/Bullet solvers.</p>
+            <p>For this project, I developed a Houdini HDA tool that automates the pre-fracturing pipeline for FBX meshes. It auto-detects materials on an imported mesh via naming convention through a Python SOP, applies per-material fracturing methods, then reassembles the fractured parts with correct naming conventions for a hassle-free export back to a game engine or alternatively for use with RBD/Bullet solvers.</p>
         </section>
 
         <!-- Demo Video -->
@@ -40,7 +40,7 @@
             <h3>Per-Material Custom Fracture Methods</h3>
             <p>A big part of this project was exploring how to fracture meshes to get realistic results for different materials (concrete, wood, glass). Throughout development of this tool I developed numerous custom fracturing methods for these three materials and eventually ended up including in the tool three variations for concrete, three for glass, and two for wood. The tool applies the correct fracturing method per material zone, producing physically plausible pre-fracture patterns without manual setup requested from the user. Alternatively, if the user wants to, the tool can be used in a manual mode by forcing a specific fracturing method to be applied to the entirety of the mesh.</p>
             <figure class="tech-breakdown-figure">
-                <img src="content\SoloProjects\FractureToolSubpage\FracturingMethod.png" alt="Per-material fracturing comparison" />
+                <img src="content\SoloProjects\FractureToolSubpage\FracturingMethods.png" alt="Per-material fracturing comparison" />
             </figure>
 
             <h3>Reassembly &amp; Naming Conventions</h3>
@@ -50,12 +50,12 @@
             </figure>
 
             <h3>Export Modes and Settings</h3>
-            <p>The tool offers multiple export modes and settings: a single combined FBX that keeps relative offset for pieces relative to the original pivot and an FBX export with all pieces centered at the world origin combined with a point cloud FBX storing the original offset of those pieces to reconstruct those positions in-engine. Each of these modes also allows the user to transfer input mesh UVs to the pre-fractured mesh, triangulate, remesh, polyreduce, or even export a metadata JSON file that could be used for engine-side implementation of the destruction simulation.</p>
+            <p>The tool offers multiple export modes and settings: a single combined FBX that keeps the offset for pieces relative to the original pivot, and an FBX export with all pieces centered at the world origin, combined with a point cloud FBX storing the original offset of those pieces to reconstruct those positions in engine. Each of these modes also allows the user to transfer input mesh UVs to the pre-fractured mesh, triangulate, remesh, polyreduce, or even export a metadata JSON file that could be used for engine-side implementation of the destruction simulation.</p>
             <figure class="tech-breakdown-figure">
                 <img src="content\SoloProjects\FractureToolSubpage\ExportSettings.png" alt="Export mode options" />
             </figure>
 
-            <h3>GPU Destruction Setup in Unreal Engine</h3>
+            <h3>Destruction Demo Setup in Unreal Engine</h3>
             <p>To demonstrate a practical use case for the tool, I built a lightweight destruction system in Unreal Engine. The pre-fractured pieces are exported centered at the world origin, alongside a point cloud FBX that stores each piece's original offset from the mesh pivot. I then made a GPU Niagara system using Mesh Renderer Flipbook to render each fractured piece as a particle, with an Initial Mesh Location module reading the point cloud FBX to reconstruct the original shape of the intact mesh and some point and rotation forces applied for the effect.</p>
             <p>A Blueprint then holds the original intact mesh and the Niagara system. On projectile hit, the intact mesh is destroyed and the Niagara system is activated — the particles start at their reconstructed positions and simulate outward, producing a satisfying destruction effect. Because the particle count equals the number of fractured pieces, the system is extremly performant while still delivering a convincing result.</p>
             <figure class="tech-breakdown-figure">

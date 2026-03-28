@@ -31,36 +31,52 @@
 
         <!-- Technical Breakdown -->
         <section class="project-detail-section">
-            <h3>Material Auto-Detection</h3>
-            <p>When using the tool in its "Auto Detect Materials Mode", the tool's Python SOP reads the incoming FBX geometry and parses material and name attributes to identify each material zone, and then creates primitive and detail attributes used for export naming convention later. Each detected material is separated into its own processing stream, where it receives the appropriate fracture treatment based on its material type and user parameters.</p>
-            <figure class="tech-breakdown-figure">
-                <img src="content\SoloProjects\FractureToolSubpage\MaterialDetection.png" alt="Material detection interface in Houdini" />
-            </figure>
+            <div class="tech-breakdown-row">
+                <div class="tech-breakdown-text">
+                    <h3>Material Auto-Detection</h3>
+                    <p>When using the tool in its "Auto Detect Materials Mode", the tool's Python SOP reads the incoming FBX geometry and parses material and name attributes to identify each material zone, and then creates primitive and detail attributes used for export naming convention later. Each detected material is separated into its own processing stream, where it receives the appropriate fracture treatment based on its material type and user parameters.</p>
+                </div>
+                <figure class="tech-breakdown-figure">
+                    <img src="content\SoloProjects\FractureToolSubpage\MaterialDetection.png" alt="Material detection interface in Houdini" />
+                </figure>
+            </div>
 
-            <h3>Per-Material Custom Fracture Methods</h3>
-            <p>A big part of this project was exploring how to fracture meshes to get realistic results for different materials (concrete, wood, glass). Throughout development of this tool I developed numerous custom fracturing methods for these three materials and eventually ended up including in the tool three variations for concrete, three for glass, and two for wood. The tool applies the correct fracturing method per material zone, producing physically plausible pre-fracture patterns without manual setup requested from the user. Alternatively, if the user wants to, the tool can be used in a manual mode by forcing a specific fracturing method to be applied to the entirety of the mesh.</p>
-            <figure class="tech-breakdown-figure">
-                <img src="content\SoloProjects\FractureToolSubpage\FracturingMethods.png" alt="Per-material fracturing comparison" />
-            </figure>
+            <div class="tech-breakdown-row tech-breakdown-row--reverse">
+                <div class="tech-breakdown-text">
+                    <h3>Per-Material Custom Fracture Methods</h3>
+                    <p>A big part of this project was exploring how to fracture meshes to get realistic results for different materials (concrete, wood, glass). Throughout development of this tool I developed numerous custom fracturing methods for these three materials and eventually ended up including in the tool three variations for concrete, three for glass, and two for wood. The tool applies the correct fracturing method per material zone, producing physically plausible pre-fracture patterns without manual setup requested from the user. Alternatively, if the user wants to, the tool can be used in a manual mode by forcing a specific fracturing method to be applied to the entirety of the mesh.</p>
+                </div>
+                <figure class="tech-breakdown-figure">
+                    <img src="content\SoloProjects\FractureToolSubpage\FracturingMethods.png" alt="Per-material fracturing comparison" />
+                </figure>
+            </div>
 
-            <h3>Reassembly &amp; Naming Conventions</h3>
-            <p>After fracturing, the tool reassembles all fragments into a single hierarchy with standardized naming. There are two different naming patterns, one that preserves the parental hierarchy of meshes, if any existed in the input mesh, and one that gives a simple piece index for each disconnected mesh. Material attributes are also preserved to facilitate automation of material application in engines such as Unreal Engine.</p>
-            <figure class="tech-breakdown-figure">
-                <img src="content\SoloProjects\FractureToolSubpage\Naming.png" alt="Reassembled hierarchy with naming conventions" />
-            </figure>
+            <div class="tech-breakdown-row">
+                <div class="tech-breakdown-text">
+                    <h3>Reassembly &amp; Naming Conventions</h3>
+                    <p>After fracturing, the tool reassembles all fragments into a single hierarchy with standardized naming. There are two different naming patterns, one that preserves the parental hierarchy of meshes, if any existed in the input mesh, and one that gives a simple piece index for each disconnected mesh. Material attributes are also preserved to facilitate automation of material application in engines such as Unreal Engine.</p>
+                </div>
+                <figure class="tech-breakdown-figure">
+                    <img src="content\SoloProjects\FractureToolSubpage\Naming.png" alt="Reassembled hierarchy with naming conventions" />
+                </figure>
+            </div>
 
-            <h3>Export Modes and Settings</h3>
-            <p>The tool offers multiple export modes and settings: a single combined FBX that keeps the offset for pieces relative to the original pivot, and an FBX export with all pieces centered at the world origin, combined with a point cloud FBX storing the original offset of those pieces to reconstruct those positions in engine. Each of these modes also allows the user to transfer input mesh UVs to the pre-fractured mesh, triangulate, remesh, polyreduce, or even export a metadata JSON file that could be used for engine-side implementation of the destruction simulation.</p>
-            <figure class="tech-breakdown-figure">
-                <img src="content\SoloProjects\FractureToolSubpage\ExportSettings.png" alt="Export mode options" />
-            </figure>
+            <div class="tech-breakdown-block">
+                <h3>Export Modes and Settings</h3>
+                <p>The tool offers multiple export modes and settings: a single combined FBX that keeps the offset for pieces relative to the original pivot, and an FBX export with all pieces centered at the world origin, combined with a point cloud FBX storing the original offset of those pieces to reconstruct those positions in engine. Each of these modes also allows the user to transfer input mesh UVs to the pre-fractured mesh, triangulate, remesh, polyreduce, or even export a metadata JSON file that could be used for engine-side implementation of the destruction simulation.</p>
+                <figure class="tech-breakdown-figure">
+                    <img src="content\SoloProjects\FractureToolSubpage\ExportSettings.png" alt="Export mode options" />
+                </figure>
+            </div>
 
-            <h3>Destruction Demo Setup in Unreal Engine</h3>
-            <p>To demonstrate a practical use case for the tool, I built a lightweight destruction system in Unreal Engine. The pre-fractured pieces are exported centered at the world origin, alongside a point cloud FBX that stores each piece's original offset from the mesh pivot. I then made a GPU Niagara system using Mesh Renderer Flipbook to render each fractured piece as a particle, with an Initial Mesh Location module reading the point cloud FBX to reconstruct the original shape of the intact mesh and some point and rotation forces applied for the effect.</p>
-            <p>A Blueprint then holds the original intact mesh and the Niagara system. On projectile hit, the intact mesh is destroyed and the Niagara system is activated — the particles start at their reconstructed positions and simulate outward, producing a satisfying destruction effect. Because the particle count equals the number of fractured pieces, the system is extremly performant while still delivering a convincing result.</p>
-            <figure class="tech-breakdown-figure">
-                <img src="content\SoloProjects\FractureToolSubpage\UE5Destruction2.png" alt="GPU destruction setup in Unreal Engine" />
-            </figure>
+            <div class="tech-breakdown-block">
+                <h3>Destruction Demo Setup in Unreal Engine</h3>
+                <p>To demonstrate a practical use case for the tool, I built a lightweight destruction system in Unreal Engine. The pre-fractured pieces are exported centered at the world origin, alongside a point cloud FBX that stores each piece's original offset from the mesh pivot. I then made a GPU Niagara system using Mesh Renderer Flipbook to render each fractured piece as a particle, with an Initial Mesh Location module reading the point cloud FBX to reconstruct the original shape of the intact mesh and some point and rotation forces applied for the effect.</p>
+                <p>A Blueprint then holds the original intact mesh and the Niagara system. On projectile hit, the intact mesh is destroyed and the Niagara system is activated - the particles start at their reconstructed positions and simulate outward, producing a satisfying destruction effect. Because the particle count equals the number of fractured pieces, the system is extremly performant while still delivering a convincing result.</p>
+                <figure class="tech-breakdown-figure">
+                    <img src="content\SoloProjects\FractureToolSubpage\UE5Destruction2.png" alt="GPU destruction setup in Unreal Engine" />
+                </figure>
+            </div>
         </section>
 
         <!-- Tools & Technologies -->

@@ -5,7 +5,8 @@
             <p class="project-detail-subtitle">A swashbuckling adventure game</p>
             <div class="project-detail-meta">
                 <span class="meta-item"><strong>Role:</strong> Technical Artist</span>
-                <span class="meta-item"><strong>Team Size:</strong> TBD</span>
+                <span class="meta-item"><strong>Team Size:</strong> 17</span>
+                <span class="meta-item"><strong>Engine:</strong> Custom DX11 Engine (TGE)</span>
                 <span class="meta-item"><strong>Year:</strong> 2025</span>
             </div>
         </div>
@@ -19,38 +20,104 @@
     </div>
 
     <div class="project-detail-body">
-        <section class="project-detail-section">
-            <h2>Overview</h2>
-            <p>Placeholder project description. Details about the game's concept, genre, and core gameplay loop will go here.</p>
-        </section>
-
+        <!-- Contributions -->
         <section class="project-detail-section">
             <h2>My Contributions</h2>
-            <p>Placeholder for specific technical artist contributions — shaders authored, tools built, pipeline work, VFX created, and other technical responsibilities within the team.</p>
-        </section>
 
-        <section class="project-detail-section">
-            <h2>Gallery</h2>
-            <div class="project-gallery">
-                <img src="content/project3.png" alt="Screenshot 1" />
-                <img src="content/project3.png" alt="Screenshot 2" />
+            <div class="tech-breakdown-block">
+                <h3>Cel Shading &amp; Outline Shader</h3>
+                <p>Authored the HLSL shaders that define the game's signature stylised look, together with my discipline partner <a href="https://dawid-batkowski.github.io" target="_blank" rel="noopener">Dawid Batkowski</a>. The cel shading works by quantizing the standard PBR lighting model into discrete color bands, with stylised control over specular highlight color, size and shape. The outline shader runs edge detection on both the depth and normal buffers to catch silhouettes as well as surface detail edges</p>
+                <div class="contrib-media">
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Hornswaggle/celshading.png" alt="Cel shading comparison" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Hornswaggle/outlines.png" alt="Outline shader detail" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Hornswaggle/finalresult.png" alt="Final stylised look" />
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Post-Processing Shaders</h3>
+                <p>Built additional HLSL post-process shaders to complement the cel shaded look. The depth of field effect samples the scene color texture at increasing mip levels based on depth from the camera to control the blur falloff. Combined with a simple vignette shader, these effects help guide the player's eye toward the gameplay area and give the image a more polished, cinematic feel.</p>
+                <div class="contrib-media">
+                    <figure class="contrib-media-item contrib-media-item--contain">
+                        <img src="content/GameProjects/Hornswaggle/vignette.png" alt="Vignette effect" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Hornswaggle/dof.gif" alt="Depth of field" />
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Obstacle Animations</h3>
+                <p>Created animations for the game's obstacles, including the tentacle and cannon hazards as well as the skeleton and pirate enemies. These were rigged, skinned and animated by me in Blender.</p>
+                <div class="contrib-media contrib-media--portrait">
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Hornswaggle/tentacle_Rotating.gif" alt="Tentacle animation1" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Hornswaggle/tentacle_Wiggle.gif" alt="Tentacle animation2" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Hornswaggle/cannon_shooting.gif" alt="Cannon animation" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Hornswaggle/skeleton_Walk.gif" alt="Enemy animation1" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Hornswaggle/skeleton_Swing.gif" alt="Enemy animation2" />
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Vertex Shader Animations</h3>
+                <p>Wrote vertex shader animations for the kraken tentacles gripping the ship and the surrounding environmental elements. The tentacles pulsate and shift, rocking nearby objects back and forth to sell the feeling of an active kraken attack rather than a static environment.</p>
+                <div class="contrib-media" style="max-width: 50%">
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Hornswaggle/vertexanim.gif" alt="Environment vertex animation" />
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>VFX Flipbooks &amp; Flipbook Shader</h3>
+                <p>Created VFX flipbook spritesheets for the player jump, cannon shooting, cannon ball projectile and explosion effects. I first wrote the flipbook playback logic as a GPU shader, then later the logic was ported to CPU by the programming team so that they could more easily integrate the effects into gameplay systems.</p>
+                <div class="contrib-media">
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Hornswaggle/image18.gif" alt="Cannon shot" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Hornswaggle/image20.gif" alt="Cannon ball projectile" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Hornswaggle/image7.gif" alt="Player jump VFX" />
+                    </figure>
+                </div>
             </div>
         </section>
 
+        <!-- Tools & Technologies -->
         <section class="project-detail-section">
             <h2>Tools & Technologies</h2>
             <ul class="tools-list">
-                <li><img src="content/icons/ue5.svg" alt="Unreal Engine 5" class="tool-icon" /> Unreal Engine 5</li>
-                <li><img src="content/icons/blueprints.svg" alt="Blueprints" class="tool-icon" /> Blueprints</li>
-                <li><img src="content/icons/materials.svg" alt="Material Editor" class="tool-icon" /> Material Editor</li>
+                <li><img src="content/icons/tgalogowhite.svg" alt="Unreal Engine 5" class="tool-icon" /> TGE </li>
+                <li><img src="content/icons/hlsl.svg" alt="HLSL" class="tool-icon" /> HLSL</li>
+                <li><img src="content/icons/blender.svg" alt="Blender" class="tool-icon" /> Blender</li>
             </ul>
         </section>
 
+        <!-- Links -->
         <div class="project-detail-links-section">
             <h2>Links</h2>
             <div class="project-detail-links">
-                <a href="https://github.com/Efrem-Torrisi" target="_blank" rel="noopener" aria-label="View project">
-                    <img src="content/icons/github.svg" alt="GitHub" />
+                <a href="https://mampen.itch.io/the-misadventures-of-captain-hornswaggle" target="_blank" rel="noopener" aria-label="View project">
+                    <img src="content/icons/itch.svg" alt="Itch.io" />
                 </a>
             </div>
         </div>

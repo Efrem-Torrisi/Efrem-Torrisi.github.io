@@ -15,7 +15,7 @@
         <!-- Overview -->
         <section class="project-detail-section">
             <h2>Overview & Technical Breakdown</h2>
-            <p>For this project, I developed an Unreal Engine 5 Plugin to render large quantity of grass blades via compute shaders. The aim of the project is to have a ready to drop plugin to create grass fields made out of millions of individual grass blades within a reasonable frame budget. The grass blades can also be customised with enough user parameters, such as wind sway vertex animations, base - tip - subsurface colors, Height - Width - Bending - Rotation variations, and Dithering effects, to make the fields able fit multiple art styles </p>
+            <p>For this project, I developed an Unreal Engine 5 plugin that renders millions of individual grass blades entirely on the GPU via compute shaders and indirect drawing. A compute shader spawns, culls, and sorts blades into LOD buckets, while custom global vertex and pixel shaders generate curved blade geometry procedurally and write directly to the GBuffer, integrating with Unreal's default deferred rendering pass. The plugin is designed to be a drop-in solution: place a Grass Volume actor in the scene and configure parameters like wind animation, base/tip/subsurface colors, height and width variations, bending, rotation, and dithering to fit the desired art style.</p>
         </section>
 
         <!-- Demo Video -->
@@ -31,30 +31,41 @@
 
         <!-- Technical Breakdown -->
         <section class="project-detail-section">
-            <h3>Compute Shader and Indirect Drawing</h3>
-            <p>When using the tool in its "Auto Detect Materials Mode", the tool's Python SOP reads the incoming FBX geometry and parses material and name attributes to identify each material zone, and then creates primitive and detail attributes used for export naming convention later. Each detected material is separated into its own processing stream, where it receives the appropriate fracture treatment based on its material type and user parameters.</p>
-            <figure class="tech-breakdown-figure">
-                <img src="content\SoloProjects\FractureToolSubpage\MaterialDetection.png" alt="Compute Shader and Indirect Drawing" />
-            </figure>
+            <div class="tech-breakdown-row">
+                <div class="tech-breakdown-text">
+                    <h3>Compute Shader and Indirect Drawing</h3>
+                    <p>The core of the plugin is a compute shader that runs one GPU thread per potential grass blade. Each thread evaluates a spawn position on a grid with hash-based jitter, performs frustum and distance culling, and if the blade is visible, appends it to a structured buffer. The draw arguments are written entirely on the GPU into an indirect args buffer, so the CPU never needs to know how many blades are visible. The final draw call uses DrawPrimitiveIndirect to render only the surviving instances, achieving zero CPU-GPU synchronization overhead.</p>
+                </div>
+                <figure class="tech-breakdown-figure">
+                    <img src="content\SoloProjects\FractureToolSubpage\MaterialDetection.png" alt="Compute Shader and Indirect Drawing" />
+                </figure>
+            </div>
 
-            <h3>Grass Blades' Vertex and Pixel Global Shaders </h3>
-            <p>A big part of this project was exploring how to fracture meshes to get realistic results for different materials (concrete, wood, glass). Throughout development of this tool I developed numerous custom fracturing methods for these three materials and eventually ended up including in the tool three variations for concrete, three for glass, and two for wood. The tool applies the correct fracturing method per material zone, producing physically plausible pre-fracture patterns without manual setup requested from the user. Alternatively, if the user wants to, the tool can be used in a manual mode by forcing a specific fracturing method to be applied to the entirety of the mesh.</p>
-            <figure class="tech-breakdown-figure">
-                <img src="content\SoloProjects\FractureToolSubpage\FracturingMethods.png" alt="Grass Blades' Vertex and Pixel Global Shaders" />
-            </figure>
+            <div class="tech-breakdown-row tech-breakdown-row--reverse">
+                <div class="tech-breakdown-text">
+                    <h3>Vertex and Pixel Global Shaders</h3>
+                    <p>The grass blades are rendered using custom global shaders that write directly to the GBuffer. The vertex shader generates blade geometry procedurally from SV_VertexID, building curved blades with Bezier bending driven by wind, per-blade random tilt, droop, and side curvature. The pixel shader outputs a base-to-tip color gradient with per-blade hue variation, self-shadowing at the roots, world-space noise based patches that vary in color value, Interleaved Gradient Noise dithered opacity for soft blade tips, and a subsurface scattering color for backlit translucency.</p>
+                </div>
+                <figure class="tech-breakdown-figure">
+                    <img src="content\SoloProjects\FractureToolSubpage\FracturingMethods.png" alt="Vertex and Pixel Global Shaders" />
+                </figure>
+            </div>
 
-            <h3>Optimization Techniques</h3>
-            <p>The tool offers multiple export modes and settings: a single combined FBX that keeps the offset for pieces relative to the original pivot, and an FBX export with all pieces centered at the world origin, combined with a point cloud FBX storing the original offset of those pieces to reconstruct those positions in engine. Each of these modes also allows the user to transfer input mesh UVs to the pre-fractured mesh, triangulate, remesh, polyreduce, or even export a metadata JSON file that could be used for engine-side implementation of the destruction simulation.</p>
-            <figure class="tech-breakdown-figure">
-                <img src="content\SoloProjects\FractureToolSubpage\ExportSettings.png" alt="Optimization Techniques" />
-            </figure>
+            <div class="tech-breakdown-block">
+                <h3>Optimization Techniques</h3>
+                <p>Several layers of optimization keep the plugin within a reasonable frame budget at high blade counts. On the compute side, frustum culling discards blades outside the camera view and distance culling rejects blades beyond a configurable draw distance. Both are simple per-thread checks before the append, so that the indirect draw call automatically renders fewer instances. A two-level LOD system sorts blades into separate buffers: nearby blades get the full 15-vertex curved geometry while distant blades fall back to a 3-vertex triangle, each drawn with their own indirect call. Screen-space width clamping enforces a minimum pixel width on distant blades to prevent artifacting. On the rendering side, the plugin hooks into PostRenderBasePassDeferred, meaning all grass participates in deferred lighting, shadows, and GI for "free" without requiring a separate lighting pass.</p>
+                <figure class="tech-breakdown-figure">
+                    <img src="content\SoloProjects\FractureToolSubpage\ExportSettings.png" alt="Optimization Techniques" />
+                </figure>
+            </div>
 
-            <h3>Performance Results</h3>
-            <p>To demonstrate a practical use case for the tool, I built a lightweight destruction system in Unreal Engine. The pre-fractured pieces are exported centered at the world origin, alongside a point cloud FBX that stores each piece's original offset from the mesh pivot. I then made a GPU Niagara system using Mesh Renderer Flipbook to render each fractured piece as a particle, with an Initial Mesh Location module reading the point cloud FBX to reconstruct the original shape of the intact mesh and some point and rotation forces applied for the effect.</p>
-            <p>A Blueprint then holds the original intact mesh and the Niagara system. On projectile hit, the intact mesh is destroyed and the Niagara system is activated — the particles start at their reconstructed positions and simulate outward, producing a satisfying destruction effect. Because the particle count equals the number of fractured pieces, the system is extremly performant while still delivering a convincing result.</p>
-            <figure class="tech-breakdown-figure">
-                <img src="content\SoloProjects\FractureToolSubpage\UE5Destruction2.png" alt="Performance Results" />
-            </figure>
+            <div class="tech-breakdown-block">
+                <h3>Plugin and User Parameters</h3>
+                <p>The plugin is structured as a self-contained UE5 runtime module. When the plugin is enabled, the user can drop a GrassVolume actor with uproperty parameters available for editing, such as: blade count, spawn radius, draw distance, height, width, bending and rotation variations, wind speed and direction, base/tip/subsurface colors, LOD distance, dithering settings and frustum culling margin. The plugin supports multiple independent grass volumes in a scene, each with its own settings, dispatching separate compute and draw passes per volume.
+                <figure class="tech-breakdown-figure">
+                    <img src="content\SoloProjects\FractureToolSubpage\UE5Destruction2.png" alt="Plugin architecture and user parameters" />
+                </figure>
+            </div>
         </section>
 
         <!-- Tools & Technologies -->

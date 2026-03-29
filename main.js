@@ -286,7 +286,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         var projectTitle = card ? card.dataset.title : projectSlug;
         document.title = projectTitle + ' | Efrem Torrisi';
 
-        modalContent.innerHTML = '<div class="modal-loading">Loading\u2026</div>';
+        modalContent.innerHTML = '<div class="modal-loading"><div class="modal-spinner"></div>Loading\u2026</div>';
         document.body.classList.add('modal-open');
         modalOverlay.classList.add('is-active');
         modalOverlay.setAttribute('aria-hidden', 'false');
@@ -304,10 +304,45 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             });
         }
 
-        if (contentCache[projectSlug]) {
-            modalContent.innerHTML = contentCache[projectSlug];
+        function lazyLoadModalVideos() {
+            var videos = modalContent.querySelectorAll('.contrib-media-item video, .tech-breakdown-figure video');
+            if (!videos.length) return;
+
+            var container = modalContainer();
+            var videoObserver = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    var video = entry.target;
+                    if (entry.isIntersecting) {
+                        if (video.preload === 'none') {
+                            video.preload = 'auto';
+                            video.load();
+                        }
+                        video.play().catch(function () {});
+                    } else {
+                        video.pause();
+                    }
+                });
+            }, { root: container, rootMargin: '200px 0px' });
+
+            videos.forEach(function (video) {
+                video.preload = 'none';
+                video.removeAttribute('autoplay');
+                videoObserver.observe(video);
+            });
+
+            // Store observer so we can disconnect on modal close
+            modalOverlay._videoObserver = videoObserver;
+        }
+
+        function initModalContent() {
             modalContainer().scrollTop = 0;
             swapModalVideos();
+            lazyLoadModalVideos();
+        }
+
+        if (contentCache[projectSlug]) {
+            modalContent.innerHTML = contentCache[projectSlug];
+            initModalContent();
         } else {
             fetch('projects/' + projectSlug + '.html')
                 .then(function (res) {
@@ -318,8 +353,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                     contentCache[projectSlug] = html;
                     if (modalOverlay.classList.contains('is-active')) {
                         modalContent.innerHTML = html;
-                        modalContainer().scrollTop = 0;
-                        swapModalVideos();
+                        initModalContent();
                     }
                 })
                 .catch(function () {
@@ -336,6 +370,10 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
     }
 
     function closeModal() {
+        if (modalOverlay._videoObserver) {
+            modalOverlay._videoObserver.disconnect();
+            modalOverlay._videoObserver = null;
+        }
         modalOverlay.classList.remove('is-active');
         modalOverlay.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('modal-open');

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Rounded square background -->
+  <rect x="16" y="16" width="480" height="480" rx="90" fill="#0a0a0a"/>
+
+  <!-- Stylised cursive italic ET -->
+  <text x="457" y="365" text-anchor="end" font-family="'Segoe Script', 'Snell Roundhand', 'Brush Script MT', 'Apple Chancery', cursive" font-size="280" font-weight="400" font-style="italic" fill="#ffffff" letter-spacing="5">ET</text>
+</svg>

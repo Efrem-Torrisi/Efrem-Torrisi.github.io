@@ -700,7 +700,8 @@ section h2 {
 .social-icons {
     display: flex;
     justify-content: center;
-    gap: 1.5rem;
+    align-items: center;
+    gap: 2rem;
     margin-top: 3rem;
 }
 
@@ -708,14 +709,16 @@ section h2 {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 28px;
+    height: 28px;
     color: var(--color-text-tertiary);
     text-decoration: none;
     transition: color 0.3s ease, transform 0.3s ease;
 }
 
 .social-icon svg {
-    width: 26px;
-    height: 26px;
+    width: 100%;
+    height: 100%;
 }
 
 .social-icon:hover {

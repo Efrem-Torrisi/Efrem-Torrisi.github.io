@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 820" fill="none" preserveAspectRatio="none" width="100%" height="100%">
+  <style>
+    text { font-family: -apple-system, 'SF Pro Display', 'Segoe UI', sans-serif; }
+    .title { font-size: 13px; font-weight: 600; fill: #f5f5f7; }
+    .label { font-size: 10.5px; fill: #c9d1d9; }
+    .sublabel { font-size: 9.5px; fill: #8b949e; }
+    .box { rx: 10; ry: 10; }
+    .arrow-line { stroke: #484f58; stroke-width: 1.5; }
+    .arrow-head { fill: #484f58; }
+    .divider { stroke: #2a2d31; stroke-width: 1; stroke-dasharray: 4 3; }
+  </style>
+
+  <!-- Background -->
+  <rect width="380" height="820" rx="14" fill="#161b22"/>
+  <rect x="1" y="1" width="378" height="818" rx="13" fill="none" stroke="#30363d" stroke-width="1"/>
+
+  <!-- CPU side -->
+  <text x="190" y="32" text-anchor="middle" class="sublabel" style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase; fill:#58a6ff;">CPU</text>
+
+  <rect x="40" y="44" width="300" height="52" class="box" fill="#1c2129" stroke="#30363d"/>
+  <text x="190" y="64" text-anchor="middle" class="title">Dispatch Compute Shader</text>
+  <text x="190" y="80" text-anchor="middle" class="sublabel">Passes spawn area, camera, frustum planes</text>
+
+  <line x1="190" y1="96" x2="190" y2="110" class="arrow-line"/>
+  <polygon points="184,106 190,116 196,106" class="arrow-head"/>
+
+  <rect x="40" y="118" width="300" height="52" class="box" fill="#1c2129" stroke="#30363d"/>
+  <text x="190" y="138" text-anchor="middle" class="title">Queue Indirect Draw</text>
+  <text x="190" y="154" text-anchor="middle" class="sublabel">Sets up draw call, CPU work is done</text>
+
+  <line x1="190" y1="170" x2="190" y2="184" class="arrow-line"/>
+  <polygon points="184,180 190,190 196,180" class="arrow-head"/>
+
+  <!-- CPU -> GPU divider -->
+  <line x1="20" y1="197" x2="360" y2="197" class="divider"/>
+  <text x="190" y="212" text-anchor="middle" class="sublabel" style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase; fill:#58a6ff;">GPU (Compute Shader)</text>
+
+  <!-- Spawn -->
+  <rect x="40" y="226" width="300" height="52" class="box" fill="#1c2129" stroke="#30363d"/>
+  <text x="190" y="248" text-anchor="middle" class="title">Spawn Position</text>
+  <text x="190" y="264" text-anchor="middle" class="sublabel">Grid placement + hash jitter per thread</text>
+
+  <line x1="190" y1="278" x2="190" y2="304" class="arrow-line"/>
+  <polygon points="184,300 190,310 196,300" class="arrow-head"/>
+
+  <!-- Culling -->
+  <rect x="40" y="312" width="300" height="64" class="box" fill="#1c2129" stroke="#da3633" stroke-opacity="0.5"/>
+  <text x="190" y="336" text-anchor="middle" class="title" style="fill:#f78166;">Culling</text>
+  <text x="190" y="352" text-anchor="middle" class="sublabel">Distance check, frustum check</text>
+  <text x="190" y="365" text-anchor="middle" class="sublabel">Threads that fail just return early</text>
+
+  <line x1="190" y1="376" x2="190" y2="402" class="arrow-line"/>
+  <polygon points="184,398 190,408 196,398" class="arrow-head"/>
+
+  <!-- LOD Sort -->
+  <rect x="40" y="410" width="300" height="52" class="box" fill="#1c2129" stroke="#30363d"/>
+  <text x="190" y="432" text-anchor="middle" class="title">LOD Sort</text>
+  <text x="190" y="448" text-anchor="middle" class="sublabel">Close blades -> LOD0, far blades -> LOD1</text>
+
+  <!-- Split to two buffers -->
+  <line x1="130" y1="462" x2="130" y2="498" class="arrow-line"/>
+  <polygon points="124,494 130,504 136,494" class="arrow-head"/>
+  <line x1="250" y1="462" x2="250" y2="498" class="arrow-line"/>
+  <polygon points="244,494 250,504 256,494" class="arrow-head"/>
+
+  <rect x="40" y="506" width="140" height="56" class="box" fill="#1c2129" stroke="#58a6ff" stroke-opacity="0.4"/>
+  <text x="110" y="528" text-anchor="middle" class="title" style="font-size:12px;">LOD0 Buffer</text>
+  <text x="110" y="544" text-anchor="middle" class="sublabel">15-vert curved blade</text>
+
+  <rect x="200" y="506" width="140" height="56" class="box" fill="#1c2129" stroke="#58a6ff" stroke-opacity="0.4"/>
+  <text x="270" y="528" text-anchor="middle" class="title" style="font-size:12px;">LOD1 Buffer</text>
+  <text x="270" y="544" text-anchor="middle" class="sublabel">3-vert triangle</text>
+
+  <!-- Merge arrows -->
+  <line x1="130" y1="562" x2="130" y2="588" class="arrow-line"/>
+  <line x1="250" y1="562" x2="250" y2="588" class="arrow-line"/>
+  <line x1="130" y1="588" x2="250" y2="588" class="arrow-line"/>
+  <line x1="190" y1="588" x2="190" y2="612" class="arrow-line"/>
+  <polygon points="184,608 190,618 196,608" class="arrow-head"/>
+
+  <!-- GPU draw divider -->
+  <line x1="20" y1="625" x2="360" y2="625" class="divider"/>
+  <text x="190" y="640" text-anchor="middle" class="sublabel" style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase; fill:#58a6ff;">GPU (Indirect Draw)</text>
+
+  <rect x="40" y="652" width="300" height="52" class="box" fill="#1c2129" stroke="#3fb950" stroke-opacity="0.4"/>
+  <text x="190" y="674" text-anchor="middle" class="title" style="fill:#3fb950;">DrawPrimitiveIndirect</text>
+  <text x="190" y="690" text-anchor="middle" class="sublabel">GPU reads its own args buffer and draws primitives</text>
+
+  <line x1="190" y1="704" x2="190" y2="730" class="arrow-line"/>
+  <polygon points="184,726 190,736 196,726" class="arrow-head"/>
+
+  <!-- VS + PS combined -->
+  <rect x="40" y="738" width="300" height="64" class="box" fill="#1c2129" stroke="#d2a8ff" stroke-opacity="0.4"/>
+  <text x="190" y="760" text-anchor="middle" class="title" style="fill:#d2a8ff;">Vertex Shader + Pixel Shader</text>
+  <text x="190" y="776" text-anchor="middle" class="sublabel">Procedural blade geometry, color, dithering</text>
+  <text x="190" y="789" text-anchor="middle" class="sublabel">Writes directly to GBuffer (deferred)</text>
+
+</svg>

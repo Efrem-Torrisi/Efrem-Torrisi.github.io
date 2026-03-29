@@ -343,6 +343,21 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             modalContainer().scrollTop = 0;
             swapModalVideos();
             lazyLoadModalVideos();
+            initCodeTabs();
+        }
+
+        function initCodeTabs() {
+            modalContent.querySelectorAll('.code-embed').forEach(function (embed) {
+                embed.querySelectorAll('.code-tab').forEach(function (tab) {
+                    tab.addEventListener('click', function () {
+                        embed.querySelectorAll('.code-tab').forEach(function (t) { t.classList.remove('active'); });
+                        embed.querySelectorAll('.code-panel').forEach(function (p) { p.classList.remove('active'); });
+                        tab.classList.add('active');
+                        var target = document.getElementById(tab.getAttribute('data-target'));
+                        if (target) target.classList.add('active');
+                    });
+                });
+            });
         }
 
         if (contentCache[projectSlug]) {

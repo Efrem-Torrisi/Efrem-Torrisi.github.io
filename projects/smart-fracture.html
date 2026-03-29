@@ -62,20 +62,45 @@
             </div>
 
             <div class="tech-breakdown-block">
-                <h3>Export Modes and Settings</h3>
-                <p>The tool offers multiple export modes and settings: a single combined FBX that keeps the offset for pieces relative to the original pivot, and an FBX export with all pieces centered at the world origin, combined with a point cloud FBX storing the original offset of those pieces to reconstruct those positions in engine. Each of these modes also allows the user to transfer input mesh UVs to the pre-fractured mesh, triangulate, remesh, polyreduce, or even export a metadata JSON file that could be used for engine-side implementation of the destruction simulation.</p>
+                <h3>Export Modes & Settings</h3>
+                <p>The tool offers multiple export modes: a single combined FBX that keeps the offset for pieces relative to the original pivot, and an FBX export with all pieces centered at the world origin. Both modes allow the user to transfer input mesh UVs to the pre-fractured mesh, triangulate, remesh, or polyreduce before export.</p>
                 <figure class="tech-breakdown-figure">
                     <img src="content\SoloProjects\FractureToolSubpage\ExportSettings.png" alt="Export mode options" />
                 </figure>
             </div>
 
             <div class="tech-breakdown-block">
-                <h3>Destruction Demo Setup in Unreal Engine</h3>
+                <h3>Point Cloud & Metadata Export</h3>
+                <p>The tool can generate two additional exports alongside the fractured meshes. The first is a point cloud FBX that stores each piece's original offset from the mesh pivot, allowing an engine to reconstruct the intact shape from origin-centered pieces. The second is a JSON metadata file that maps each piece name to its position and bounding box dimensions, providing everything needed to generate correctly placed collision boxes in code.</p>
+                <div class="contrib-media contrib-media--contain">
+                    <figure class="contrib-media-item">
+                        <img src="content\SoloProjects\FractureToolSubpage\pointcloud_export.png" alt="Point cloud Export" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content\SoloProjects\FractureToolSubpage\json_export.png" alt="Json Export" />
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Destruction Demo in Unreal Engine 5</h3>
                 <p>To demonstrate a practical use case for the tool, I built a lightweight destruction system in Unreal Engine. The pre-fractured pieces are exported centered at the world origin, alongside a point cloud FBX that stores each piece's original offset from the mesh pivot. I then made a GPU Niagara system using Mesh Renderer Flipbook to render each fractured piece as a particle, with an Initial Mesh Location module reading the point cloud FBX to reconstruct the original shape of the intact mesh and some point and rotation forces applied for the effect.</p>
-                <p>A Blueprint then holds the original intact mesh and the Niagara system. On projectile hit, the intact mesh is destroyed and the Niagara system is activated - the particles start at their reconstructed positions and simulate outward, producing a satisfying destruction effect. Because the particle count equals the number of fractured pieces, the system is extremly performant while still delivering a convincing result.</p>
-                <figure class="tech-breakdown-figure">
-                    <img src="content\SoloProjects\FractureToolSubpage\UE5Destruction2.png" alt="GPU destruction setup in Unreal Engine" />
-                </figure>
+                <p>A Blueprint then holds the original intact mesh and the Niagara system. On projectile hit, the intact mesh is destroyed and the Niagara system is activated -- the particles start at their reconstructed positions and simulate outward, producing a satisfying destruction effect. Because the particle count equals the number of fractured pieces, the system is extremely performant while still delivering a convincing result.</p>
+                <div class="contrib-media contrib-media--contain" style="max-width: 50%">
+                    <figure class="contrib-media-item">
+                        <video src="content/SoloProjects/FractureToolSubpage/unreal_demo.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Destruction Demo in Custom Engine (Jolt Physics)</h3>
+                <p>The fractured meshes were also used in a custom DX11 engine with Jolt physics for real-time destruction. For this setup, the origin-centered FBX pieces and the JSON metadata export were used -- the engine reads each piece's position and dimensions from the JSON to generate collision boxes at the correct placement and scale in code. On impact, the intact mesh is swapped for the individual pieces with their physics bodies, and Jolt simulates the destruction from there.</p>
+                <div class="contrib-media contrib-media--contain" style="max-width: 50%">
+                    <figure class="contrib-media-item">
+                        <video src="content/SoloProjects/FractureToolSubpage/rhe_demo.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                    </figure>
+                </div>
             </div>
         </section>
 

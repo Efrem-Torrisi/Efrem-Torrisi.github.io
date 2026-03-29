@@ -21,7 +21,7 @@
         <!-- Demo Video -->
         <div class="project-detail-trailer project-detail-trailer--inline">
             <video
-                src="content/SoloProjects/Grass/GrassPlugin2V.mp4"
+                src="content/SoloProjects/Grass/GrassPluginV.mp4"
                 controls
                 playsinline
                 preload="metadata"
@@ -31,40 +31,185 @@
 
         <!-- Technical Breakdown -->
         <section class="project-detail-section">
-            <div class="tech-breakdown-row">
+            <div class="tech-breakdown-row compute-section">
                 <div class="tech-breakdown-text">
                     <h3>Compute Shader and Indirect Drawing</h3>
-                    <p>The core of the plugin is a compute shader that runs one GPU thread per potential grass blade. Each thread evaluates a spawn position on a grid with hash-based jitter, performs frustum and distance culling, and if the blade is visible, appends it to a structured buffer. The draw arguments are written entirely on the GPU into an indirect args buffer, so the CPU never needs to know how many blades are visible. The final draw call uses DrawPrimitiveIndirect to render only the surviving instances, achieving zero CPU-GPU synchronization overhead.</p>
+                    <p>The core of the plugin is a compute shader that runs one GPU thread per potential grass blade. Each thread evaluates a spawn position on a grid, performs frustum and distance culling, and if the blade is visible, appends it to a structured buffer. The draw arguments are written entirely on the GPU into an indirect args buffer, so the CPU never needs to know how many blades are visible. The final draw call uses DrawPrimitiveIndirect to render only the surviving instances, achieving zero CPU-GPU synchronization overhead.</p>
                 </div>
-                <figure class="tech-breakdown-figure">
-                    <img src="content\SoloProjects\FractureToolSubpage\MaterialDetection.png" alt="Compute Shader and Indirect Drawing" />
-                </figure>
+                <div class="compute-media-row">
+                    <figure class="compute-diagram">
+                        <img src="content/SoloProjects/Grass/compute-pipeline.svg" alt="Compute shader pipeline flowchart" />
+                    </figure>
+                    <div class="code-embed">
+                    <div class="code-embed-tabs">
+                        <button class="code-tab active" data-target="tab-hlsl">GrassCompute.usf (HLSL)</button>
+                        <button class="code-tab" data-target="tab-cpp">GrassSceneViewExtension.cpp (C++)</button>
+                    </div>
+                    <div class="code-panel active" id="tab-hlsl">
+                        <pre><code>[<span class="hlsl-attr">numthreads</span>(<span class="hlsl-num">64</span>, <span class="hlsl-num">1</span>, <span class="hlsl-num">1</span>)]
+<span class="hlsl-type">void</span> <span class="hlsl-func">MainCS</span>(<span class="hlsl-type">uint3</span> DispatchThreadId : <span class="hlsl-attr">SV_DispatchThreadID</span>)
+{
+    <span class="hlsl-type">uint</span> ThreadIndex = DispatchThreadId.x;
+
+    <span class="hlsl-comment">// Only thread 0 needs to write the draw args</span>
+    <span class="hlsl-keyword">if</span> (ThreadIndex == <span class="hlsl-num">0</span>)
+    {
+        OutDrawArgsLOD0[<span class="hlsl-num">0</span>].VertexCountPerInstance = VertexCountPerInstanceLOD0;
+        OutDrawArgsLOD0[<span class="hlsl-num">0</span>].StartVertexLocation   = <span class="hlsl-num">0</span>;
+        OutDrawArgsLOD0[<span class="hlsl-num">0</span>].StartInstanceLocation  = <span class="hlsl-num">0</span>;
+
+        OutDrawArgsLOD1[<span class="hlsl-num">0</span>].VertexCountPerInstance = VertexCountPerInstanceLOD1;
+        OutDrawArgsLOD1[<span class="hlsl-num">0</span>].StartVertexLocation   = <span class="hlsl-num">0</span>;
+        OutDrawArgsLOD1[<span class="hlsl-num">0</span>].StartInstanceLocation  = <span class="hlsl-num">0</span>;
+    }
+
+    <span class="hlsl-keyword">if</span> (ThreadIndex >= NumGrassBlades)
+        <span class="hlsl-keyword">return</span>;
+
+    <span class="hlsl-comment">// Get a grid position and jitter it so the blades don't look too uniform</span>
+    <span class="hlsl-type">uint</span> GridSize = <span class="hlsl-func">uint</span>(<span class="hlsl-func">sqrt</span>(<span class="hlsl-func">float</span>(NumGrassBlades)));
+    <span class="hlsl-type">float2</span> GridUV = <span class="hlsl-func">IndexToGridPosition</span>(ThreadIndex, GridSize);
+
+    <span class="hlsl-type">float</span> JitterX = <span class="hlsl-func">Hash</span>(ThreadIndex * <span class="hlsl-num">2</span>) * <span class="hlsl-num">0.8</span> - <span class="hlsl-num">0.4</span>;
+    <span class="hlsl-type">float</span> JitterY = <span class="hlsl-func">Hash</span>(ThreadIndex * <span class="hlsl-num">2</span> + <span class="hlsl-num">1</span>) * <span class="hlsl-num">0.8</span> - <span class="hlsl-num">0.4</span>;
+    GridUV += <span class="hlsl-type">float2</span>(JitterX, JitterY) / <span class="hlsl-func">float</span>(GridSize);
+    GridUV = <span class="hlsl-func">saturate</span>(GridUV);
+
+    <span class="hlsl-comment">// Convert grid UV to world space</span>
+    <span class="hlsl-type">float3</span> WorldPos;
+    WorldPos.x = SpawnOrigin.x + (GridUV.x * <span class="hlsl-num">2.0</span> - <span class="hlsl-num">1.0</span>) * SpawnExtent.x;
+    WorldPos.y = SpawnOrigin.y + (GridUV.y * <span class="hlsl-num">2.0</span> - <span class="hlsl-num">1.0</span>) * SpawnExtent.y;
+    WorldPos.z = SpawnOrigin.z;
+
+    <span class="hlsl-comment">// If circular mode is on, skip blades outside the circle</span>
+    <span class="hlsl-keyword">if</span> (bCircularShape)
+    {
+        <span class="hlsl-type">float2</span> offset = (WorldPos.xy - SpawnOrigin.xy) / SpawnExtent.xy;
+        <span class="hlsl-keyword">if</span> (<span class="hlsl-func">dot</span>(offset, offset) > <span class="hlsl-num">1.0</span>)
+            <span class="hlsl-keyword">return</span>;
+    }
+
+    <span class="hlsl-comment">// Skip if too far or not in view</span>
+    <span class="hlsl-type">float</span> DistanceToCamera = <span class="hlsl-func">length</span>(WorldPos - CameraPosition);
+    <span class="hlsl-keyword">if</span> (DistanceToCamera > MaxDrawDistance)
+        <span class="hlsl-keyword">return</span>;
+    <span class="hlsl-keyword">if</span> (!<span class="hlsl-func">IsInFrustum</span>(WorldPos))
+        <span class="hlsl-keyword">return</span>;
+
+    <span class="hlsl-comment">// If we got here the blade is visible, so fill in its data</span>
+    <span class="hlsl-type">FGrassInstance</span> Instance;
+    Instance.Position = WorldPos;
+    Instance.Scale    = <span class="hlsl-num">0.8</span> + <span class="hlsl-func">Hash</span>(ThreadIndex * <span class="hlsl-num">3</span>) * <span class="hlsl-num">0.4</span>;
+    Instance.Normal   = <span class="hlsl-type">float3</span>(<span class="hlsl-num">0</span>, <span class="hlsl-num">0</span>, <span class="hlsl-num">1</span>);
+    Instance.Rotation = <span class="hlsl-func">Hash</span>(ThreadIndex * <span class="hlsl-num">4</span>) * <span class="hlsl-num">6.28318</span>;
+
+    <span class="hlsl-comment">// Put it in the close or far LOD buffer and increment the count</span>
+    <span class="hlsl-type">uint</span> WriteIndex;
+    <span class="hlsl-keyword">if</span> (DistanceToCamera <= LODDistance)
+    {
+        <span class="hlsl-func">InterlockedAdd</span>(OutDrawArgsLOD0[<span class="hlsl-num">0</span>].InstanceCount, <span class="hlsl-num">1</span>, WriteIndex);
+        OutGrassInstancesLOD0[WriteIndex] = Instance;
+    }
+    <span class="hlsl-keyword">else</span>
+    {
+        <span class="hlsl-func">InterlockedAdd</span>(OutDrawArgsLOD1[<span class="hlsl-num">0</span>].InstanceCount, <span class="hlsl-num">1</span>, WriteIndex);
+        OutGrassInstancesLOD1[WriteIndex] = Instance;
+    }
+}</code></pre>
+                    </div>
+                    <div class="code-panel" id="tab-cpp">
+                        <pre><code><span class="hlsl-comment">// One buffer per LOD to store the grass instances that pass culling</span>
+<span class="hlsl-type">FRDGBufferDesc</span> InstanceDesc = <span class="hlsl-type">FRDGBufferDesc</span>::<span class="hlsl-func">CreateStructuredDesc</span>(
+    <span class="hlsl-keyword">sizeof</span>(<span class="hlsl-type">FGrassInstanceGPU</span>), MaxInstances);
+
+<span class="hlsl-type">FRDGBufferRef</span> InstancesLOD0 = GraphBuilder.<span class="hlsl-func">CreateBuffer</span>(InstanceDesc, <span class="hlsl-func">TEXT</span>(<span class="hlsl-str">"GrassInstancesLOD0"</span>));
+<span class="hlsl-type">FRDGBufferRef</span> InstancesLOD1 = GraphBuilder.<span class="hlsl-func">CreateBuffer</span>(InstanceDesc, <span class="hlsl-func">TEXT</span>(<span class="hlsl-str">"GrassInstancesLOD1"</span>));
+
+<span class="hlsl-comment">// These hold the draw args - the compute shader fills in how many to draw</span>
+<span class="hlsl-type">FRDGBufferDesc</span> ArgsDesc = <span class="hlsl-type">FRDGBufferDesc</span>::<span class="hlsl-func">CreateStructuredDesc</span>(
+    <span class="hlsl-keyword">sizeof</span>(<span class="hlsl-type">FGrassDrawIndirectArgsGPU</span>), <span class="hlsl-num">1</span>);
+ArgsDesc.Usage |= <span class="hlsl-type">EBufferUsageFlags</span>::DrawIndirect;
+
+<span class="hlsl-type">FRDGBufferRef</span> ArgsLOD0 = GraphBuilder.<span class="hlsl-func">CreateBuffer</span>(ArgsDesc, <span class="hlsl-func">TEXT</span>(<span class="hlsl-str">"GrassArgsLOD0"</span>));
+<span class="hlsl-type">FRDGBufferRef</span> ArgsLOD1 = GraphBuilder.<span class="hlsl-func">CreateBuffer</span>(ArgsDesc, <span class="hlsl-func">TEXT</span>(<span class="hlsl-str">"GrassArgsLOD1"</span>));
+
+<span class="hlsl-comment">// Clear to zero before the shader runs</span>
+<span class="hlsl-func">AddClearUAVPass</span>(GraphBuilder, GraphBuilder.<span class="hlsl-func">CreateUAV</span>(ArgsLOD0), <span class="hlsl-num">0</span>);
+<span class="hlsl-func">AddClearUAVPass</span>(GraphBuilder, GraphBuilder.<span class="hlsl-func">CreateUAV</span>(ArgsLOD1), <span class="hlsl-num">0</span>);
+
+<span class="hlsl-comment">// Pass in spawn area, camera info, and culling settings</span>
+<span class="hlsl-keyword">auto</span>* PassParams = GraphBuilder.<span class="hlsl-func">AllocParameters</span>&lt;<span class="hlsl-type">FGrassComputeCS</span>::<span class="hlsl-type">FParameters</span>&gt;();
+PassParams->NumGrassBlades = MaxInstances;
+PassParams->SpawnOrigin    = <span class="hlsl-type">FVector3f</span>(Settings.SpawnOrigin);
+PassParams->SpawnExtent    = <span class="hlsl-type">FVector3f</span>(Settings.SpawnRadius, Settings.SpawnRadius, <span class="hlsl-num">0.f</span>);
+PassParams->CameraPosition = CameraPositionF;
+PassParams->MaxDrawDistance = Settings.MaxDrawDistance;
+PassParams->LODDistance     = Settings.LODDistance;
+<span class="hlsl-func">ExtractFrustumPlanes</span>(InView, PassParams);
+
+<span class="hlsl-comment">// Give the shader write access to the instance and draw arg buffers</span>
+PassParams->OutGrassInstancesLOD0 = GraphBuilder.<span class="hlsl-func">CreateUAV</span>(InstancesLOD0);
+PassParams->OutGrassInstancesLOD1 = GraphBuilder.<span class="hlsl-func">CreateUAV</span>(InstancesLOD1);
+PassParams->OutDrawArgsLOD0       = GraphBuilder.<span class="hlsl-func">CreateUAV</span>(ArgsLOD0);
+PassParams->OutDrawArgsLOD1       = GraphBuilder.<span class="hlsl-func">CreateUAV</span>(ArgsLOD1);
+
+<span class="hlsl-comment">// Kick off the compute shader - one thread per blade</span>
+<span class="hlsl-keyword">const</span> <span class="hlsl-type">uint32</span> GroupSize   = <span class="hlsl-num">64</span>;
+<span class="hlsl-keyword">const</span> <span class="hlsl-type">uint32</span> GroupCount  = <span class="hlsl-type">FMath</span>::<span class="hlsl-func">DivideAndRoundUp</span>(MaxInstances, GroupSize);
+
+<span class="hlsl-type">FComputeShaderUtils</span>::<span class="hlsl-func">AddPass</span>(
+    GraphBuilder,
+    <span class="hlsl-func">RDG_EVENT_NAME</span>(<span class="hlsl-str">"GrassCompute_Culling"</span>),
+    ComputeShader, PassParams,
+    <span class="hlsl-type">FIntVector</span>(GroupCount, <span class="hlsl-num">1</span>, <span class="hlsl-num">1</span>));
+
+<span class="hlsl-comment">// ... VS/PS setup, pipeline state init ...</span>
+
+<span class="hlsl-comment">// Draw with indirect args - the GPU already knows how many blades there are</span>
+RHICmdList.<span class="hlsl-func">DrawPrimitiveIndirect</span>(DrawParams->IndirectDrawArgs-><span class="hlsl-func">GetRHI</span>(), <span class="hlsl-num">0</span>);</code></pre>
+                    </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="tech-breakdown-row tech-breakdown-row--reverse">
-                <div class="tech-breakdown-text">
-                    <h3>Vertex and Pixel Global Shaders</h3>
-                    <p>The grass blades are rendered using custom global shaders that write directly to the GBuffer. The vertex shader generates blade geometry procedurally from SV_VertexID, building curved blades with Bezier bending driven by wind, per-blade random tilt, droop, and side curvature. The pixel shader outputs a base-to-tip color gradient with per-blade hue variation, self-shadowing at the roots, world-space noise based patches that vary in color value, Interleaved Gradient Noise dithered opacity for soft blade tips, and a subsurface scattering color for backlit translucency.</p>
+            <div class="tech-breakdown-block">
+                <h3>Vertex and Pixel Global Shaders</h3>
+                <p>The grass blades are rendered using custom global shaders that write directly to the GBuffer. The vertex shader generates blade geometry procedurally from SV_VertexID, building curved blades with Bezier bending driven by wind, per-blade random tilt, droop, and side curvature. The pixel shader outputs a base-to-tip color gradient with per-blade hue variation, self-shadowing at the roots, world-space noise based patches that vary in color value, Interleaved Gradient Noise dithered opacity for soft blade tips, and a subsurface scattering color for backlit translucency.</p>
+                <div class="contrib-media contrib-media--contain">
+                    <figure class="contrib-media-item">
+                        <img src="content/SoloProjects/Grass/gbuffer.png" alt="GBuffer outputs: Albedo, Subsurface, Normal, Roughness" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <video src="content/SoloProjects/Grass/dithering.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                    </figure>
                 </div>
-                <figure class="tech-breakdown-figure">
-                    <img src="content\SoloProjects\FractureToolSubpage\FracturingMethods.png" alt="Vertex and Pixel Global Shaders" />
-                </figure>
             </div>
 
             <div class="tech-breakdown-block">
                 <h3>Optimization Techniques</h3>
-                <p>Several layers of optimization keep the plugin within a reasonable frame budget at high blade counts. On the compute side, frustum culling discards blades outside the camera view and distance culling rejects blades beyond a configurable draw distance. Both are simple per-thread checks before the append, so that the indirect draw call automatically renders fewer instances. A two-level LOD system sorts blades into separate buffers: nearby blades get the full 15-vertex curved geometry while distant blades fall back to a 3-vertex triangle, each drawn with their own indirect call. Screen-space width clamping enforces a minimum pixel width on distant blades to prevent artifacting. On the rendering side, the plugin hooks into PostRenderBasePassDeferred, meaning all grass participates in deferred lighting, shadows, and GI for "free" without requiring a separate lighting pass.</p>
-                <figure class="tech-breakdown-figure">
-                    <img src="content\SoloProjects\FractureToolSubpage\ExportSettings.png" alt="Optimization Techniques" />
-                </figure>
+                <p>The optimization techniques used keep the plugin within a reasonable frame budget at high blade counts. On the compute side, frustum culling discards blades outside the camera view and distance culling rejects blades beyond the chosen draw distance. Both are simple per-thread checks before the append, so that the indirect draw call automatically renders fewer instances. A two-level LOD system sorts blades into separate buffers: nearby blades get the full 15-vertex curved geometry while distant blades fall back to a 3-vertex triangle, each drawn with their own indirect call. Screen-space width clamping enforces a minimum pixel width on distant blades to prevent artifacting. On the rendering side, the plugin hooks into PostRenderBasePassDeferred, meaning all grass participates in deferred lighting, shadows, and GI for "free" without requiring a separate lighting pass.</p>
+                <div class="contrib-media contrib-media--contain">
+                    <figure class="contrib-media-item">
+                        <img src="content\SoloProjects\Grass\performance0.png" alt="Frametime without optimization" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content\SoloProjects\Grass\performance1.png" alt="Frametime with optimization" />
+                    </figure>
+                </div>
+                <p class="media-note"> Screenshots taken with: 10 million blades, Development Editor with debugger attached, 1440p on a 3080 Ti.</p>
             </div>
 
             <div class="tech-breakdown-block">
                 <h3>Plugin and User Parameters</h3>
-                <p>The plugin is structured as a self-contained UE5 runtime module. When the plugin is enabled, the user can drop a GrassVolume actor with uproperty parameters available for editing, such as: blade count, spawn radius, draw distance, height, width, bending and rotation variations, wind speed and direction, base/tip/subsurface colors, LOD distance, dithering settings and frustum culling margin. The plugin supports multiple independent grass volumes in a scene, each with its own settings, dispatching separate compute and draw passes per volume.
-                <figure class="tech-breakdown-figure">
-                    <img src="content\SoloProjects\FractureToolSubpage\UE5Destruction2.png" alt="Plugin architecture and user parameters" />
-                </figure>
+                <p>The plugin is structured as a self-contained UE5 runtime module. When the plugin is enabled, the user can drop a GrassVolume actor with uproperty parameters available for editing, such as: blade count, spawn radius, draw distance, height, width, bending and rotation variations, wind speed and direction, base/tip/subsurface colors, LOD distance, dithering settings and frustum culling margin. The plugin supports multiple independent grass volumes in a scene, each with its own settings, dispatching separate compute and draw passes per volume.</p>
+                <div class="contrib-media contrib-media--contain" style="grid-template-columns: auto auto; justify-content: center;">
+                    <figure class="contrib-media-item" style="max-height: 400px; aspect-ratio: auto;">
+                        <img src="content/SoloProjects/Grass/uproperties.png" alt="GrassVolume exposed parameters" style="height: 100%; width: auto;" />
+                    </figure>
+                    <figure class="contrib-media-item" style="max-height: 400px; aspect-ratio: auto; align-self: start;">
+                        <img src="content/SoloProjects/Grass/pluginpackaged.png" alt="Plugin in UE5 plugin browser" style="height: auto; width: auto;" />
+                    </figure>
+                </div>
             </div>
         </section>
 

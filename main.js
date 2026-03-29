@@ -106,6 +106,8 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         video.loop = true;
         video.playsInline = true;
         video.preload = preload || 'metadata';
+        video.disablePictureInPicture = true;
+        video.setAttribute('controlslist', 'nodownload nofullscreen noremoteplayback noplaybackrate');
         img.parentNode.replaceChild(video, img);
         return video;
     }
@@ -327,6 +329,8 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             videos.forEach(function (video) {
                 video.preload = 'none';
                 video.removeAttribute('autoplay');
+                video.disablePictureInPicture = true;
+                video.setAttribute('controlslist', 'nodownload nofullscreen noremoteplayback noplaybackrate');
                 videoObserver.observe(video);
             });
 

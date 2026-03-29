@@ -107,6 +107,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         video.playsInline = true;
         video.preload = preload || 'metadata';
         video.disablePictureInPicture = true;
+        video.disableRemotePlayback = true;
         video.setAttribute('controlslist', 'nodownload nofullscreen noremoteplayback noplaybackrate');
         img.parentNode.replaceChild(video, img);
         return video;

@@ -2,11 +2,11 @@
     <header class="project-detail-header">
         <div class="project-header-info">
             <h1 class="project-detail-title">Spite: The Depth of Darkness</h1>
-            <p class="project-detail-subtitle">Dark atmospheric horror</p>
+            <p class="project-detail-subtitle">A Diablo-like action RPG</p>
             <div class="project-detail-meta">
                 <span class="meta-item"><strong>Role:</strong> Technical Artist</span>
-                <span class="meta-item"><strong>Team Size:</strong> TBD</span>
-                <span class="meta-item"><strong>Engine:</strong> Unreal Engine 5</span>
+                <span class="meta-item"><strong>Team Size:</strong> 20</span>
+                <span class="meta-item"><strong>Engine:</strong> Custom DX11 Engine (RHE)</span>
                 <span class="meta-item"><strong>Year:</strong> 2025</span>
             </div>
         </div>
@@ -23,16 +23,96 @@
         <!-- Contributions -->
         <section class="project-detail-section">
             <h2>My Contributions</h2>
+            <p>This project spanned a 3-month development period at half-time pace (20 hours per week).</p>
 
             <div class="tech-breakdown-block">
-                <h3>Placeholder Section</h3>
-                <p>Placeholder description for this contribution.</p>
-                <div class="contrib-media">
+                <h3>Pipeline Tools</h3>
+                <p>Built two pipeline tools to speed up the team's asset workflow. The first is a DDS texture converter with configurable compression settings, allowing artists to batch convert textures into the format the engine expects. The second is a TGO batch generator that automates the creation of prefab files for the engine, removing the need to manually set them up one by one.</p>
+                <div class="contrib-media contrib-media--contain">
                     <figure class="contrib-media-item">
-                        <img src="content/project3.png" alt="Placeholder" />
+                        <img src="content/GameProjects/Spite/DDSConverter.gif" alt="DDS Converter tool" />
                     </figure>
                     <figure class="contrib-media-item">
-                        <img src="content/project3.png" alt="Placeholder" />
+                        <img src="content/GameProjects/Spite/TGOConverter.gif" alt="TGO batch generator tool" />
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>VFX Shaders</h3>
+                <p>Created VFX shaders in HLSL for the game's combat and environmental effects. Two flipbook-based effects were authored in Illugenn and played back using a custom flipbook shader I developed with frame interpolation, allowing smooth playback from fewer source frames and keeping the memory footprint low. I also built a fire effect done entirely in shader code with a single color gradient texture, and a cooldown shader for abilities in the style of World of Warcraft's radial wipe.</p>
+                <div class="contrib-media">
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/chargevfx.gif" alt="Charge VFX flipbook" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/RMBAttackVFX.gif" alt="Attack VFX flipbook" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/firesShader1.gif" alt="Fire shader effect 1" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/firesShader2.gif" alt="Fire shader effect 2" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/CooldownShader.gif" alt="Cooldown shader" />
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Dithering Camera Shader</h3>
+                <p>Wrote a dithering transparency shader in HLSL to handle camera occlusion. Since the game uses an isometric camera, environment geometry often blocks the player's view. Instead of hiding or clipping those objects entirely, this shader fades them out with a dithering pattern, keeping the scene readable without breaking the visual continuity.</p>
+                <div class="contrib-media contrib-media--contain" style="max-width: 35%">
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/DitheringCameraShader.gif" alt="Dithering camera shader" />
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Rigs &amp; Animations</h3>
+                <p>Rigged and animated three of the game's enemy characters: the Popcorn enemy, the Heavy enemy, and the Boss. Each character has a full animation set including idle, movement, attack, and death sequences.</p>
+                <div class="contrib-media contrib-media--contain">
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/anim_popcornIdle.gif" alt="Popcorn idle" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/anim_popcornAttack.gif" alt="Popcorn attack" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/anim_popcornRun.gif" alt="Popcorn run" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/anim_popcornDeath.gif" alt="Popcorn death" />
+                    </figure>
+                </div>
+                <div class="contrib-media contrib-media--contain">
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/anim_heavyIdle.gif" alt="Heavy idle" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/anim_heavyRun.gif" alt="Heavy run" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/anim_heavyIdleBreak.gif" alt="Heavy idle break" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/anim_heavyDeath.gif" alt="Heavy death" />
+                    </figure>
+                </div>
+                <div class="contrib-media contrib-media--contain">
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/anim_bossIdle.gif" alt="Boss idle" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/anim_bossSmash.gif" alt="Boss smash" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/anim_bossIntermission.gif" alt="Boss intermission" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/Spite/anim_bossDeath.gif" alt="Boss death" />
                     </figure>
                 </div>
             </div>
@@ -42,20 +122,12 @@
         <section class="project-detail-section">
             <h2>Tools & Technologies</h2>
             <ul class="tools-list">
-                <li><img src="content/icons/UE-Icon-2023-White.svg" alt="Unreal Engine 5" class="tool-icon" /> Unreal Engine 5</li>
-                <li><img src="content/icons/blueprints.svg" alt="Blueprints" class="tool-icon" /> Blueprints</li>
-                <li><img src="content/icons/niagara.svg" alt="Niagara VFX" class="tool-icon" /> Niagara VFX</li>
+                <li><img src="content/icons/hlsl.svg" alt="HLSL" class="tool-icon" /> HLSL</li>
+                <li><img src="content/icons/python.svg" alt="Python" class="tool-icon" /> Python </li>
+                <li><img src="content/icons/illugen.svg" alt="Illugen" class="tool-icon" /> Illugen</li>
+                <li><img src="content/icons/blender.svg" alt="Blender" class="tool-icon" /> Blender</li>
+                <li><img src="content/icons/rhe.svg" alt="RHE" class="tool-icon" /> Rabbit Hole Engine</li>
             </ul>
         </section>
-
-        <!-- Links -->
-        <div class="project-detail-links-section">
-            <h2>Links</h2>
-            <div class="project-detail-links">
-                <a href="https://github.com/Efrem-Torrisi" target="_blank" rel="noopener" aria-label="View project">
-                    <img src="content/icons/github.svg" alt="GitHub" />
-                </a>
-            </div>
-        </div>
     </div>
 </article>

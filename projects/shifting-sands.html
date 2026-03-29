@@ -2,12 +2,12 @@
     <header class="project-detail-header">
         <div class="project-header-info">
             <h1 class="project-detail-title">Shifting Sands</h1>
-            <p class="project-detail-subtitle">Desert exploration adventure</p>
+            <p class="project-detail-subtitle">A Souls-like boss rush arena game</p>
             <div class="project-detail-meta">
-                <span class="meta-item"><strong>Role:</strong> Technical Artist</span>
-                <span class="meta-item"><strong>Team Size:</strong> TBD</span>
-                <span class="meta-item"><strong>Engine:</strong> Unreal Engine 5</span>
-                <span class="meta-item"><strong>Year:</strong> 2025</span>
+                <span class="meta-item"><strong>Role:</strong> Technical Artist, 3D Artist</span>
+                <span class="meta-item"><strong>Team Size:</strong> ~ 10</span>
+                <span class="meta-item"><strong>Engine:</strong> Unity</span>
+                <span class="meta-item"><strong>Year:</strong> 2023</span>
             </div>
         </div>
         <div class="project-header-image">
@@ -23,16 +23,59 @@
         <!-- Contributions -->
         <section class="project-detail-section">
             <h2>My Contributions</h2>
+            <p>I joined the team after the initial vertical slice was completed. My role was to strengthen the areas the project was lacking in: shaders, materials, and detailed 3D art. The trailer above is from the original vertical slice, while the work shown below reflects the improvements I made after joining.</p>
 
             <div class="tech-breakdown-block">
-                <h3>Placeholder Section</h3>
-                <p>Placeholder description for this contribution.</p>
-                <div class="contrib-media">
+                <h3>Sand Shader &amp; Material</h3>
+                <p>Created the sand shader and material used across the arena environment. The shader includes a dynamic displacement system written with custom HLSL snippets in Unity that deforms the sand surface in real time as objects interact with it, visible in the demo where objects press into and pass through the sand, leaving deformation trails behind them. The displacement is captured using a render texture camera that tracks the interaction area from above.</p>
+                <div class="contrib-media contrib-media--contain">
                     <figure class="contrib-media-item">
-                        <img src="content/project3.png" alt="Placeholder" />
+                        <video src="content/GameProjects/SS/sandshader.mp4" autoplay loop muted playsinline></video>
                     </figure>
                     <figure class="contrib-media-item">
-                        <img src="content/project3.png" alt="Placeholder" />
+                        <img src="content/GameProjects/SS/sand.png" alt="Sand material" />
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>3D Art &amp; Texturing</h3>
+                <p>Modeled and textured weapons for the game, including the main character's sword.</p>
+                <div class="contrib-media contrib-media--contain">
+                    <figure class="contrib-media-item">
+                        <video src="content/GameProjects/SS/sword.mp4" autoplay loop muted playsinline></video>
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/SS/sword.png" alt="Sword model" />
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Outline Shader</h3>
+                <p>During development, the team considered porting the project from Unity to Unreal Engine 5. Since I was already familiar with UE5, I built an outline shader demo to test whether the game's visual direction could translate well to the new engine. Ultimately the team decided to stay on Unity, but the exploration helped inform that decision.</p>
+                <div class="contrib-media" style="max-width: 50%">
+                    <figure class="contrib-media-item">
+                        <video src="content/GameProjects/SS/outline.mp4" autoplay loop muted playsinline></video>
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Sand FX Prototypes</h3>
+                <p>As part of the same UE5 exploration, I prototyped sand-related shader effects to test how environmental FX could look in the new engine. The sand here also uses a tri-planar projection shader, which was necessary since the arena geometry is constantly shifting and deforming - standard UV mapping would stretch and break, so tri-planar projection keeps the tileable sand texture looking correct regardless of surface orientation.</p>
+                <div class="contrib-media contrib-media--contain">
+                    <figure class="contrib-media-item">
+                        <video src="content/GameProjects/SS/sandfx0.mp4" autoplay loop muted playsinline></video>
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <video src="content/GameProjects/SS/sandfx1.mp4" autoplay loop muted playsinline></video>
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <video src="content/GameProjects/SS/sandfx2.mp4" autoplay loop muted playsinline></video>
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <video src="content/GameProjects/SS/sandfx3.mp4" autoplay loop muted playsinline></video>
                     </figure>
                 </div>
             </div>
@@ -42,19 +85,14 @@
         <section class="project-detail-section">
             <h2>Tools & Technologies</h2>
             <ul class="tools-list">
+                <li><img src="content/icons/Unity.svg" alt="Unity" class="tool-icon" /> Unity</li>
                 <li><img src="content/icons/UE-Icon-2023-White.svg" alt="Unreal Engine 5" class="tool-icon" /> Unreal Engine 5</li>
-                <li><img src="content/icons/blueprints.svg" alt="Blueprints" class="tool-icon" /> Blueprints</li>
+                <li><img src="content/icons/zbrush-svgrepo-com.svg" alt="ZBrush" class="tool-icon" /> ZBrush</li>
+                <li><img src="content/icons/maya.svg" alt="Maya" class="tool-icon" /> Maya</li>
+                <li><img src="content/icons/substancePainter.svg" alt="Substance Painter" class="tool-icon" /> Substance Painter</li>
+                <li><img src="content/icons/substanceDesigner.svg" alt="Substance Designer" class="tool-icon" /> Substance Designer</li>
+                <li><img src="content/icons/hlsl.svg" alt="HLSL" class="tool-icon" /> HLSL</li>
             </ul>
         </section>
-
-        <!-- Links -->
-        <div class="project-detail-links-section">
-            <h2>Links</h2>
-            <div class="project-detail-links">
-                <a href="https://github.com/Efrem-Torrisi" target="_blank" rel="noopener" aria-label="View project">
-                    <img src="content/icons/github.svg" alt="GitHub" />
-                </a>
-            </div>
-        </div>
     </div>
 </article>

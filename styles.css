@@ -1071,6 +1071,12 @@ section h2 {
     background: #000;
 }
 
+.contrib-media--contain .contrib-media-item img,
+.contrib-media--contain .contrib-media-item video {
+    object-fit: contain;
+    background: transparent;
+}
+
 .contrib-media-item--contain img,
 .contrib-media-item--contain video {
     object-fit: contain;
@@ -1463,5 +1469,77 @@ section h2 {
 
     .carousel-track {
         height: clamp(200px, 60vw, 300px);
+    }
+}
+
+/* ── Lightbox ─────────────────────────────── */
+.lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.92);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    cursor: pointer;
+}
+
+.lightbox-overlay.is-active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.lightbox-overlay .lightbox-content {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 6px;
+    cursor: default;
+    transform: scale(0.95);
+    transition: transform 0.25s ease;
+}
+
+.lightbox-overlay.is-active .lightbox-content {
+    transform: scale(1);
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 2rem;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    z-index: 1;
+    line-height: 1;
+}
+
+.lightbox-close:hover {
+    opacity: 1;
+}
+
+.contrib-media-item img,
+.contrib-media-item video {
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .lightbox-overlay .lightbox-content {
+        max-width: 95vw;
+        max-height: 80vh;
+    }
+
+    .lightbox-close {
+        top: 0.75rem;
+        right: 0.75rem;
+        font-size: 2.5rem;
+        padding: 0.5rem;
     }
 }

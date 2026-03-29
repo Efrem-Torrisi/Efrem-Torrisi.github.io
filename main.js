@@ -433,6 +433,90 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
 
     /* ========================================
+       LIGHTBOX — Full-size media viewer
+       ======================================== */
+
+    (function initLightbox() {
+        // Create overlay
+        var overlay = document.createElement('div');
+        overlay.className = 'lightbox-overlay';
+        overlay.innerHTML = '<button class="lightbox-close" aria-label="Close">&times;</button>';
+        document.body.appendChild(overlay);
+
+        var closeBtn = overlay.querySelector('.lightbox-close');
+        var currentMedia = null;
+
+        function openLightbox(sourceEl) {
+            // Remove previous content (but keep close button)
+            if (currentMedia) {
+                currentMedia.remove();
+                currentMedia = null;
+            }
+
+            var el;
+            if (sourceEl.tagName === 'VIDEO') {
+                el = document.createElement('video');
+                el.src = sourceEl.src;
+                el.autoplay = true;
+                el.loop = true;
+                el.muted = sourceEl.muted;
+                el.controls = true;
+                el.playsInline = true;
+            } else {
+                el = document.createElement('img');
+                el.src = sourceEl.src;
+                el.alt = sourceEl.alt || '';
+            }
+
+            el.className = 'lightbox-content';
+            currentMedia = el;
+            overlay.appendChild(el);
+            overlay.classList.add('is-active');
+        }
+
+        function closeLightbox() {
+            overlay.classList.remove('is-active');
+            if (currentMedia && currentMedia.tagName === 'VIDEO') {
+                currentMedia.pause();
+            }
+            setTimeout(function () {
+                if (!overlay.classList.contains('is-active') && currentMedia) {
+                    currentMedia.remove();
+                    currentMedia = null;
+                }
+            }, 300);
+        }
+
+        // Click on backdrop (not on media) to close
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) closeLightbox();
+        });
+
+        closeBtn.addEventListener('click', closeLightbox);
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && overlay.classList.contains('is-active')) {
+                closeLightbox();
+            }
+        });
+
+        // Delegate clicks on contrib-media items
+        document.addEventListener('click', function (e) {
+            var media = e.target.closest('.contrib-media-item img, .contrib-media-item video');
+            if (!media) return;
+            openLightbox(media);
+        });
+
+        // Also handle tech-breakdown figures
+        document.addEventListener('click', function (e) {
+            var media = e.target.closest('.tech-breakdown-figure img');
+            if (!media) return;
+            openLightbox(media);
+        });
+    })();
+
+
+    /* ========================================
        SCROLL REVEAL — Apple-style fade in/out
        ======================================== */
 

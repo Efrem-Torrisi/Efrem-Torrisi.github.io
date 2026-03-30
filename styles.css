@@ -1106,7 +1106,7 @@ section h2 {
 .compute-diagram img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     border-radius: var(--card-radius-sm);
     border: 1px solid var(--color-border);
 }
@@ -1222,21 +1222,18 @@ section h2 {
     font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
     font-size: 0.82rem;
     line-height: 1.6;
+    color: #c9d1d9;
     tab-size: 4;
 }
 
-/* Override Prism background to match code-embed */
-.code-panel code[class*="language-"],
-.code-panel pre[class*="language-"] {
-    background: transparent;
-    margin: 0;
-}
-
-/* Extended syntax highlighting tokens */
-.token.builtin { color: #4ec9b0; }
-.token.property { color: #9cdcfe; }
-.token.variable { color: #9cdcfe; }
-.token.attr-name { color: #dcdcaa; }
+/* Syntax highlighting - dark theme */
+.hlsl-keyword { color: #ff7b72; }
+.hlsl-type    { color: #79c0ff; }
+.hlsl-func    { color: #d2a8ff; }
+.hlsl-num     { color: #a5d6ff; }
+.hlsl-str     { color: #a5d6ff; }
+.hlsl-comment { color: #8b949e; font-style: italic; }
+.hlsl-attr    { color: #ffa657; }
 
 /* Scrollbar styling for code panels */
 .code-panel::-webkit-scrollbar {
@@ -1284,16 +1281,24 @@ section h2 {
     background: #000;
 }
 
-.contrib-media--contain .contrib-media-item img,
-.contrib-media--contain .contrib-media-item video {
+.contrib-media--contain .contrib-media-item img {
     object-fit: contain;
-    background: transparent;
+    background: #1a1a1a;
 }
 
-.contrib-media-item--contain img,
+.contrib-media--contain .contrib-media-item video {
+    object-fit: contain;
+    background: #000;
+}
+
+.contrib-media-item--contain img {
+    object-fit: contain;
+    background: #1a1a1a;
+}
+
 .contrib-media-item--contain video {
     object-fit: contain;
-    background: transparent;
+    background: #000;
 }
 
 .contrib-media--16x9 .contrib-media-item img,
@@ -1740,8 +1745,42 @@ section h2 {
     opacity: 1;
 }
 
+.lightbox-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 3.5rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    z-index: 1;
+    line-height: 1;
+    padding: 1rem;
+    user-select: none;
+}
+
+.lightbox-arrow:hover {
+    opacity: 1;
+}
+
+.lightbox-prev {
+    left: 1rem;
+}
+
+.lightbox-next {
+    right: 1rem;
+}
+
 .contrib-media-item img,
 .contrib-media-item video {
+    cursor: pointer;
+}
+
+.project-gallery img,
+.project-gallery video {
     cursor: pointer;
 }
 
@@ -1756,5 +1795,18 @@ section h2 {
         right: 0.75rem;
         font-size: 2.5rem;
         padding: 0.5rem;
+    }
+
+    .lightbox-arrow {
+        font-size: 2.5rem;
+        padding: 0.75rem;
+    }
+
+    .lightbox-prev {
+        left: 0.25rem;
+    }
+
+    .lightbox-next {
+        right: 0.25rem;
     }
 }

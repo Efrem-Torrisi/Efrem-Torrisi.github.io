@@ -1,53 +1,103 @@
 <article class="project-detail">
     <header class="project-detail-header">
-        <h1 class="project-detail-title">Sketch2Level</h1>
-        <p class="project-detail-subtitle">Sketch-to-Level Design Pipeline</p>
-        <div class="project-detail-meta">
-            <span class="meta-item"><strong>Role:</strong> Solo Developer</span>
-            <span class="meta-item"><strong>Engine:</strong> Unreal Engine 5</span>
-            <span class="meta-item"><strong>Type:</strong> Level Design Pipeline</span>
+        <div class="project-header-info">
+            <h1 class="project-detail-title">Sketch2Level</h1>
+            <p class="project-detail-subtitle">2D Pixel Sketch to 3D Level Assembly Pipeline</p>
+            <div class="project-detail-meta">
+                <span class="meta-item"><strong>Role:</strong> Solo Developer</span>
+                <span class="meta-item"><strong>Tools:</strong> Houdini, Python, Unreal Engine 5</span>
+                <span class="meta-item"><strong>Type:</strong> Level Design Pipeline Tool</span>
+            </div>
         </div>
     </header>
 
-    <div class="project-detail-hero">
-        <img src="content/piece2.png" alt="Sketch2Level hero image" />
-    </div>
-
     <div class="project-detail-body">
+        <!-- Overview -->
         <section class="project-detail-section">
-            <h2>Overview</h2>
-            <p>A rapid prototyping pipeline that converts hand-drawn sketches into playable 3D level geometry. Designers can sketch rough layouts on paper or tablet, and the tool interprets the drawing to generate blockout-quality environments ready for iteration.</p>
+            <h2>Overview & Technical Breakdown</h2>
+            <p>For this project, I built a Houdini HDA that converts top-down 2D sketches into assembled 3D levels. The input is one or more PNG images where each pixel represents a tile, and different pixel colors map to different modular kit pieces: floors, walls, doors, windows, stairs, pillars, corners, ecc... The tool reads the image, automatically detects where walls and corners need to be placed based on floor adjacency, and outputs a point cloud with type, rotation, and floor index attributes. These points are then used to instance the corresponding modular mesh pieces, producing a complete level layout preview in houdini from a simple pixel sketch. The tool supports multi-floor levels by stacking multiple sketch images, and exports a JSON manifest with coordinate conversion for Unreal Engine, Unity, or any custom axis system. Any program that can draw at a single-pixel level and export PNGs works as the sketching tool, though the dedicated standalone app shown in the demo is a work in progress.</p>
         </section>
 
-        <section class="project-detail-section">
-            <h2>Technical Breakdown</h2>
-            <p>Placeholder for technical details — image processing pipeline, contour detection, height map interpretation, mesh generation from sketch data, integration with UE5 level editor, and iterative refinement workflow.</p>
-        </section>
+        <!-- Demo Video -->
+        <div class="project-detail-trailer project-detail-trailer--inline">
+            <video
+                src="content/SoloProjects/SketchAssemblerV.mp4"
+                controls
+                playsinline
+                preload="metadata"
+                poster="content/SoloProjects/SketchAssembler.png"
+            ></video>
+        </div>
 
+        <!-- Technical Breakdown -->
         <section class="project-detail-section">
-            <h2>Gallery</h2>
-            <div class="project-gallery">
-                <img src="content/piece2.png" alt="Sketch2Level screenshot 1" />
-                <img src="content/piece2.png" alt="Sketch2Level screenshot 2" />
-                <img src="content/piece2.png" alt="Sketch2Level screenshot 3" />
+            <div class="tech-breakdown-block">
+                <h3>Color Legend and Pixel Parsing</h3>
+                <p>Each pixel color in the input PNG maps to a building element type. The legend is fully user-configurable through the HDA's parameters, with default colors for floor, wall, corner, door, window, stair, pillar, and empty space. A Python SOP reads the image using PIL (Python Imaging Library), iterates over every pixel, and checks it against the legend to give the point the appropriate type attribute value. Floor pixels and special types like stairs and pillars are placed directly as points at their grid positions, while wall positions are inferred based on floors positions in a later pass. The wall color used in the sketch is used to indicate which type of wall should be attached to the corresponding floor tile.</p>
+                <div class="contrib-media contrib-media--contain">
+                    <figure class="contrib-media-item">
+                        <img src="content/SoloProjects/sketch2level/levelsketch.png" alt="Pixel art level sketch with color-coded building elements" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/SoloProjects/sketch2level/gridpoints.png" alt="Resulting point cloud in Houdini generated from the pixel sketch" />
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Wall Placement and Corner Detection</h3>
+                <p>For each floor pixel, the tool checks its four cardinal neighbors. If a neighbor is a wall pixel (wall, door, or window color), a wall piece is placed at the edge between the two cells with the correct rotation. The wall pixel's color determines whether the placed piece is a standard wall, a door, a window, empty or any other modular piece used in your kit with minimal modifications of the HDA. The tool then performs a pass to detect corner conditions: where two perpendicular walls meet, the tool classifies the junction as an inner L-corner, outer L-corner, T-junction, or X-junction based on how many walls converge and how many floor tiles surround that point. Inner corners consume their adjacent wall edges to avoid overlap.</p>
+                <div class="contrib-media contrib-media--contain">
+                    <figure class="contrib-media-item">
+                        <img src="content/SoloProjects/sketch2level/nocorners.png" alt="Assembled level without corner detection, showing gaps at wall junctions" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/SoloProjects/sketch2level/corners.png" alt="Assembled level with corner pieces detected and placed at wall junctions" />
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Multi-Floor Support</h3>
+                <p>The tool supports multi-floor levels through the HDA multiparm input floors PNGs parameter. Each floor takes its own PNG image, and the tool processes them sequentially, offsetting each floor's points by a procedural amount vertically depending on the height of your modular kit's wall piece. This means a level with multiple vertical levels can be sketched as a series of simple top-down drawings, one per floor, and the tool stacks them into a stacking 3D structure.</p>
+                <div class="contrib-media contrib-media--contain" style="max-width: 50%">
+                    <figure class="contrib-media-item">
+                        <video src="content/SoloProjects/sketch2level/floorsV.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>JSON Export</h3>
+                <p>Once the level is assembled, the HDA can export a JSON manifest containing every placed piece's mesh name, position, rotation, and scale. The export supports coordinate conversion for compatibility with engines that use different coordinate systems.</p>
+                <div class="contrib-media contrib-media--contain">
+                    <figure class="contrib-media-item">
+                        <img src="content/SoloProjects/sketch2level/export.png" alt="HDA export tab showing target engine selection and JSON export path" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/SoloProjects/sketch2level/json.png" alt="Exported JSON manifest with piece positions and rotations" />
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Unreal Engine Import</h3>
+                <p>A Python script runs inside Unreal Engine's editor via an Editor Utility Widget to import the level data JSON. The script reads the json, checks each piece's mesh name against a configurable asset path, and, if meshes with corresponding names exist, spawns the Static Mesh actors at the correct positions and rotations. Because the JSON export already handles the coordinate conversion from Houdini's coordinate system to Unreal's system, the import script can place everything directly without additional transform logic. The result is a folder with the level fully assembled, ready for lighting, set dressing, and gameplay inteagration. Additionally, since each piece is spawned as its own independent actor, the result is identical to a level built by hand, level designers can freely move, delete, or replace any individual piece after import, making it easy to use the assembled layout as a starting point and manually iterate from there. </p>
+                <div class="contrib-media contrib-media--contain" style="max-width: 50%">
+                    <figure class="contrib-media-item">
+                        <video src="content/SoloProjects/sketch2level/importerV.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                    </figure>
+                </div>
             </div>
         </section>
 
+        <!-- Tools & Technologies -->
         <section class="project-detail-section">
-            <h2>Tools & Technologies</h2>
+            <h2>Tools & Technologies used</h2>
             <ul class="tools-list">
-                <li><img src="content/icons/ue5.svg" alt="Unreal Engine 5" class="tool-icon" /> Unreal Engine 5</li>
+                <li><img src="content/icons/houdini_badge_flat.svg" alt="Houdini" class="tool-icon" /> Houdini</li>
                 <li><img src="content/icons/python.svg" alt="Python" class="tool-icon" /> Python</li>
-                <li><img src="content/icons/opencv.svg" alt="OpenCV" class="tool-icon" /> OpenCV</li>
-                <li><img src="content/icons/blueprints.svg" alt="Blueprints" class="tool-icon" /> Blueprints</li>
-                <li>Editor Utility Widgets</li>
-            </ul>
-        </section>
-
-        <section class="project-detail-section">
-            <h2>Links</h2>
-            <ul class="project-links">
-                <li><a href="https://github.com/Efrem-Torrisi" target="_blank" rel="noopener">GitHub Repository</a></li>
+                <li><img src="content/icons/UE-Icon-2023-White.svg" alt="UE5" class="tool-icon" /> Unreal Engine 5</li>
             </ul>
         </section>
     </div>

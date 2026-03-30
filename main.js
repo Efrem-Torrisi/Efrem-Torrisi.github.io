@@ -558,18 +558,25 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
        ======================================== */
 
     (function initLightbox() {
-        // Create overlay
+        // Create overlay with nav arrows
         var overlay = document.createElement('div');
         overlay.className = 'lightbox-overlay';
-        overlay.innerHTML = '<button class="lightbox-close" aria-label="Close">&times;</button>';
+        overlay.innerHTML =
+            '<button class="lightbox-close" aria-label="Close">&times;</button>' +
+            '<button class="lightbox-arrow lightbox-prev" aria-label="Previous">&#8249;</button>' +
+            '<button class="lightbox-arrow lightbox-next" aria-label="Next">&#8250;</button>';
         document.body.appendChild(overlay);
 
         var closeBtn = overlay.querySelector('.lightbox-close');
+        var prevBtn = overlay.querySelector('.lightbox-prev');
+        var nextBtn = overlay.querySelector('.lightbox-next');
         var currentMedia = null;
+        var galleryItems = [];
+        var galleryIndex = -1;
 
-        function openLightbox(sourceEl) {
-            // Remove previous content (but keep close button)
+        function showMedia(sourceEl) {
             if (currentMedia) {
+                if (currentMedia.tagName === 'VIDEO') currentMedia.pause();
                 currentMedia.remove();
                 currentMedia = null;
             }
@@ -592,7 +599,34 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             el.className = 'lightbox-content';
             currentMedia = el;
             overlay.appendChild(el);
+        }
+
+        function updateArrows() {
+            var hasGallery = galleryItems.length > 1;
+            prevBtn.style.display = hasGallery ? '' : 'none';
+            nextBtn.style.display = hasGallery ? '' : 'none';
+        }
+
+        function openLightbox(sourceEl) {
+            // Check if source is inside a gallery
+            var gallery = sourceEl.closest('.project-gallery');
+            if (gallery) {
+                galleryItems = Array.from(gallery.querySelectorAll('img, video'));
+                galleryIndex = galleryItems.indexOf(sourceEl);
+            } else {
+                galleryItems = [];
+                galleryIndex = -1;
+            }
+
+            showMedia(sourceEl);
+            updateArrows();
             overlay.classList.add('is-active');
+        }
+
+        function navigate(direction) {
+            if (galleryItems.length < 2) return;
+            galleryIndex = (galleryIndex + direction + galleryItems.length) % galleryItems.length;
+            showMedia(galleryItems[galleryIndex]);
         }
 
         function closeLightbox() {
@@ -605,10 +639,22 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                     currentMedia.remove();
                     currentMedia = null;
                 }
+                galleryItems = [];
+                galleryIndex = -1;
             }, 300);
         }
 
-        // Click on backdrop (not on media) to close
+        prevBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            navigate(-1);
+        });
+
+        nextBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            navigate(1);
+        });
+
+        // Click on backdrop (not on media or arrows) to close
         overlay.addEventListener('click', function (e) {
             if (e.target === overlay) closeLightbox();
         });
@@ -616,9 +662,10 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         closeBtn.addEventListener('click', closeLightbox);
 
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && overlay.classList.contains('is-active')) {
-                closeLightbox();
-            }
+            if (!overlay.classList.contains('is-active')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') navigate(-1);
+            if (e.key === 'ArrowRight') navigate(1);
         });
 
         // Delegate clicks on contrib-media items
@@ -631,6 +678,13 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         // Also handle tech-breakdown figures
         document.addEventListener('click', function (e) {
             var media = e.target.closest('.tech-breakdown-figure img');
+            if (!media) return;
+            openLightbox(media);
+        });
+
+        // Handle project-gallery images
+        document.addEventListener('click', function (e) {
+            var media = e.target.closest('.project-gallery img, .project-gallery video');
             if (!media) return;
             openLightbox(media);
         });

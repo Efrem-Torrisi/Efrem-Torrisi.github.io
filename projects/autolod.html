@@ -1,53 +1,127 @@
 <article class="project-detail">
     <header class="project-detail-header">
-        <h1 class="project-detail-title">AutoLOD</h1>
-        <p class="project-detail-subtitle">Automatic LOD & Collision Mesh Generation</p>
-        <div class="project-detail-meta">
-            <span class="meta-item"><strong>Role:</strong> Solo Developer</span>
-            <span class="meta-item"><strong>Engine:</strong> Unreal Engine 5</span>
-            <span class="meta-item"><strong>Type:</strong> 3D Pipeline Tool</span>
+        <div class="project-header-info">
+            <h1 class="project-detail-title">Auto LOD Tool</h1>
+            <p class="project-detail-subtitle">Batch LOD and Convex Collision Mesh Generator for Houdini</p>
+            <div class="project-detail-meta">
+                <span class="meta-item"><strong>Role:</strong> Solo Developer</span>
+                <span class="meta-item"><strong>Tools:</strong> Houdini, Python, Unreal Engine 5</span>
+                <span class="meta-item"><strong>Type:</strong> 3D Pipeline Tool</span>
+            </div>
         </div>
     </header>
 
-    <div class="project-detail-hero">
-        <img src="content/piece1.png" alt="AutoLOD hero image" />
-    </div>
-
     <div class="project-detail-body">
+        <!-- Overview -->
         <section class="project-detail-section">
-            <h2>Overview</h2>
-            <p>An automated tool for generating optimized Level of Detail meshes and collision geometry from high-poly source assets. Designed to streamline the art pipeline by reducing manual LOD authoring and ensuring consistent collision fidelity across assets.</p>
+            <h2>Overview & Technical Breakdown</h2>
+            <p>For this project, I built a Houdini shelf tool that automates the generation of Level of Detail meshes and convex collision geometry from a source FBX mesh. The tool takes an input mesh, produces LOD0 through LOD3 by reducing polygon count at user-defined percentages, and optionally generates UCX collision meshes in either a simple or complex mode. The PolyReduce step preserves UVs where possible, and in cases where reduction distorts them, a UV Transfer pass can be used to restore the original mapping. Everything is exported as a single FBX file with correct naming conventions so that engines like Unreal Engine 5 automatically recognize the LOD chain and collision meshes on import.</p>
         </section>
 
-        <section class="project-detail-section">
-            <h2>Technical Breakdown</h2>
-            <p>Placeholder for technical details — algorithms used for mesh decimation, collision hull generation approach, integration with the UE5 asset pipeline, performance benchmarks, and quality comparison metrics.</p>
-        </section>
+        <!-- Demo Video -->
+        <div class="project-detail-trailer project-detail-trailer--inline">
+            <video
+                src="content/SoloProjects/LOD/lodV.mp4"
+                controls
+                playsinline
+                preload="metadata"
+                poster="content/SoloProjects/AutoLOD.png"
+            ></video>
+        </div>
 
+        <!-- Technical Breakdown -->
         <section class="project-detail-section">
-            <h2>Gallery</h2>
-            <div class="project-gallery">
-                <img src="content/piece1.png" alt="AutoLOD screenshot 1" />
-                <img src="content/piece1.png" alt="AutoLOD screenshot 2" />
-                <img src="content/piece1.png" alt="AutoLOD screenshot 3" />
+            <div class="tech-breakdown-row">
+                <div class="tech-breakdown-text">
+                    <h3>Network Overview</h3>
+                    <p> When exectued, the tool creates all the needed 'obj' and 'out' node chains needed in an organized subnetwork. The 'obj' networks's top-level network is organized into 1/2 additional subnetworks and 1/2 temp geo nodes depending on user settings. The source_file node holds the imported FBX input. The LODS subnetwork contains the LOD generation chain, producing LOD0 through LOD3 at the user's specified reduction percentages. The UCX subnetwork handles collision mesh generation in either simple or complex mode. A temporary complex collision node sits alongside for the complex mode before the results are split into individually named collision pieces.</p>
+                </div>
+                <figure class="tech-breakdown-figure">
+                    <img src="content/SoloProjects/LOD/Subnetwork1.png" alt="Top-level Houdini network showing source_file, LODS subnetwork, UCX subnetwork, and complex collision temp node" />
+                </figure>
+            </div>
+
+            <div class="tech-breakdown-row tech-breakdown-row--reverse">
+                <div class="tech-breakdown-text">
+                    <h3>LOD Generation</h3>
+                    <p>Inside the LODS subnetwork, four geometry networks generate the LOD chain. Each LOD node merges in the source mesh and applies a PolyReduce with a user-defined settings and target percentage. The defaults are 100% for LOD0 (the original mesh), 50% for LOD1, 25% for LOD2, and 15% for LOD3, and settings for preserving quads and/or recomputing normals, these can be adjusted by the user each time they want to run the tool. Each geo network outputs the reduced mesh with the correct naming convention (e.g. meshname_LOD0, meshname_LOD1) so that the final FBX export will be ready for engine import.</p>
+                </div>
+                <figure class="tech-breakdown-figure">
+                    <img src="content/SoloProjects/LOD/LOD_Subnet.png" alt="LODS subnetwork containing four LOD geometry nodes" />
+                </figure>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Inside an LOD Node</h3>
+                <p>Each individual LOD node follows the same simple pipeline: an Object Merge brings in the source mesh, a PolyReduce node with the user defined settings that reduces it to the target percentage, and a Null marks the output. This structure is replicated across all four LOD levels, with only the reduction percentage and the preserve quad setting if enabled changing between them.</p>
+                <figure class="tech-breakdown-figure">
+                    <img src="content/SoloProjects/LOD/LOD_Network.png" alt="Inside an LOD node: merge_in, poly_reduce, and OUT null" />
+                </figure>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Collision Generation: Simple Mode</h3>
+                <p>In simple mode, the tool generates a single convex collision mesh for the entire input. The LOD0 mesh is brought in via Object Merge and passed through a Shrinkwrap node to produce a convex hull that tightly wraps around the original shape. This is fast and well-suited for meshes that are already roughly convex or where a single collision volume is sufficient. The result is named with the UCX_ prefix so that Unreal Engine automatically recognizes it as a collision mesh.</p>
+                <div class="contrib-media contrib-media--contain">
+                    <figure class="contrib-media-item">
+                        <img src="content/SoloProjects/LOD/simple_temp.png" alt="Simple collision pipeline: merge_in from LOD0, Shrinkwrap convex_hull, OUT null" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/SoloProjects/LOD/simple_mesh.png" alt="Simple convex hull collision mesh result" />
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Collision Generation: Complex Mode</h3>
+                <p>For meshes with concave or intricate shapes, the complex mode uses Convex Decomposition to break the mesh into multiple convex pieces. The user can set a maximum convexity level to control the accuracy-to-count tradeoff: higher values produce more collision pieces that better approximate the original shape, while lower values keep the count down for performance. Each resulting piece is isolated into its own geometry node inside the UCX subnetwork and named sequentially (e.g. UCX_meshname_00, UCX_meshname_01) following the UE5 naming convention.</p>
+                <div class="contrib-media contrib-media--contain">
+                    <figure class="contrib-media-item">
+                        <img src="content/SoloProjects/LOD/complex_temp.png" alt="Complex collision temp node: merge_in from LOD0, Convex Decomposition" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/SoloProjects/LOD/UCX_Mesh.png" alt="Inside a UCX collision node: merge_in, convex_decomp, isolate_segment, OUT" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/SoloProjects/LOD/complex_mesh.png" alt="Complex collision mesh result with multiple convex pieces" />
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>UCX Subnetwork</h3>
+                <p>After the Convex Decomposition splits the mesh, each resulting convex piece gets its own geometry node inside the UCX subnetwork. The number of nodes scales with the user's chosen convexity level. Each piece follows the same internal pipeline: merge in from the decomposed result, isolate its specific segment, and output with its sequential UCX_ name. All collision pieces are then included in the final FBX export alongside the LOD chain.</p>
+                <figure class="tech-breakdown-figure">
+                    <img src="content/SoloProjects/LOD/UCX_subnetwork.png" alt="UCX subnetwork containing multiple collision geometry nodes" />
+                </figure>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Result & Export</h3>
+                <p>The final output is a single FBX file containing the full LOD chain (LOD0 through LOD3), the source mesh, and all generated UCX collision meshes. The naming convention is applied automatically so that Unreal Engine 5 recognizes the LOD levels and collision volumes on import without any manual setup. The image below shows an example result with a lion head mesh: the four LOD levels at decreasing polygon counts, a simple UCX convex hull, a complex UCX decomposition, and the resulting hierarchy with correct names in the scene tree.</p>
+                <figure class="tech-breakdown-figure">
+                    <img src="content/SoloProjects/LOD/Result.png" alt="Final result showing LOD0-3 with polygon counts, simple and complex UCX collisions, and the naming convention hierarchy" />
+                </figure>
             </div>
         </section>
 
+        <!-- Tools & Technologies -->
         <section class="project-detail-section">
-            <h2>Tools & Technologies</h2>
+            <h2>Tools & Technologies used</h2>
             <ul class="tools-list">
-                <li><img src="content/icons/ue5.svg" alt="Unreal Engine 5" class="tool-icon" /> Unreal Engine 5</li>
-                <li><img src="content/icons/cpp.svg" alt="C++" class="tool-icon" /> C++</li>
-                <li><img src="content/icons/blueprints.svg" alt="Blueprints" class="tool-icon" /> Blueprints</li>
-                <li>Editor Scripting</li>
+                <li><img src="content/icons/houdini_badge_flat.svg" alt="Houdini" class="tool-icon" /> Houdini</li>
+                <li><img src="content/icons/python.svg" alt="Python" class="tool-icon" /> Python</li>
             </ul>
         </section>
 
-        <section class="project-detail-section">
+        <!-- Links -->
+        <div class="project-detail-links-section">
             <h2>Links</h2>
-            <ul class="project-links">
-                <li><a href="https://github.com/Efrem-Torrisi" target="_blank" rel="noopener">GitHub Repository</a></li>
-            </ul>
-        </section>
+            <div class="project-detail-links">
+                <a href="https://github.com/Efrem-Torrisi" target="_blank" rel="noopener" aria-label="View on GitHub">
+                    <img src="content/icons/github.svg" alt="GitHub" />
+                </a>
+            </div>
+        </div>
     </div>
 </article>

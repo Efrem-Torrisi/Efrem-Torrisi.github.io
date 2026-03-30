@@ -2,6 +2,40 @@
  * Portfolio — Modal System + Three.js Particle Field
  * Efrem Torrisi | Technical Artist
  */
+// ── Theme Toggle ─────────────────────────────────────────────
+(function initTheme() {
+    window.swapIcons = function swapIcons(isLight) {
+        var attr = isLight ? 'data-light-src' : 'data-dark-src';
+        document.querySelectorAll('[data-light-src][data-dark-src]').forEach(function (img) {
+            var newSrc = img.getAttribute(attr);
+            if (newSrc) img.setAttribute('src', newSrc);
+        });
+    };
+
+    var saved = localStorage.getItem('theme');
+    if (saved === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        window.swapIcons(true);
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+    }
+
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.theme-toggle');
+        if (!btn) return;
+        var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+        if (isLight) {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'dark');
+            window.swapIcons(false);
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+            window.swapIcons(true);
+        }
+    });
+})();
+
 // ── Work In Progress Gate ─────────────────────────────────────
 const WIP_MODE = false; // set to false to disable
 
@@ -403,6 +437,8 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             swapModalVideos();
             lazyLoadModalVideos();
             initCodeTabs();
+            var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            window.swapIcons(isLight);
             if (typeof Prism !== 'undefined') {
                 extendPrismLanguages();
                 Prism.highlightAllUnder(modalContent);
@@ -549,7 +585,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
     // Dynamic copyright year
     var footerP = document.querySelector('.footer p');
     if (footerP) {
-        footerP.innerHTML = '&copy; ' + new Date().getFullYear() + ' Efrem. All rights reserved.';
+        footerP.innerHTML = 'Designed & built by Efrem Torrisi &copy; ' + new Date().getFullYear();
     }
 
 
@@ -1221,14 +1257,16 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
     geometry.setAttribute('aSize',    new THREE.BufferAttribute(sizes, 1));
     geometry.setAttribute('aOpacity', new THREE.BufferAttribute(opacities, 1));
 
-    // Emissive HDR-style shader — bright core with soft radial falloff
-    // Uses color values > 1.0 so additive blending creates natural glow
+    // Shader with dual mode: bright stars (dark theme) / dark motes (light theme)
+    var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+
     var material = new THREE.ShaderMaterial({
         transparent: true,
         depthWrite: false,
-        blending: THREE.AdditiveBlending,
+        blending: isDark ? THREE.AdditiveBlending : THREE.NormalBlending,
         uniforms: {
-            uPixelRatio: { value: renderer.getPixelRatio() }
+            uPixelRatio: { value: renderer.getPixelRatio() },
+            uDarkMode: { value: isDark ? 1.0 : 0.0 }
         },
         vertexShader: [
             'attribute float aSize;',
@@ -1244,22 +1282,26 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         ].join('\n'),
         fragmentShader: [
             'varying float vOpacity;',
+            'uniform float uDarkMode;',
             'void main() {',
             '    float d = length(gl_PointCoord - vec2(0.5));',
             '    if (d > .7) discard;',
             '',
-            '    // Soft radial falloff',
             '    float glow = 1.0 - smoothstep(0.0, 1.0, d);',
-            '    // Concentrated bright core (emissive feel)',
             '    float core = pow(glow, 10.0);',
             '',
-            '    // HDR intensity: core pushes values above 1.0',
-            '    float intensity = core * 2.0 + glow * 0.1;',
-            '    // Alpha peaks at 1.0 in the center, fades at edges',
-            '    float alpha = core + glow * vOpacity * 0.5;',
+            '    // Dark mode: bright blue-white emissive stars',
+            '    float intensityD = core * 2.0 + glow * 0.1;',
+            '    float alphaD = core + glow * vOpacity * 0.5;',
+            '    vec3 colorD = vec3(0.4, 0.62, 0.9) * intensityD;',
             '',
-            '    // Blue-white emissive color',
-            '    vec3 color = vec3(0.4, 0.62, 0.9) * intensity;',
+            '    // Light mode: smooth circular motes',
+            '    float softGlow = pow(glow, 3.0);',
+            '    float alphaL = softGlow * vOpacity * 0.7;',
+            '    vec3 colorL = vec3(0.15, 0.18, 0.25);',
+            '',
+            '    vec3 color = mix(colorL, colorD, uDarkMode);',
+            '    float alpha = mix(alphaL, alphaD, uDarkMode);',
             '    gl_FragColor = vec4(color, alpha);',
             '}'
         ].join('\n')
@@ -1317,6 +1359,15 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         camera.position.x = mouse.x * 0.5;
         camera.position.y = mouse.y * 0.3;
         camera.lookAt(0, 0, 0);
+
+        // Check for theme changes and update particle mode
+        var nowDark = document.documentElement.getAttribute('data-theme') !== 'light';
+        var currentMode = material.uniforms.uDarkMode.value > 0.5;
+        if (nowDark !== currentMode) {
+            material.uniforms.uDarkMode.value = nowDark ? 1.0 : 0.0;
+            material.blending = nowDark ? THREE.AdditiveBlending : THREE.NormalBlending;
+            material.needsUpdate = true;
+        }
 
         renderer.render(scene, camera);
         requestAnimationFrame(animate);

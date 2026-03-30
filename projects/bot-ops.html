@@ -25,15 +25,108 @@
         <section class="project-detail-section">
             <h2>My Contributions</h2>
 
+            <div class="tech-breakdown-row">
+                <div class="tech-breakdown-text">
+                    <h3>Player Rig</h3>
+                    <p>I built the first-person player rig in Blender, which drives both weapons and the camera. The rig includes two full weapon hierarchies, dedicated bones for projectile and muzzle flash spawn points used by the gameplay programmers, and bones for controlling the in-game camera. To keep everything controllable, the rig makes heavy use of modifiers such as Copy Transforms, Copy Location, and Copy Rotation constraints, along with custom bone shapes for intuitive selection in the viewport. The camera bone was set up to match the exact field of view used in the engine so that what I see in Blender is a 1:1 match with the in-game perspective.</p>
+                </div>
+                <figure class="tech-breakdown-figure">
+                    <img src="content/GameProjects/BO/rig.png" alt="Player rig in Blender" />
+                </figure>
+            </div>
+
             <div class="tech-breakdown-block">
-                <h3>Placeholder Section</h3>
-                <p>Placeholder description for this contribution.</p>
-                <div class="contrib-media">
+                <h3>Player Animations</h3>
+                <p>I animated all first-person actions for both weapons: idle, walk, fire, reload, alternative reload, and weapon swap transitions.</p>
+                <h4>MP40</h4>
+                <div class="contrib-media contrib-media--contain">
                     <figure class="contrib-media-item">
-                        <img src="content/project3.png" alt="Placeholder" />
+                        <video src="content/GameProjects/BO/mp40_tacticalreload.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                        <figcaption>Tactical Reload</figcaption>
                     </figure>
                     <figure class="contrib-media-item">
-                        <img src="content/project3.png" alt="Placeholder" />
+                        <video src="content/GameProjects/BO/mp40_emptyreload.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                        <figcaption>Empty Reload</figcaption>
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <video src="content/GameProjects/BO/mp40_shooting.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                        <figcaption>Fire</figcaption>
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <video src="content/GameProjects/BO/mp40_walk.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                        <figcaption>Walk</figcaption>
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <video src="content/GameProjects/BO/mp40_swap.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                        <figcaption>Weapon Swap</figcaption>
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <video src="content/GameProjects/BO/mp40_idle.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                        <figcaption>Idle</figcaption>
+                    </figure>
+                </div>
+                <h4>Shotgun</h4>
+                <div class="contrib-media contrib-media--contain">
+                    <figure class="contrib-media-item">
+                        <video src="content/GameProjects/BO/shotgun_reload.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                        <figcaption>Reload</figcaption>
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <video src="content/GameProjects/BO/shotgun_shoot.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                        <figcaption>Fire</figcaption>
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <video src="content/GameProjects/BO/shotgun_walk.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                        <figcaption>Walk</figcaption>
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <video src="content/GameProjects/BO/shotgun_swap.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                        <figcaption>Weapon Swap</figcaption>
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <video src="content/GameProjects/BO/shotgun_idle.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                        <figcaption>Idle</figcaption>
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Destructible Objects</h3>
+                <p>I collaborated with the programming team to design the destructible objects pipeline and logic, and supported its implementation. Specific props in the environment can be destroyed by the player, breaking apart into pre-fractured pieces with Jolt physics. The meshes were pre-fractured using my <a href="#project/smart-fracture" class="inline-link">Smart Mesh Fracturing Tool</a>, which exports the fractured pieces in an FBX alongside a JSON metadata file mapping each piece's name to its position and bounding-box dimensions. The engine reads this JSON at load time to generate correctly placed and scaled collision boxes in code, and on impact swaps the intact mesh for the individual pieces with their physics bodies so Jolt can simulate the destruction from there.</p>
+                <div class="contrib-media contrib-media--contain">
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/BO/cup.png" alt="Fractured cup" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/BO/plate.png" alt="Fractured plate" />
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <img src="content/GameProjects/BO/chair.png" alt="Fractured chair" />
+                    </figure>
+                </div>
+                <div class="contrib-media contrib-media--contain" style="max-width: 50%">
+                    <figure class="contrib-media-item">
+                        <video src="content/GameProjects/BO/rhe_demo.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                    </figure>
+                </div>
+            </div>
+
+            <div class="tech-breakdown-row">
+                <div class="tech-breakdown-text">
+                    <h3>Level Data Validator</h3>
+                    <p>During production, we ran into an issue where some objects in the level data files would be saved with extremely large translation values (coordinates with 30+ zeroes), silently crashing the level on startup with no clear error. Tracking these entries down manually was impractical given the size of the data files. I wrote a Python script that parses every entry in the level data files, flags any transforms with values outside a sane range, and presents them in a list. From there you can either delete the bad entries directly or open them for inspection, turning what was a painful debugging session into a couple of clicks fix.</p>
+                </div>
+                <figure class="tech-breakdown-figure">
+                    <img src="content/GameProjects/BO/datavalidator.png" alt="Level data validator output" />
+                </figure>
+            </div>
+
+            <div class="tech-breakdown-block">
+                <h3>Pickup VFX</h3>
+                <p>I created the in-game pickup visual effects, inspired by the power-up style from Call of Duty Zombies. The effect was written entirely in HLSL, working on both the vertex and pixel shaders. The vertex shader handles the bobbing and rotation animation of the pickup mesh, while the pixel shader produces the glowing, pulsating outline and color shifts that make pickups visually distinct and readable from a distance.</p>
+                <div class="contrib-media contrib-media--contain" style="max-width: 50%">
+                    <figure class="contrib-media-item">
+                        <video src="content/GameProjects/BO/vfxV.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
                     </figure>
                 </div>
             </div>

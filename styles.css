@@ -1170,6 +1170,22 @@ section h2 {
     }
 }
 
+.tech-breakdown-block h4 {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 1.5rem 0 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.contrib-media-item figcaption {
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    margin-top: 0.4rem;
+}
+
 /* Compute section: text left, diagram + code right */
 .compute-section {
     align-items: flex-start;

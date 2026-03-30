@@ -315,6 +315,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
     var modalBackdrop = modalOverlay.querySelector('.modal-backdrop');
     var contentCache  = {};
     var originalTitle = document.title;
+    var modalStack    = []; // stack of { html, scrollTop, slug, title }
 
     function openModal(projectSlug) {
         history.pushState({ project: projectSlug }, '', '#project/' + projectSlug);
@@ -493,10 +494,24 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             modalOverlay._videoObserver.disconnect();
             modalOverlay._videoObserver = null;
         }
+
+        // If there's a stacked modal, pop back to it instead of closing
+        if (modalStack.length > 0) {
+            var prev = modalStack.pop();
+            modalContent.innerHTML = prev.html;
+            history.pushState({ project: prev.slug }, '', '#project/' + prev.slug);
+            document.title = prev.title;
+            modalContainer().scrollTop = prev.scrollTop;
+            var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            window.swapIcons(isLight);
+            return;
+        }
+
         modalOverlay.classList.remove('is-active');
         modalOverlay.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('modal-open');
 
+        modalStack = [];
         history.pushState(null, '', window.location.pathname);
         document.title = originalTitle;
 
@@ -510,6 +525,23 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             }
         }, 400);
     }
+
+    // Click on inline project link inside modal (stacked modal)
+    modalContent.addEventListener('click', function (e) {
+        var link = e.target.closest('a[href^="#project/"]');
+        if (!link) return;
+        e.preventDefault();
+        e.stopPropagation();
+        var slug = link.getAttribute('href').replace('#project/', '');
+        // Push current state onto stack
+        modalStack.push({
+            html: modalContent.innerHTML,
+            scrollTop: modalContainer().scrollTop,
+            slug: window.location.hash.replace('#project/', ''),
+            title: document.title
+        });
+        openModal(slug);
+    });
 
     // Click on any project card (event delegation)
     document.addEventListener('click', function (e) {

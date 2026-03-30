@@ -6,7 +6,7 @@
             <div class="project-detail-meta">
                 <span class="meta-item"><strong>Role:</strong> Solo Developer</span>
                 <span class="meta-item"><strong>Tools:</strong> Unreal Engine 5, C++, HLSL</span>
-                <span class="meta-item"><strong>Year:</strong> 2025</span>
+                <span class="meta-item"><strong>Type:</strong> Real-Time Rendering</span>
             </div>
         </div>
     </header>
@@ -38,7 +38,7 @@
                 </div>
                 <div class="compute-media-row">
                     <figure class="compute-diagram">
-                        <img src="content/SoloProjects/Grass/compute-pipeline.svg" alt="Compute shader pipeline flowchart" />
+                        <img src="content/SoloProjects/Grass/compute-pipeline.png" alt="Compute shader pipeline flowchart" />
                     </figure>
                     <div class="code-embed">
                     <div class="code-embed-tabs">
@@ -46,127 +46,127 @@
                         <button class="code-tab" data-target="tab-cpp">GrassSceneViewExtension.cpp (C++)</button>
                     </div>
                     <div class="code-panel active" id="tab-hlsl">
-                        <pre><code>[<span class="hlsl-attr">numthreads</span>(<span class="hlsl-num">64</span>, <span class="hlsl-num">1</span>, <span class="hlsl-num">1</span>)]
-<span class="hlsl-type">void</span> <span class="hlsl-func">MainCS</span>(<span class="hlsl-type">uint3</span> DispatchThreadId : <span class="hlsl-attr">SV_DispatchThreadID</span>)
+                        <pre><code class="language-hlsl">[numthreads(64, 1, 1)]
+void MainCS(uint3 DispatchThreadId : SV_DispatchThreadID)
 {
-    <span class="hlsl-type">uint</span> ThreadIndex = DispatchThreadId.x;
+    uint ThreadIndex = DispatchThreadId.x;
 
-    <span class="hlsl-comment">// Only thread 0 needs to write the draw args</span>
-    <span class="hlsl-keyword">if</span> (ThreadIndex == <span class="hlsl-num">0</span>)
+    // Only thread 0 needs to write the draw args
+    if (ThreadIndex == 0)
     {
-        OutDrawArgsLOD0[<span class="hlsl-num">0</span>].VertexCountPerInstance = VertexCountPerInstanceLOD0;
-        OutDrawArgsLOD0[<span class="hlsl-num">0</span>].StartVertexLocation   = <span class="hlsl-num">0</span>;
-        OutDrawArgsLOD0[<span class="hlsl-num">0</span>].StartInstanceLocation  = <span class="hlsl-num">0</span>;
+        OutDrawArgsLOD0[0].VertexCountPerInstance = VertexCountPerInstanceLOD0;
+        OutDrawArgsLOD0[0].StartVertexLocation   = 0;
+        OutDrawArgsLOD0[0].StartInstanceLocation  = 0;
 
-        OutDrawArgsLOD1[<span class="hlsl-num">0</span>].VertexCountPerInstance = VertexCountPerInstanceLOD1;
-        OutDrawArgsLOD1[<span class="hlsl-num">0</span>].StartVertexLocation   = <span class="hlsl-num">0</span>;
-        OutDrawArgsLOD1[<span class="hlsl-num">0</span>].StartInstanceLocation  = <span class="hlsl-num">0</span>;
+        OutDrawArgsLOD1[0].VertexCountPerInstance = VertexCountPerInstanceLOD1;
+        OutDrawArgsLOD1[0].StartVertexLocation   = 0;
+        OutDrawArgsLOD1[0].StartInstanceLocation  = 0;
     }
 
-    <span class="hlsl-keyword">if</span> (ThreadIndex >= NumGrassBlades)
-        <span class="hlsl-keyword">return</span>;
+    if (ThreadIndex >= NumGrassBlades)
+        return;
 
-    <span class="hlsl-comment">// Get a grid position and jitter it so the blades don't look too uniform</span>
-    <span class="hlsl-type">uint</span> GridSize = <span class="hlsl-func">uint</span>(<span class="hlsl-func">sqrt</span>(<span class="hlsl-func">float</span>(NumGrassBlades)));
-    <span class="hlsl-type">float2</span> GridUV = <span class="hlsl-func">IndexToGridPosition</span>(ThreadIndex, GridSize);
+    // Get a grid position and jitter it so the blades don't look too uniform
+    uint GridSize = uint(sqrt(float(NumGrassBlades)));
+    float2 GridUV = IndexToGridPosition(ThreadIndex, GridSize);
 
-    <span class="hlsl-type">float</span> JitterX = <span class="hlsl-func">Hash</span>(ThreadIndex * <span class="hlsl-num">2</span>) * <span class="hlsl-num">0.8</span> - <span class="hlsl-num">0.4</span>;
-    <span class="hlsl-type">float</span> JitterY = <span class="hlsl-func">Hash</span>(ThreadIndex * <span class="hlsl-num">2</span> + <span class="hlsl-num">1</span>) * <span class="hlsl-num">0.8</span> - <span class="hlsl-num">0.4</span>;
-    GridUV += <span class="hlsl-type">float2</span>(JitterX, JitterY) / <span class="hlsl-func">float</span>(GridSize);
-    GridUV = <span class="hlsl-func">saturate</span>(GridUV);
+    float JitterX = Hash(ThreadIndex * 2) * 0.8 - 0.4;
+    float JitterY = Hash(ThreadIndex * 2 + 1) * 0.8 - 0.4;
+    GridUV += float2(JitterX, JitterY) / float(GridSize);
+    GridUV = saturate(GridUV);
 
-    <span class="hlsl-comment">// Convert grid UV to world space</span>
-    <span class="hlsl-type">float3</span> WorldPos;
-    WorldPos.x = SpawnOrigin.x + (GridUV.x * <span class="hlsl-num">2.0</span> - <span class="hlsl-num">1.0</span>) * SpawnExtent.x;
-    WorldPos.y = SpawnOrigin.y + (GridUV.y * <span class="hlsl-num">2.0</span> - <span class="hlsl-num">1.0</span>) * SpawnExtent.y;
+    // Convert grid UV to world space
+    float3 WorldPos;
+    WorldPos.x = SpawnOrigin.x + (GridUV.x * 2.0 - 1.0) * SpawnExtent.x;
+    WorldPos.y = SpawnOrigin.y + (GridUV.y * 2.0 - 1.0) * SpawnExtent.y;
     WorldPos.z = SpawnOrigin.z;
 
-    <span class="hlsl-comment">// If circular mode is on, skip blades outside the circle</span>
-    <span class="hlsl-keyword">if</span> (bCircularShape)
+    // If circular mode is on, skip blades outside the circle
+    if (bCircularShape)
     {
-        <span class="hlsl-type">float2</span> offset = (WorldPos.xy - SpawnOrigin.xy) / SpawnExtent.xy;
-        <span class="hlsl-keyword">if</span> (<span class="hlsl-func">dot</span>(offset, offset) > <span class="hlsl-num">1.0</span>)
-            <span class="hlsl-keyword">return</span>;
+        float2 offset = (WorldPos.xy - SpawnOrigin.xy) / SpawnExtent.xy;
+        if (dot(offset, offset) > 1.0)
+            return;
     }
 
-    <span class="hlsl-comment">// Skip if too far or not in view</span>
-    <span class="hlsl-type">float</span> DistanceToCamera = <span class="hlsl-func">length</span>(WorldPos - CameraPosition);
-    <span class="hlsl-keyword">if</span> (DistanceToCamera > MaxDrawDistance)
-        <span class="hlsl-keyword">return</span>;
-    <span class="hlsl-keyword">if</span> (!<span class="hlsl-func">IsInFrustum</span>(WorldPos))
-        <span class="hlsl-keyword">return</span>;
+    // Skip if too far or not in view
+    float DistanceToCamera = length(WorldPos - CameraPosition);
+    if (DistanceToCamera > MaxDrawDistance)
+        return;
+    if (!IsInFrustum(WorldPos))
+        return;
 
-    <span class="hlsl-comment">// If we got here the blade is visible, so fill in its data</span>
-    <span class="hlsl-type">FGrassInstance</span> Instance;
+    // If we got here the blade is visible, so fill in its data
+    FGrassInstance Instance;
     Instance.Position = WorldPos;
-    Instance.Scale    = <span class="hlsl-num">0.8</span> + <span class="hlsl-func">Hash</span>(ThreadIndex * <span class="hlsl-num">3</span>) * <span class="hlsl-num">0.4</span>;
-    Instance.Normal   = <span class="hlsl-type">float3</span>(<span class="hlsl-num">0</span>, <span class="hlsl-num">0</span>, <span class="hlsl-num">1</span>);
-    Instance.Rotation = <span class="hlsl-func">Hash</span>(ThreadIndex * <span class="hlsl-num">4</span>) * <span class="hlsl-num">6.28318</span>;
+    Instance.Scale    = 0.8 + Hash(ThreadIndex * 3) * 0.4;
+    Instance.Normal   = float3(0, 0, 1);
+    Instance.Rotation = Hash(ThreadIndex * 4) * 6.28318;
 
-    <span class="hlsl-comment">// Put it in the close or far LOD buffer and increment the count</span>
-    <span class="hlsl-type">uint</span> WriteIndex;
-    <span class="hlsl-keyword">if</span> (DistanceToCamera <= LODDistance)
+    // Put it in the close or far LOD buffer and increment the count
+    uint WriteIndex;
+    if (DistanceToCamera <= LODDistance)
     {
-        <span class="hlsl-func">InterlockedAdd</span>(OutDrawArgsLOD0[<span class="hlsl-num">0</span>].InstanceCount, <span class="hlsl-num">1</span>, WriteIndex);
+        InterlockedAdd(OutDrawArgsLOD0[0].InstanceCount, 1, WriteIndex);
         OutGrassInstancesLOD0[WriteIndex] = Instance;
     }
-    <span class="hlsl-keyword">else</span>
+    else
     {
-        <span class="hlsl-func">InterlockedAdd</span>(OutDrawArgsLOD1[<span class="hlsl-num">0</span>].InstanceCount, <span class="hlsl-num">1</span>, WriteIndex);
+        InterlockedAdd(OutDrawArgsLOD1[0].InstanceCount, 1, WriteIndex);
         OutGrassInstancesLOD1[WriteIndex] = Instance;
     }
 }</code></pre>
                     </div>
                     <div class="code-panel" id="tab-cpp">
-                        <pre><code><span class="hlsl-comment">// One buffer per LOD to store the grass instances that pass culling</span>
-<span class="hlsl-type">FRDGBufferDesc</span> InstanceDesc = <span class="hlsl-type">FRDGBufferDesc</span>::<span class="hlsl-func">CreateStructuredDesc</span>(
-    <span class="hlsl-keyword">sizeof</span>(<span class="hlsl-type">FGrassInstanceGPU</span>), MaxInstances);
+                        <pre><code class="language-cpp">// One buffer per LOD to store the grass instances that pass culling
+FRDGBufferDesc InstanceDesc = FRDGBufferDesc::CreateStructuredDesc(
+    sizeof(FGrassInstanceGPU), MaxInstances);
 
-<span class="hlsl-type">FRDGBufferRef</span> InstancesLOD0 = GraphBuilder.<span class="hlsl-func">CreateBuffer</span>(InstanceDesc, <span class="hlsl-func">TEXT</span>(<span class="hlsl-str">"GrassInstancesLOD0"</span>));
-<span class="hlsl-type">FRDGBufferRef</span> InstancesLOD1 = GraphBuilder.<span class="hlsl-func">CreateBuffer</span>(InstanceDesc, <span class="hlsl-func">TEXT</span>(<span class="hlsl-str">"GrassInstancesLOD1"</span>));
+FRDGBufferRef InstancesLOD0 = GraphBuilder.CreateBuffer(InstanceDesc, TEXT("GrassInstancesLOD0"));
+FRDGBufferRef InstancesLOD1 = GraphBuilder.CreateBuffer(InstanceDesc, TEXT("GrassInstancesLOD1"));
 
-<span class="hlsl-comment">// These hold the draw args - the compute shader fills in how many to draw</span>
-<span class="hlsl-type">FRDGBufferDesc</span> ArgsDesc = <span class="hlsl-type">FRDGBufferDesc</span>::<span class="hlsl-func">CreateStructuredDesc</span>(
-    <span class="hlsl-keyword">sizeof</span>(<span class="hlsl-type">FGrassDrawIndirectArgsGPU</span>), <span class="hlsl-num">1</span>);
-ArgsDesc.Usage |= <span class="hlsl-type">EBufferUsageFlags</span>::DrawIndirect;
+// These hold the draw args - the compute shader fills in how many to draw
+FRDGBufferDesc ArgsDesc = FRDGBufferDesc::CreateStructuredDesc(
+    sizeof(FGrassDrawIndirectArgsGPU), 1);
+ArgsDesc.Usage |= EBufferUsageFlags::DrawIndirect;
 
-<span class="hlsl-type">FRDGBufferRef</span> ArgsLOD0 = GraphBuilder.<span class="hlsl-func">CreateBuffer</span>(ArgsDesc, <span class="hlsl-func">TEXT</span>(<span class="hlsl-str">"GrassArgsLOD0"</span>));
-<span class="hlsl-type">FRDGBufferRef</span> ArgsLOD1 = GraphBuilder.<span class="hlsl-func">CreateBuffer</span>(ArgsDesc, <span class="hlsl-func">TEXT</span>(<span class="hlsl-str">"GrassArgsLOD1"</span>));
+FRDGBufferRef ArgsLOD0 = GraphBuilder.CreateBuffer(ArgsDesc, TEXT("GrassArgsLOD0"));
+FRDGBufferRef ArgsLOD1 = GraphBuilder.CreateBuffer(ArgsDesc, TEXT("GrassArgsLOD1"));
 
-<span class="hlsl-comment">// Clear to zero before the shader runs</span>
-<span class="hlsl-func">AddClearUAVPass</span>(GraphBuilder, GraphBuilder.<span class="hlsl-func">CreateUAV</span>(ArgsLOD0), <span class="hlsl-num">0</span>);
-<span class="hlsl-func">AddClearUAVPass</span>(GraphBuilder, GraphBuilder.<span class="hlsl-func">CreateUAV</span>(ArgsLOD1), <span class="hlsl-num">0</span>);
+// Clear to zero before the shader runs
+AddClearUAVPass(GraphBuilder, GraphBuilder.CreateUAV(ArgsLOD0), 0);
+AddClearUAVPass(GraphBuilder, GraphBuilder.CreateUAV(ArgsLOD1), 0);
 
-<span class="hlsl-comment">// Pass in spawn area, camera info, and culling settings</span>
-<span class="hlsl-keyword">auto</span>* PassParams = GraphBuilder.<span class="hlsl-func">AllocParameters</span>&lt;<span class="hlsl-type">FGrassComputeCS</span>::<span class="hlsl-type">FParameters</span>&gt;();
+// Pass in spawn area, camera info, and culling settings
+auto* PassParams = GraphBuilder.AllocParameters&lt;FGrassComputeCS::FParameters&gt;();
 PassParams->NumGrassBlades = MaxInstances;
-PassParams->SpawnOrigin    = <span class="hlsl-type">FVector3f</span>(Settings.SpawnOrigin);
-PassParams->SpawnExtent    = <span class="hlsl-type">FVector3f</span>(Settings.SpawnRadius, Settings.SpawnRadius, <span class="hlsl-num">0.f</span>);
+PassParams->SpawnOrigin    = FVector3f(Settings.SpawnOrigin);
+PassParams->SpawnExtent    = FVector3f(Settings.SpawnRadius, Settings.SpawnRadius, 0.f);
 PassParams->CameraPosition = CameraPositionF;
 PassParams->MaxDrawDistance = Settings.MaxDrawDistance;
 PassParams->LODDistance     = Settings.LODDistance;
-<span class="hlsl-func">ExtractFrustumPlanes</span>(InView, PassParams);
+ExtractFrustumPlanes(InView, PassParams);
 
-<span class="hlsl-comment">// Give the shader write access to the instance and draw arg buffers</span>
-PassParams->OutGrassInstancesLOD0 = GraphBuilder.<span class="hlsl-func">CreateUAV</span>(InstancesLOD0);
-PassParams->OutGrassInstancesLOD1 = GraphBuilder.<span class="hlsl-func">CreateUAV</span>(InstancesLOD1);
-PassParams->OutDrawArgsLOD0       = GraphBuilder.<span class="hlsl-func">CreateUAV</span>(ArgsLOD0);
-PassParams->OutDrawArgsLOD1       = GraphBuilder.<span class="hlsl-func">CreateUAV</span>(ArgsLOD1);
+// Give the shader write access to the instance and draw arg buffers
+PassParams->OutGrassInstancesLOD0 = GraphBuilder.CreateUAV(InstancesLOD0);
+PassParams->OutGrassInstancesLOD1 = GraphBuilder.CreateUAV(InstancesLOD1);
+PassParams->OutDrawArgsLOD0       = GraphBuilder.CreateUAV(ArgsLOD0);
+PassParams->OutDrawArgsLOD1       = GraphBuilder.CreateUAV(ArgsLOD1);
 
-<span class="hlsl-comment">// Kick off the compute shader - one thread per blade</span>
-<span class="hlsl-keyword">const</span> <span class="hlsl-type">uint32</span> GroupSize   = <span class="hlsl-num">64</span>;
-<span class="hlsl-keyword">const</span> <span class="hlsl-type">uint32</span> GroupCount  = <span class="hlsl-type">FMath</span>::<span class="hlsl-func">DivideAndRoundUp</span>(MaxInstances, GroupSize);
+// Kick off the compute shader - one thread per blade
+const uint32 GroupSize   = 64;
+const uint32 GroupCount  = FMath::DivideAndRoundUp(MaxInstances, GroupSize);
 
-<span class="hlsl-type">FComputeShaderUtils</span>::<span class="hlsl-func">AddPass</span>(
+FComputeShaderUtils::AddPass(
     GraphBuilder,
-    <span class="hlsl-func">RDG_EVENT_NAME</span>(<span class="hlsl-str">"GrassCompute_Culling"</span>),
+    RDG_EVENT_NAME("GrassCompute_Culling"),
     ComputeShader, PassParams,
-    <span class="hlsl-type">FIntVector</span>(GroupCount, <span class="hlsl-num">1</span>, <span class="hlsl-num">1</span>));
+    FIntVector(GroupCount, 1, 1));
 
-<span class="hlsl-comment">// ... VS/PS setup, pipeline state init ...</span>
+// ... VS/PS setup, pipeline state init ...
 
-<span class="hlsl-comment">// Draw with indirect args - the GPU already knows how many blades there are</span>
-RHICmdList.<span class="hlsl-func">DrawPrimitiveIndirect</span>(DrawParams->IndirectDrawArgs-><span class="hlsl-func">GetRHI</span>(), <span class="hlsl-num">0</span>);</code></pre>
+// Draw with indirect args - the GPU already knows how many blades there are
+RHICmdList.DrawPrimitiveIndirect(DrawParams->IndirectDrawArgs->GetRHI(), 0);</code></pre>
                     </div>
                     </div>
                 </div>
@@ -219,7 +219,7 @@ RHICmdList.<span class="hlsl-func">DrawPrimitiveIndirect</span>(DrawParams->Indi
             <ul class="tools-list">
                 <li><img src="content/icons/UE-Icon-2023-White.svg" alt="UE5 Logo" class="tool-icon" /> Unreal Engine 5</li>
                 <li><img src="content/icons/c.svg" alt="C++ Logo" class="tool-icon" /> C++</li>
-                <li><img src="content/icons/hlsl.svg" alt="HLSL Icon" class="tool-icon" /> HLSL</li>
+                <li><img src="content/icons/HLSL.png" alt="HLSL Icon" class="tool-icon" /> HLSL</li>
             </ul>
         </section>
 

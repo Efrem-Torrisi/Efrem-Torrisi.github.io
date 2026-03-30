@@ -339,11 +339,74 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             modalOverlay._videoObserver = videoObserver;
         }
 
+        var _prismExtended = false;
+        function extendPrismLanguages() {
+            if (_prismExtended) return;
+            _prismExtended = true;
+
+            // Extend HLSL
+            if (Prism.languages.hlsl) {
+                Prism.languages.insertBefore('hlsl', 'keyword', {
+                    'hlsl-semantic': {
+                        pattern: /\b(?:SV_\w+|TEXCOORD\d*|COLOR\d*|POSITION\d*|NORMAL\d*|TANGENT\d*|BINORMAL\d*|BLENDWEIGHT\d*|BLENDINDICES\d*|PSIZE\d*|VFACE|VPOS|SV_DispatchThreadID|SV_GroupID|SV_GroupThreadID|SV_GroupIndex|SV_VertexID|SV_InstanceID|SV_PrimitiveID|SV_Target\d*|SV_Depth|SV_Position)\b/,
+                        alias: 'builtin'
+                    },
+                    'hlsl-attribute': {
+                        pattern: /\[(?:numthreads|maxvertexcount|domain|partitioning|outputtopology|outputcontrolpoints|patchconstantfunc|earlydepthstencil)\b[^\]]*\]/,
+                        alias: 'attr-name',
+                        inside: {
+                            'number': /\b\d+\b/,
+                            'punctuation': /[[\],()]/
+                        }
+                    },
+                    'hlsl-builtin': {
+                        pattern: /\b(?:saturate|lerp|step|smoothstep|clamp|abs|sign|floor|ceil|round|frac|fmod|pow|exp|exp2|log|log2|log10|sqrt|rsqrt|normalize|length|distance|dot|cross|reflect|refract|min|max|mul|transpose|determinant|sin|cos|tan|asin|acos|atan|atan2|sincos|radians|degrees|ddx|ddy|fwidth|clip|tex2D|tex2Dlod|Sample|SampleLevel|SampleGrad|SampleCmp|Load|GetDimensions|InterlockedAdd|InterlockedMin|InterlockedMax|InterlockedOr|InterlockedAnd|InterlockedXor|InterlockedCompareStore|InterlockedCompareExchange|InterlockedExchange|AllMemoryBarrier|AllMemoryBarrierWithGroupSync|GroupMemoryBarrier|GroupMemoryBarrierWithGroupSync|DeviceMemoryBarrier|DeviceMemoryBarrierWithGroupSync|asfloat|asint|asuint|countbits|firstbithigh|firstbitlow|reversebits|any|all|isnan|isinf|isfinite|mad|rcp|frexp|ldexp|trunc|modf)\b/,
+                        alias: 'function'
+                    },
+                    'hlsl-global': {
+                        pattern: /\b(?:Out\w+|In\w+|Num\w+|Max\w+|Spawn\w+|Camera\w+|LOD\w+|VertexCount\w+|Start\w+|bCircularShape)\b/,
+                        alias: 'variable'
+                    },
+                    'hlsl-member': {
+                        pattern: /\.(?:x|y|z|w|xy|xyz|xyzw|r|g|b|a|rgb|rgba|Position|Scale|Normal|Rotation|VertexCountPerInstance|StartVertexLocation|StartInstanceLocation|InstanceCount)\b/,
+                        alias: 'property'
+                    }
+                });
+            }
+
+            // Extend C++
+            if (Prism.languages.cpp) {
+                Prism.languages.insertBefore('cpp', 'keyword', {
+                    'ue-type': {
+                        pattern: /\b(?:F[A-Z]\w+|U[A-Z]\w+|A[A-Z]\w+|E[A-Z]\w+|T[A-Z]\w+)\b/,
+                        alias: 'class-name'
+                    },
+                    'ue-function': {
+                        pattern: /\b(?:AddClearUAVPass|ExtractFrustumPlanes|RDG_EVENT_NAME|TEXT|DrawPrimitiveIndirect)\b/,
+                        alias: 'function'
+                    },
+                    'cpp-member': {
+                        pattern: /(?:->|\.)\s*([A-Z]\w+|[a-z]\w+)\s*(?=[=(])/,
+                        lookbehind: false,
+                        alias: 'function'
+                    },
+                    'cpp-scope': {
+                        pattern: /\b\w+(?=::)/,
+                        alias: 'class-name'
+                    }
+                });
+            }
+        }
+
         function initModalContent() {
             modalContainer().scrollTop = 0;
             swapModalVideos();
             lazyLoadModalVideos();
             initCodeTabs();
+            if (typeof Prism !== 'undefined') {
+                extendPrismLanguages();
+                Prism.highlightAllUnder(modalContent);
+            }
         }
 
         function initCodeTabs() {

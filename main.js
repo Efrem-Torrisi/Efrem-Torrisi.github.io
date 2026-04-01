@@ -707,15 +707,12 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
         // Prefetch all solo project HTML in parallel (they're small text files).
         // Uses shared fetchProject() so clicks never create duplicate requests.
-        // Media prefetch waits until all HTML is cached to avoid bandwidth contention.
+        // Each file's poster/thumbnail media prefetches as soon as its HTML is cached.
         setTimeout(function () {
-            var htmlPromises = soloSlugs.map(function (slug) {
-                return fetchProject(slug).catch(function () { return null; });
-            });
-            Promise.all(htmlPromises).then(function (results) {
-                results.forEach(function (html) {
-                    if (html) prefetchMedia(html);
-                });
+            soloSlugs.forEach(function (slug) {
+                fetchProject(slug)
+                    .then(function (html) { if (html) prefetchMedia(html); })
+                    .catch(function () {});
             });
         }, 1500);
     })();

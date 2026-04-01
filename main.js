@@ -147,11 +147,11 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         return video;
     }
 
-    // Solo projects (.piece) — force preload immediately
+    // Solo projects (.piece) — load metadata only (first frame + dimensions)
     document.querySelectorAll('.piece img').forEach(function (img) {
         if (!videoExts.test(img.getAttribute('src'))) return;
         var isHover = img.classList.contains('preview-hover');
-        var video = imgToVideo(img, 'auto');
+        var video = imgToVideo(img, 'metadata');
         if (!isHover) {
             video.autoplay = true;
         }
@@ -336,7 +336,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         modalClose.focus();
 
         function swapModalVideos() {
-            modalContent.querySelectorAll('.project-gallery img').forEach(function (img) {
+            modalContent.querySelectorAll('.project-gallery img, .contrib-media-item img, .tech-breakdown-figure img').forEach(function (img) {
                 if (!videoExts.test(img.getAttribute('src'))) return;
                 var video = imgToVideo(img);
                 video.autoplay = true;
@@ -377,12 +377,52 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             modalOverlay._videoObserver = videoObserver;
         }
 
+        /* ── Lazy Prism loader ── */
+        var _prismState = 'idle'; // idle | loading | ready
+        var _prismQueue = [];     // callbacks waiting for Prism
+
+        function loadPrism(callback) {
+            if (_prismState === 'ready') { callback(); return; }
+            _prismQueue.push(callback);
+            if (_prismState === 'loading') return;
+            _prismState = 'loading';
+
+            // CSS
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css';
+            document.head.appendChild(link);
+
+            // JS — load core, then language components in order
+            var scripts = [
+                'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-hlsl.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js'
+            ];
+            var i = 0;
+            function loadNext() {
+                if (i >= scripts.length) {
+                    _prismState = 'ready';
+                    extendPrismLanguages();
+                    _prismQueue.forEach(function (cb) { cb(); });
+                    _prismQueue = [];
+                    return;
+                }
+                var s = document.createElement('script');
+                s.src = scripts[i++];
+                s.onload = loadNext;
+                s.onerror = loadNext;
+                document.head.appendChild(s);
+            }
+            loadNext();
+        }
+
         var _prismExtended = false;
         function extendPrismLanguages() {
             if (_prismExtended) return;
             _prismExtended = true;
 
-            // Extend HLSL
             if (Prism.languages.hlsl) {
                 Prism.languages.insertBefore('hlsl', 'keyword', {
                     'hlsl-semantic': {
@@ -412,7 +452,6 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                 });
             }
 
-            // Extend C++
             if (Prism.languages.cpp) {
                 Prism.languages.insertBefore('cpp', 'keyword', {
                     'ue-type': {
@@ -443,9 +482,12 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             initCodeTabs();
             var isLight = document.documentElement.getAttribute('data-theme') === 'light';
             window.swapIcons(isLight);
-            if (typeof Prism !== 'undefined') {
-                extendPrismLanguages();
-                Prism.highlightAllUnder(modalContent);
+
+            // Highlight code blocks — load Prism on demand if needed
+            if (modalContent.querySelector('pre code')) {
+                loadPrism(function () {
+                    Prism.highlightAllUnder(modalContent);
+                });
             }
         }
 

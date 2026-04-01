@@ -26,7 +26,7 @@
                 controls
                 playsinline
                 preload="metadata"
-                poster="content/SoloProjects/AutoLOD.png"
+                poster="content/SoloProjects/AutoLOD.webp"
             ></video>
         </div>
 
@@ -69,7 +69,7 @@
                         <img src="content/SoloProjects/LOD/simple_temp.png" alt="Simple collision pipeline: merge_in from LOD0, Shrinkwrap convex_hull, OUT null" />
                     </figure>
                     <figure class="contrib-media-item">
-                        <img src="content/SoloProjects/LOD/simple_mesh.png" alt="Simple convex hull collision mesh result" />
+                        <img src="content/SoloProjects/LOD/simple_mesh.webp" alt="Simple convex hull collision mesh result" />
                     </figure>
                 </div>
             </div>
@@ -82,10 +82,10 @@
                         <img src="content/SoloProjects/LOD/complex_temp.png" alt="Complex collision temp node: merge_in from LOD0, Convex Decomposition" />
                     </figure>
                     <figure class="contrib-media-item">
-                        <img src="content/SoloProjects/LOD/UCX_Mesh.png" alt="Inside a UCX collision node: merge_in, convex_decomp, isolate_segment, OUT" />
+                        <img src="content/SoloProjects/LOD/UCX_Mesh.webp" alt="Inside a UCX collision node: merge_in, convex_decomp, isolate_segment, OUT" />
                     </figure>
                     <figure class="contrib-media-item">
-                        <img src="content/SoloProjects/LOD/complex_mesh.png" alt="Complex collision mesh result with multiple convex pieces" />
+                        <img src="content/SoloProjects/LOD/complex_mesh.webp" alt="Complex collision mesh result with multiple convex pieces" />
                     </figure>
                 </div>
             </div>
@@ -94,7 +94,7 @@
                 <h3>UCX Subnetwork</h3>
                 <p>Each convex piece gets its own geometry node inside the UCX subnetwork, following the same pipeline: merge in the decomposed result, isolate the segment, and output with its UCX_ name. All pieces are included in the final FBX alongside the LOD chain.</p>
                 <figure class="tech-breakdown-figure">
-                    <img src="content/SoloProjects/LOD/UCX_subnetwork.png" alt="UCX subnetwork containing multiple collision geometry nodes" />
+                    <img src="content/SoloProjects/LOD/UCX_subnetwork.webp" alt="UCX subnetwork containing multiple collision geometry nodes" />
                 </figure>
             </div>
 
@@ -102,7 +102,7 @@
                 <h3>Result & Export</h3>
                 <p>The final output is a single FBX containing the full LOD chain, source mesh, and all UCX collision meshes with automatic naming conventions for engine import.</p>
                 <figure class="tech-breakdown-figure">
-                    <img src="content/SoloProjects/LOD/Result.png" alt="Final result showing LOD0-3 with polygon counts, simple and complex UCX collisions, and the naming convention hierarchy" />
+                    <img src="content/SoloProjects/LOD/Result.webp" alt="Final result showing LOD0-3 with polygon counts, simple and complex UCX collisions, and the naming convention hierarchy" />
                 </figure>
             </div>
         </section>

@@ -21,7 +21,7 @@
                 controls
                 playsinline
                 preload="metadata"
-                poster="content/SoloProjects/Grass/GrassPlugin2_blur.png"
+                poster="content/SoloProjects/Grass/GrassPlugin2_blur.webp"
             ></video>
         </div>
     
@@ -30,10 +30,10 @@
 
             <h3>Screenshots</h3>
             <div class="project-gallery project-gallery--strip">
-                <img src="content/SoloProjects/Grass/screenshots/thumbs/still1.jpg" data-full-src="content/SoloProjects/Grass/screenshots/still1.png" alt="Grass1" />
-                <img src="content/SoloProjects/Grass/screenshots/thumbs/still2.jpg" data-full-src="content/SoloProjects/Grass/screenshots/still2.png" alt="Grass2" />
-                <img src="content/SoloProjects/Grass/screenshots/thumbs/still3.jpg" data-full-src="content/SoloProjects/Grass/screenshots/still3.png" alt="Grass3" />
-                <img src="content/SoloProjects/Grass/screenshots/thumbs/still4.jpg" data-full-src="content/SoloProjects/Grass/screenshots/still4.png" alt="Grass4" />
+                <img src="content/SoloProjects/Grass/screenshots/thumbs/still1.jpg" data-full-src="content/SoloProjects/Grass/screenshots/still1.webp" alt="Grass1" />
+                <img src="content/SoloProjects/Grass/screenshots/thumbs/still2.jpg" data-full-src="content/SoloProjects/Grass/screenshots/still2.webp" alt="Grass2" />
+                <img src="content/SoloProjects/Grass/screenshots/thumbs/still3.jpg" data-full-src="content/SoloProjects/Grass/screenshots/still3.webp" alt="Grass3" />
+                <img src="content/SoloProjects/Grass/screenshots/thumbs/still4.jpg" data-full-src="content/SoloProjects/Grass/screenshots/still4.webp" alt="Grass4" />
                 <span class="gallery-more-indicator"></span>
             </div>
         </section>
@@ -53,7 +53,7 @@
                 controls
                 playsinline
                 preload="metadata"
-                poster="content/SoloProjects/Grass/GrassPlugin2_blur.png"
+                poster="content/SoloProjects/Grass/GrassPlugin2_blur.webp"
             ></video>
         </div>
 
@@ -67,7 +67,7 @@
                 </div>
                 <div class="compute-media-row">
                     <figure class="compute-diagram">
-                        <img src="content/SoloProjects/Grass/compute-pipeline.png" alt="Compute shader pipeline flowchart" />
+                        <img src="content/SoloProjects/Grass/compute-pipeline.webp" alt="Compute shader pipeline flowchart" />
                     </figure>
                     <div class="code-embed">
                     <div class="code-embed-tabs">
@@ -207,7 +207,7 @@ RHICmdList.DrawPrimitiveIndirect(DrawParams->IndirectDrawArgs->GetRHI(), 0);</co
                 <p>The pixel shader outputs a base-to-tip color gradient with blade hue variation, root self-shadowing, world-space noise patches, Interleaved Gradient Noise dithered opacity for soft tips, and a subsurface scattering color for backlit translucency.</p>
                 <div class="contrib-media contrib-media--contain">
                     <figure class="contrib-media-item">
-                        <img src="content/SoloProjects/Grass/gbuffer.png" alt="GBuffer outputs: Albedo, Subsurface, Normal, Roughness" />
+                        <img src="content/SoloProjects/Grass/gbuffer.webp" alt="GBuffer outputs: Albedo, Subsurface, Normal, Roughness" />
                     </figure>
                     <figure class="contrib-media-item">
                         <video src="content/SoloProjects/Grass/dithering.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
@@ -221,10 +221,10 @@ RHICmdList.DrawPrimitiveIndirect(DrawParams->IndirectDrawArgs->GetRHI(), 0);</co
                 <p>The plugin hooks into PostRenderBasePassDeferred, so all grass participates in deferred lighting, shadows, and GI without a separate lighting pass.</p>
                 <div class="contrib-media contrib-media--contain">
                     <figure class="contrib-media-item">
-                        <img src="content\SoloProjects\Grass\performance0.png" alt="Frametime without optimization" />
+                        <img src="content/SoloProjects/Grass/performance0.webp" alt="Frametime without optimization" />
                     </figure>
                     <figure class="contrib-media-item">
-                        <img src="content\SoloProjects\Grass\performance1.png" alt="Frametime with optimization" />
+                        <img src="content/SoloProjects/Grass/performance1.webp" alt="Frametime with optimization" />
                     </figure>
                 </div>
                 <p class="media-note"> On the left: Grass field entirely in view, with optimization settings disabled. || On the right: Same exact grass field with a game realistic camera frame and optimization settings enabled. /p>
@@ -236,7 +236,7 @@ RHICmdList.DrawPrimitiveIndirect(DrawParams->IndirectDrawArgs->GetRHI(), 0);</co
                 <p>A self-contained UE5 plugin. Users drop a GrassVolume actor and configure blade count, spawn radius, draw distance, height/width, bending, wind, colors, LOD distance, and dithering via exposed UProperties. Multiple independent volumes are supported, each dispatching its own compute and draw passes.</p>
                 <div class="contrib-media contrib-media--contain" style="grid-template-columns: auto auto; justify-content: center;">
                     <figure class="contrib-media-item" style="max-height: 400px; aspect-ratio: auto;">
-                        <img src="content/SoloProjects/Grass/uproperties.png" alt="GrassVolume exposed parameters" style="height: 100%; width: auto;" />
+                        <img src="content/SoloProjects/Grass/uproperties.webp" alt="GrassVolume exposed parameters" style="height: 100%; width: auto;" />
                     </figure>
                     <figure class="contrib-media-item" style="max-height: 400px; aspect-ratio: auto; align-self: start;">
                         <img src="content/SoloProjects/Grass/pluginpackaged.png" alt="Plugin in UE5 plugin browser" style="height: auto; width: auto;" />
@@ -251,7 +251,7 @@ RHICmdList.DrawPrimitiveIndirect(DrawParams->IndirectDrawArgs->GetRHI(), 0);</co
             <ul class="tools-list">
                 <li><img src="content/icons/UE-Icon-2023-White.svg" data-dark-src="content/icons/UE-Icon-2023-White.svg" data-light-src="content/icons/UE-Icon-2023-Black.svg" alt="UE5 Logo" class="tool-icon" /> Unreal Engine 5</li>
                 <li><img src="content/icons/c.svg" alt="C++ Logo" class="tool-icon" /> C++ (UE5)</li>
-                <li><img src="content/icons/HLSL.png" alt="HLSL Icon" class="tool-icon" /> HLSL</li>
+                <li><img src="content/icons/HLSL.webp" alt="HLSL Icon" class="tool-icon" /> HLSL</li>
             </ul>
         </section>
     </div>

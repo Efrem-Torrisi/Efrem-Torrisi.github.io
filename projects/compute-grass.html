@@ -5,23 +5,51 @@
             <p class="project-detail-subtitle">GPU-Driven Grass Plugin via Compute Shaders in Unreal Engine 5</p>
             <div class="project-detail-meta">
                 <span class="meta-item"><strong>Role:</strong> Solo Developer</span>
-                <span class="meta-item"><strong>Tools:</strong> Unreal Engine 5, C++, HLSL</span>
+                <span class="meta-item"><strong>Tools:</strong> Unreal Engine 5, C++ (UE5), HLSL</span>
                 <span class="meta-item"><strong>Type:</strong> Real-Time Rendering</span>
             </div>
         </div>
     </header>
 
     <div class="project-detail-body">
+
+        <section class="project-detail-section">
+        <div  class="project-detail-trailer project-detail-trailer--inline">
+            <h3> Results showcase</h3>
+            <video
+                src="content/SoloProjects/Grass/GrassPluginShowcase_compressed.mp4"
+                controls
+                playsinline
+                preload="metadata"
+                poster="content/SoloProjects/Grass/GrassPlugin2_blur.png"
+            ></video>
+        </div>
+    
+
+    <!-- Screenshots -->
+
+            <h3>Screenshots</h3>
+            <div class="project-gallery project-gallery--strip">
+                <img src="content/SoloProjects/Grass/screenshots/thumbs/still1.jpg" data-full-src="content/SoloProjects/Grass/screenshots/still1.png" alt="Grass1" />
+                <img src="content/SoloProjects/Grass/screenshots/thumbs/still2.jpg" data-full-src="content/SoloProjects/Grass/screenshots/still2.png" alt="Grass2" />
+                <img src="content/SoloProjects/Grass/screenshots/thumbs/still3.jpg" data-full-src="content/SoloProjects/Grass/screenshots/still3.png" alt="Grass3" />
+                <img src="content/SoloProjects/Grass/screenshots/thumbs/still4.jpg" data-full-src="content/SoloProjects/Grass/screenshots/still4.png" alt="Grass4" />
+                <span class="gallery-more-indicator"></span>
+            </div>
+        </section>
+
         <!-- Overview -->
         <section class="project-detail-section">
             <h2>Overview & Technical Breakdown</h2>
-            <p>For this project, I developed an Unreal Engine 5 plugin that renders millions of individual grass blades entirely on the GPU via compute shaders and indirect drawing. A compute shader spawns, culls, and sorts blades into LOD buckets, while custom global vertex and pixel shaders generate curved blade geometry procedurally and write directly to the GBuffer, integrating with Unreal's default deferred rendering pass. The plugin is designed to be a drop-in solution: place a Grass Volume actor in the scene and configure parameters like wind animation, base/tip/subsurface colors, height and width variations, bending, rotation, and dithering to fit the desired art style.</p>
+            <p>An Unreal Engine 5 plugin that renders millions of grass blades entirely on the GPU. A compute shader handles spawning, culling, and sorting blades into LOD buckets, while custom global vertex and pixel shaders generate the curved geometry procedurally and write directly to the GBuffer so it integrates with Unreal’s deferred rendering pass.</p>
+            <p>Planned for easy drop-in usage: add a Grass Volume actor to the scene and configure wind, colors, height/width variations, bending, and dithering.</p>
         </section>
 
         <!-- Demo Video -->
         <div class="project-detail-trailer project-detail-trailer--inline">
+            <h3> Workflow Demo</h3>
             <video
-                src="content/SoloProjects/Grass/GrassPluginV.mp4"
+                src="content/SoloProjects/Grass/workflowV.mp4"
                 controls
                 playsinline
                 preload="metadata"
@@ -34,7 +62,8 @@
             <div class="tech-breakdown-row compute-section">
                 <div class="tech-breakdown-text">
                     <h3>Compute Shader and Indirect Drawing</h3>
-                    <p>The core of the plugin is a compute shader that runs one GPU thread per potential grass blade. Each thread evaluates a spawn position on a grid, performs frustum and distance culling, and if the blade is visible, appends it to a structured buffer. The draw arguments are written entirely on the GPU into an indirect args buffer, so the CPU never needs to know how many blades are visible. The final draw call uses DrawPrimitiveIndirect to render only the surviving instances, achieving zero CPU-GPU synchronization overhead.</p>
+                    <p>The core of the plugin is a compute shader that runs one GPU thread per potential grass blade. Each thread evaluates a spawn position on a grid, performs frustum and distance culling, and if the blade is visible, appends it to a structured buffer.</p>
+                    <p>The draw arguments are written entirely on the GPU into an indirect args buffer, so the CPU never needs to know how many blades are visible. The final draw call uses DrawPrimitiveIndirect to render only the instances that passed all checks, achieving zero CPU-GPU synchronization overhead.</p>
                 </div>
                 <div class="compute-media-row">
                     <figure class="compute-diagram">
@@ -174,7 +203,8 @@ RHICmdList.DrawPrimitiveIndirect(DrawParams->IndirectDrawArgs->GetRHI(), 0);</co
 
             <div class="tech-breakdown-block">
                 <h3>Vertex and Pixel Global Shaders</h3>
-                <p>The grass blades are rendered using custom global shaders that write directly to the GBuffer. The vertex shader generates blade geometry procedurally from SV_VertexID, building curved blades with Bezier bending driven by wind, per-blade random tilt, droop, and side curvature. The pixel shader outputs a base-to-tip color gradient with per-blade hue variation, self-shadowing at the roots, world-space noise based patches that vary in color value, Interleaved Gradient Noise dithered opacity for soft blade tips, and a subsurface scattering color for backlit translucency.</p>
+                <p>Custom global shaders write directly to the GBuffer. The vertex shader generates curved blade geometry procedurally from SV_VertexID with bending driven by wind, per-blade random tilt, droop, and side curvature.</p>
+                <p>The pixel shader outputs a base-to-tip color gradient with blade hue variation, root self-shadowing, world-space noise patches, Interleaved Gradient Noise dithered opacity for soft tips, and a subsurface scattering color for backlit translucency.</p>
                 <div class="contrib-media contrib-media--contain">
                     <figure class="contrib-media-item">
                         <img src="content/SoloProjects/Grass/gbuffer.png" alt="GBuffer outputs: Albedo, Subsurface, Normal, Roughness" />
@@ -187,7 +217,8 @@ RHICmdList.DrawPrimitiveIndirect(DrawParams->IndirectDrawArgs->GetRHI(), 0);</co
 
             <div class="tech-breakdown-block">
                 <h3>Optimization Techniques</h3>
-                <p>The optimization techniques used keep the plugin within a reasonable frame budget at high blade counts. On the compute side, frustum culling discards blades outside the camera view and distance culling rejects blades beyond the chosen draw distance. Both are simple per-thread checks before the append, so that the indirect draw call automatically renders fewer instances. A two-level LOD system sorts blades into separate buffers: nearby blades get the full 15-vertex curved geometry while distant blades fall back to a 3-vertex triangle, each drawn with their own indirect call. Screen-space width clamping enforces a minimum pixel width on distant blades to prevent artifacting. On the rendering side, the plugin hooks into PostRenderBasePassDeferred, meaning all grass participates in deferred lighting, shadows, and GI for "free" without requiring a separate lighting pass.</p>
+                <p>Frustum and distance culling run as thread checks in the compute pass, so the indirect draw call automatically renders fewer instances. A two-level LOD system sorts blades into separate buffers: nearby blades get full 15-vertex curved geometry, distant blades fall back to a 3-vertex triangle. Screen-space width clamping prevents sub-pixel artifacting.</p>
+                <p>The plugin hooks into PostRenderBasePassDeferred, so all grass participates in deferred lighting, shadows, and GI without a separate lighting pass.</p>
                 <div class="contrib-media contrib-media--contain">
                     <figure class="contrib-media-item">
                         <img src="content\SoloProjects\Grass\performance0.png" alt="Frametime without optimization" />
@@ -196,12 +227,13 @@ RHICmdList.DrawPrimitiveIndirect(DrawParams->IndirectDrawArgs->GetRHI(), 0);</co
                         <img src="content\SoloProjects\Grass\performance1.png" alt="Frametime with optimization" />
                     </figure>
                 </div>
+                <p class="media-note"> On the left: Grass field entirely in view, with optimization settings disabled. || On the right: Same exact grass field with a game realistic camera frame and optimization settings enabled. /p>
                 <p class="media-note"> Screenshots taken with: 10 million blades, Development Editor with debugger attached, 1440p on a 3080 Ti.</p>
             </div>
 
             <div class="tech-breakdown-block">
                 <h3>Plugin and User Parameters</h3>
-                <p>The plugin is structured as a self-contained UE5 runtime module. When the plugin is enabled, the user can drop a GrassVolume actor with uproperty parameters available for editing, such as: blade count, spawn radius, draw distance, height, width, bending and rotation variations, wind speed and direction, base/tip/subsurface colors, LOD distance, dithering settings and frustum culling margin. The plugin supports multiple independent grass volumes in a scene, each with its own settings, dispatching separate compute and draw passes per volume.</p>
+                <p>A self-contained UE5 plugin. Users drop a GrassVolume actor and configure blade count, spawn radius, draw distance, height/width, bending, wind, colors, LOD distance, and dithering via exposed UProperties. Multiple independent volumes are supported, each dispatching its own compute and draw passes.</p>
                 <div class="contrib-media contrib-media--contain" style="grid-template-columns: auto auto; justify-content: center;">
                     <figure class="contrib-media-item" style="max-height: 400px; aspect-ratio: auto;">
                         <img src="content/SoloProjects/Grass/uproperties.png" alt="GrassVolume exposed parameters" style="height: 100%; width: auto;" />
@@ -218,7 +250,7 @@ RHICmdList.DrawPrimitiveIndirect(DrawParams->IndirectDrawArgs->GetRHI(), 0);</co
             <h2>Tools & Technologies used</h2>
             <ul class="tools-list">
                 <li><img src="content/icons/UE-Icon-2023-White.svg" data-dark-src="content/icons/UE-Icon-2023-White.svg" data-light-src="content/icons/UE-Icon-2023-Black.svg" alt="UE5 Logo" class="tool-icon" /> Unreal Engine 5</li>
-                <li><img src="content/icons/c.svg" alt="C++ Logo" class="tool-icon" /> C++</li>
+                <li><img src="content/icons/c.svg" alt="C++ Logo" class="tool-icon" /> C++ (UE5)</li>
                 <li><img src="content/icons/HLSL.png" alt="HLSL Icon" class="tool-icon" /> HLSL</li>
             </ul>
         </section>

@@ -660,7 +660,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                 el.playsInline = true;
             } else {
                 el = document.createElement('img');
-                el.src = sourceEl.src;
+                el.src = sourceEl.getAttribute('data-full-src') || sourceEl.src;
                 el.alt = sourceEl.alt || '';
             }
 
@@ -743,9 +743,9 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             openLightbox(media);
         });
 
-        // Also handle tech-breakdown figures
+        // Also handle tech-breakdown figures and compute diagrams
         document.addEventListener('click', function (e) {
-            var media = e.target.closest('.tech-breakdown-figure img');
+            var media = e.target.closest('.tech-breakdown-figure img, .compute-diagram img');
             if (!media) return;
             openLightbox(media);
         });
@@ -821,10 +821,16 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
         var track = document.querySelector('.carousel-track');
         var dotsContainer = document.querySelector('.carousel-dots');
-        var MOBILE_BP = 768;
+        var MOBILE_BP = 1024;
+        var isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+        function useDesktopCarousel() {
+            if (isCoarsePointer) return false;
+            return window.innerWidth > MOBILE_BP;
+        }
         var AUTO_INTERVAL = 4000;
         var autoTimer = null;
-        var currentIndex = 0;
+        var INITIAL_INDEX = 3; // Captain Hornswaggle
+        var currentIndex = INITIAL_INDEX;
 
         /* --- Desktop accordion --- */
 
@@ -882,7 +888,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
         cards.forEach(function (card) {
             card.addEventListener('mouseenter', function () {
-                if (window.innerWidth > MOBILE_BP) {
+                if (useDesktopCarousel()) {
                     userHasInteracted = true;
                     setFocused(card, true);
                 }
@@ -890,7 +896,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         });
 
         track.addEventListener('mouseleave', function () {
-            if (window.innerWidth > MOBILE_BP) {
+            if (useDesktopCarousel()) {
                 // Keep the last focused card, just stop the video
                 if (hoverVideoTimer) {
                     clearTimeout(hoverVideoTimer);
@@ -908,7 +914,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
         cards.forEach(function (card) {
             card.addEventListener('click', function (e) {
-                if (window.innerWidth > MOBILE_BP && !card.classList.contains('is-focused')) {
+                if (useDesktopCarousel() && !card.classList.contains('is-focused')) {
                     e.preventDefault();
                     e.stopPropagation();
                     setFocused(card, true);
@@ -916,14 +922,14 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             });
         });
 
-        setFocused(cards[0], false);
+        setFocused(cards[INITIAL_INDEX], false);
 
         /* --- Mobile swipe carousel --- */
 
         // Build dots
         cards.forEach(function (_, i) {
             var dot = document.createElement('button');
-            dot.className = 'carousel-dot' + (i === 0 ? ' is-active' : '');
+            dot.className = 'carousel-dot' + (i === INITIAL_INDEX ? ' is-active' : '');
             dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
             dot.addEventListener('click', function () {
                 goToSlide(i);
@@ -945,7 +951,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             if (carouselEl) {
                 carouselInView = false;
                 var carouselObserver = new IntersectionObserver(function (entries) {
-                    if (window.innerWidth > MOBILE_BP) return;
+                    if (useDesktopCarousel()) return;
                     entries.forEach(function (entry) {
                         var wasInView = carouselInView;
                         carouselInView = entry.isIntersecting;
@@ -989,7 +995,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         }
 
         function mobileCarouselVideo(activeCard) {
-            if (window.innerWidth > MOBILE_BP) return;
+            if (useDesktopCarousel()) return;
             stopCarouselVideos();
             if (!activeCard || !carouselInView) return;
             // Priority load and play the active card's video after a delay
@@ -1015,7 +1021,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         function goToSlide(index) {
             currentIndex = Math.max(0, Math.min(index, cards.length - 1));
 
-            if (window.innerWidth <= MOBILE_BP) {
+            if (!useDesktopCarousel()) {
                 cards.forEach(function (card, i) {
                     card.classList.remove('carousel-prev', 'carousel-active', 'carousel-next');
                     if (i === currentIndex) {
@@ -1054,7 +1060,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         }
 
         function resetAutoPlay() {
-            if (window.innerWidth <= MOBILE_BP) {
+            if (!useDesktopCarousel()) {
                 // Don't auto-swipe if a video preview is playing
                 if (carouselVideoPlaying) return;
                 startAutoPlay();
@@ -1137,8 +1143,26 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             });
         }
 
+        // Click prev/next cards to navigate in mobile carousel
+        track.addEventListener('click', function (e) {
+            if (useDesktopCarousel()) return;
+            var card = e.target.closest('.project');
+            if (!card) return;
+            if (card.classList.contains('carousel-prev')) {
+                e.preventDefault();
+                e.stopPropagation();
+                goToSlide((currentIndex - 1 + cards.length) % cards.length);
+                resetAutoPlay();
+            } else if (card.classList.contains('carousel-next')) {
+                e.preventDefault();
+                e.stopPropagation();
+                goToSlide((currentIndex + 1) % cards.length);
+                resetAutoPlay();
+            }
+        });
+
         track.addEventListener('touchstart', function (e) {
-            if (window.innerWidth > MOBILE_BP) return;
+            if (useDesktopCarousel()) return;
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
             touchDeltaX = 0;
@@ -1153,7 +1177,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         }, { passive: true });
 
         track.addEventListener('touchmove', function (e) {
-            if (!isSwiping || window.innerWidth > MOBILE_BP) return;
+            if (!isSwiping || useDesktopCarousel()) return;
             var dx = e.touches[0].clientX - touchStartX;
             var dy = e.touches[0].clientY - touchStartY;
 
@@ -1178,7 +1202,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         }, { passive: false });
 
         track.addEventListener('touchend', function () {
-            if (!isSwiping || window.innerWidth > MOBILE_BP) return;
+            if (!isSwiping || useDesktopCarousel()) return;
             isSwiping = false;
 
             // Determine which card is closest to center based on drag progress
@@ -1217,7 +1241,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
         // Start auto-play on mobile
         function handleResize() {
-            if (window.innerWidth <= MOBILE_BP) {
+            if (!useDesktopCarousel()) {
                 goToSlide(currentIndex);
                 startAutoPlay();
             } else {

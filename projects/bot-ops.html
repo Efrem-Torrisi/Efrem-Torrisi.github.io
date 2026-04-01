@@ -28,7 +28,8 @@
             <div class="tech-breakdown-row">
                 <div class="tech-breakdown-text">
                     <h3>Player Rig</h3>
-                    <p>I built the first-person player rig in Blender, which drives both weapons and the camera. The rig includes two full weapon hierarchies, dedicated bones for projectile and muzzle flash spawn points used by the gameplay programmers, and bones for controlling the in-game camera. To keep everything controllable, the rig makes heavy use of modifiers such as Copy Transforms, Copy Location, and Copy Rotation constraints, along with custom bone shapes for intuitive selection in the viewport. The camera bone was set up to match the exact field of view used in the engine so that what I see in Blender is a 1:1 match with the in-game perspective.</p>
+                    <p>I built the first-person player rig in Blender, driving both weapons and the camera. The rig includes two full weapon hierarchies, dedicated bones for projectile and muzzle flash spawn points, and bones for camera control, all organized with Copy Transforms/Location/Rotation constraints and custom bone shapes.</p>
+                    <p>The camera bone matches the engine's field of view exactly, so what I see in Blender is a 1:1 match with the in-game perspective.</p>
                 </div>
                 <figure class="tech-breakdown-figure">
                     <img src="content/GameProjects/BO/rig.png" alt="Player rig in Blender" />
@@ -92,7 +93,8 @@
 
             <div class="tech-breakdown-block">
                 <h3>Destructible Objects</h3>
-                <p>I collaborated with the programming team to design the destructible objects pipeline and logic, and supported its implementation. Specific props in the environment can be destroyed by the player, breaking apart into pre-fractured pieces with Jolt physics. The meshes were pre-fractured using my <a href="#project/smart-fracture" class="inline-link">Smart Mesh Fracturing Tool</a>, which exports the fractured pieces in an FBX alongside a JSON metadata file mapping each piece's name to its position and bounding-box dimensions. The engine reads this JSON at load time to generate correctly placed and scaled collision boxes in code, and on impact swaps the intact mesh for the individual pieces with their physics bodies so Jolt can simulate the destruction from there.</p>
+                <p>I designed the destructible objects pipeline with the programming team. Props are pre-fractured using my <a href="#project/smart-fracture" class="inline-link">Smart Mesh Fracturing Tool</a>, which exports an FBX alongside a JSON file mapping each piece's position and bounding-box dimensions.</p>
+                <p>At load time the engine reads the JSON to generate collision boxes, and on impact swaps the intact mesh for the individual pieces with Jolt physics bodies to simulate the destruction.</p>
                 <div class="contrib-media contrib-media--contain">
                     <figure class="contrib-media-item">
                         <img src="content/GameProjects/BO/cup.png" alt="Fractured cup" />
@@ -114,7 +116,8 @@
             <div class="tech-breakdown-row">
                 <div class="tech-breakdown-text">
                     <h3>Level Data Validator</h3>
-                    <p>During production, we ran into an issue where some objects in the level data files would be saved with extremely large translation values (coordinates with 30+ zeroes), silently crashing the level on startup with no clear error. Tracking these entries down manually was impractical given the size of the data files. I wrote a Python script that parses every entry in the level data files, flags any transforms with values outside a sane range, and presents them in a list. From there you can either delete the bad entries directly or open them for inspection, turning what was a painful debugging session into a couple of clicks fix.</p>
+                    <p>Some objects in the level data files would occasionally be saved with absurdly large translation values, silently crashing the level on startup. Finding them manually was impractical.</p>
+                    <p>I wrote a Python script that scans every entry, flags transforms outside a sane range, and lets you delete or inspect them directly.</p>
                 </div>
                 <figure class="tech-breakdown-figure">
                     <img src="content/GameProjects/BO/datavalidator.png" alt="Level data validator output" />
@@ -123,7 +126,7 @@
 
             <div class="tech-breakdown-block">
                 <h3>Pickup VFX</h3>
-                <p>I created the in-game pickup visual effects, inspired by the power-up style from Call of Duty Zombies. The effect was written entirely in HLSL, working on both the vertex and pixel shaders. The vertex shader handles the bobbing and rotation animation of the pickup mesh, while the pixel shader produces the glowing, pulsating outline and color shifts that make pickups visually distinct and readable from a distance.</p>
+                <p>I created pickup VFX inspired by Call of Duty Zombies power-ups, written entirely in HLSL. The vertex shader drives the bobbing and rotation, while the pixel shader handles the glowing, pulsating outline and color shifts.</p>
                 <div class="contrib-media contrib-media--contain" style="max-width: 50%">
                     <figure class="contrib-media-item">
                         <video src="content/GameProjects/BO/vfxV.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>

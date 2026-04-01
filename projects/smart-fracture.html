@@ -11,15 +11,51 @@
         </div>
     </header>
 
+        
+
     <div class="project-detail-body">
+
+        
+
+    <section class="project-detail-section">
+        <div  class="project-detail-trailer project-detail-trailer--inline">
+            <h3> Results showcase</h3>
+            <video
+                src="content/SoloProjects/FractureToolSubpage/unreal_demo.mp4"
+                controls
+                playsinline
+                preload="metadata"
+            ></video>
+        </div>
+    
+
+    <!-- Screenshots -->
+
+            <h3>Screenshots</h3>
+            <div class="project-gallery project-gallery--strip">
+                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/thumbs/glass.jpg" data-full-src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/glass.png" alt="Glass1" />
+                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/thumbs/glass2.jpg" data-full-src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/glass2.png" alt="Glass2" />
+                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/thumbs/glass3.jpg" data-full-src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/glass3.png" alt="Glass3" />
+                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/thumbs/glass4.jpg" data-full-src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/glass4.png" alt="Glass4" />
+                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/thumbs/woodbox.jpg" data-full-src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/woodbox.png" alt="Fractured wooden box" />
+                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/thumbs/chair.jpg" data-full-src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/chair.png" alt="Fractured chair with wood fracture method" />
+                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/thumbs/022734.jpg" data-full-src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/Screenshot 2026-03-25 022734.png" alt="barrier" />
+                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/thumbs/025433.jpg" data-full-src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/Screenshot 2026-03-25 025433.png" alt="barrier2" />
+                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/thumbs/cup.jpg" data-full-src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/cup.png" alt="cup" />
+                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/thumbs/plate.jpg" data-full-src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/plate.png" alt="Plate" />
+                <span class="gallery-more-indicator"></span>
+            </div>
+        </section>
+
         <!-- Overview -->
         <section class="project-detail-section">
             <h2>Overview & Technical Breakdown</h2>
-            <p>For this project, I developed a Houdini HDA tool that automates the pre-fracturing pipeline for FBX meshes. It auto-detects materials on an imported mesh via naming convention through a Python SOP, applies per-material fracturing methods, then reassembles the fractured parts with correct naming conventions for a hassle-free export back to a game engine or alternatively for use with RBD/Bullet solvers.</p>
+            <p>For this project, I developed a Houdini HDA tool that automates the pre-fracturing pipeline for FBX meshes. It auto-detects materials on an imported mesh via naming convention through a Python SOP, applies per-material fracturing methods, then organizes the fractured parts with correct naming conventions for a hassle-free export back to a game engine or alternatively for use with RBD/Bullet solvers.</p>
         </section>
 
         <!-- Demo Video -->
         <div class="project-detail-trailer project-detail-trailer--inline">
+            <h3> Workflow Demo</h3>
             <video
                 src="content/SoloProjects/SmartFractureToolDemo_compressed.mp4"
                 controls
@@ -34,7 +70,7 @@
             <div class="tech-breakdown-row">
                 <div class="tech-breakdown-text">
                     <h3>Material Auto-Detection</h3>
-                    <p>When using the tool in its "Auto Detect Materials Mode", the tool's Python SOP reads the incoming FBX geometry and parses material and name attributes to identify each material zone, and then creates primitive and detail attributes used for export naming convention later. Each detected material is separated into its own processing stream, where it receives the appropriate fracture treatment based on its material type and user parameters.</p>
+                    <p>In "Auto Detect Materials Mode", a Python SOP parses the incoming FBX's material and name attributes to identify each material zone. Each zone is then separated into its own processing stream and fractured according to its material type and user parameters.</p>
                 </div>
                 <figure class="tech-breakdown-figure">
                     <img src="content\SoloProjects\FractureToolSubpage\MaterialDetection.png" alt="Material detection interface in Houdini" />
@@ -44,7 +80,7 @@
             <div class="tech-breakdown-row tech-breakdown-row--reverse">
                 <div class="tech-breakdown-text">
                     <h3>Per-Material Custom Fracture Methods</h3>
-                    <p>A big part of this project was exploring how to fracture meshes to get realistic results for different materials (concrete, wood, glass). Throughout development of this tool I developed numerous custom fracturing methods for these three materials and eventually ended up including in the tool three variations for concrete, three for glass, and two for wood. The tool applies the correct fracturing method per material zone, producing physically plausible pre-fracture patterns without manual setup requested from the user. Alternatively, if the user wants to, the tool can be used in a manual mode by forcing a specific fracturing method to be applied to the entirety of the mesh.</p>
+                    <p>The tool includes custom fracturing methods for concrete (3 variations), glass (3), and wood (2), each producing physically plausible break patterns. In auto mode the correct method is applied per material zone; in manual mode the user can force a specific method across the entire mesh.</p>
                 </div>
                 <figure class="tech-breakdown-figure">
                     <img src="content\SoloProjects\FractureToolSubpage\FracturingMethods.png" alt="Per-material fracturing comparison" />
@@ -54,7 +90,7 @@
             <div class="tech-breakdown-row">
                 <div class="tech-breakdown-text">
                     <h3>Reassembly &amp; Naming Conventions</h3>
-                    <p>After fracturing, the tool reassembles all fragments into a single hierarchy with standardized naming. There are two different naming patterns, one that preserves the parental hierarchy of meshes, if any existed in the input mesh, and one that gives a simple piece index for each disconnected mesh. Material attributes are also preserved to facilitate automation of material application in engines such as Unreal Engine.</p>
+                    <p>After fracturing, fragments are merged back together with standardized naming: either preserving the original parental hierarchy or using a flat piece index. Material attributes are preserved for automated material assignment in-engine.</p>
                 </div>
                 <figure class="tech-breakdown-figure">
                     <img src="content\SoloProjects\FractureToolSubpage\Naming.png" alt="Reassembled hierarchy with naming conventions" />
@@ -63,7 +99,7 @@
 
             <div class="tech-breakdown-block">
                 <h3>Export Modes & Settings</h3>
-                <p>The tool offers multiple export modes: a single combined FBX that keeps the offset for pieces relative to the original pivot, and an FBX export with all pieces centered at the world origin. Both modes allow the user to transfer input mesh UVs to the pre-fractured mesh, triangulate, remesh, or polyreduce before export.</p>
+                <p>Two export modes are available: a combined FBX with pieces offset relative to the original pivot, or an FBX with all pieces centered at the world origin. Both support UV transfer, triangulation, remeshing, and polyreduction before export.</p>
                 <figure class="tech-breakdown-figure">
                     <img src="content\SoloProjects\FractureToolSubpage\ExportSettings.png" alt="Export mode options" />
                 </figure>
@@ -71,7 +107,7 @@
 
             <div class="tech-breakdown-block">
                 <h3>Point Cloud & Metadata Export</h3>
-                <p>The tool can generate two additional exports alongside the fractured meshes. The first is a point cloud FBX that stores each piece's original offset from the mesh pivot, allowing an engine to reconstruct the intact shape from origin-centered pieces. The second is a JSON metadata file that maps each piece name to its position and bounding box dimensions, providing everything needed to generate correctly placed collision boxes in code.</p>
+                <p>Two additional exports can be generated: a point cloud FBX storing each piece's original offset from the mesh pivot (for reconstructing the intact shape), and a JSON file mapping each piece name to its position and bounding-box dimensions (for reconstruction or collision box generation in code).</p>
                 <div class="contrib-media contrib-media--contain">
                     <figure class="contrib-media-item">
                         <img src="content\SoloProjects\FractureToolSubpage\pointcloud_export.png" alt="Point cloud Export" />
@@ -84,8 +120,8 @@
 
             <div class="tech-breakdown-block">
                 <h3>Destruction Demo in Unreal Engine 5</h3>
-                <p>To demonstrate a practical use case for the tool, I built a lightweight destruction system in Unreal Engine. The pre-fractured pieces are exported centered at the world origin, alongside a point cloud FBX that stores each piece's original offset from the mesh pivot. I then made a GPU Niagara system using Mesh Renderer Flipbook to render each fractured piece as a particle, with an Initial Mesh Location module reading the point cloud FBX to reconstruct the original shape of the intact mesh and some point and rotation forces applied for the effect.</p>
-                <p>A Blueprint then holds the original intact mesh and the Niagara system. On projectile hit, the intact mesh is destroyed and the Niagara system is activated -- the particles start at their reconstructed positions and simulate outward, producing a satisfying destruction effect. Because the particle count equals the number of fractured pieces, the system is extremely performant while still delivering a convincing result.</p>
+                <p>To demonstrate a practical use case, I built a lightweight destruction system in UE5. A GPU Niagara system uses Mesh Renderer Flipbook to render each fractured piece as a particle, reading the point cloud FBX via an Initial Mesh Location module to reconstruct the intact shape.</p>
+                <p>On projectile hit, the intact mesh is destroyed and the Niagara system activates, simulating pieces outward. Since the particle count equals the piece count, performance stays very high.</p>
                 <div class="contrib-media contrib-media--contain" style="max-width: 50%">
                     <figure class="contrib-media-item">
                         <video src="content/SoloProjects/FractureToolSubpage/unreal_demo.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
@@ -95,29 +131,12 @@
 
             <div class="tech-breakdown-block">
                 <h3>Destruction Demo in Custom Engine (Jolt Physics)</h3>
-                <p>The fractured meshes were also used in a custom DX11 engine with Jolt physics for real-time destruction. For this setup, the origin-centered FBX pieces and the JSON metadata export were used -- the engine reads each piece's position and dimensions from the JSON to generate collision boxes at the correct placement and scale in code. On impact, the intact mesh is swapped for the individual pieces with their physics bodies, and Jolt simulates the destruction from there.</p>
+                <p>The tool's exports were also used in a custom DX11 engine with Jolt physics. The engine reads piece positions and dimensions from the JSON to generate collision boxes, and on impact swaps the intact mesh for the physics-enabled pieces.</p>
                 <div class="contrib-media contrib-media--contain" style="max-width: 50%">
                     <figure class="contrib-media-item">
                         <video src="content/SoloProjects/FractureToolSubpage/rhe_demo.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
                     </figure>
                 </div>
-            </div>
-        </section>
-
-        <!-- Additional Screenshots -->
-        <section class="project-detail-section">
-            <h2>Additional Screenshots</h2>
-            <div class="project-gallery">
-                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/glass.png" alt="Glass1" />
-                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/glass2.png" alt="Glass2" />
-                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/glass3.png" alt="Glass3" />
-                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/glass4.png" alt="Glass4" />
-                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/woodbox.png" alt="Fractured wooden box" />
-                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/chair.png" alt="Fractured chair with wood fracture method" />
-                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/Screenshot 2026-03-25 022734.png" alt="barrier" />
-                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/Screenshot 2026-03-25 025433.png" alt="barrier2" />
-                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/cup.png" alt="cup" />
-                <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/plate.png" alt="Plate" />
             </div>
         </section>
 

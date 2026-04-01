@@ -1133,6 +1133,7 @@ section h2 {
     margin-bottom: 1.5rem;
 }
 
+
 .tech-breakdown-row {
     display: flex;
     gap: 2rem;
@@ -1168,6 +1169,7 @@ section h2 {
         flex: none;
         max-width: 100%;
     }
+
 }
 
 .tech-breakdown-block h4 {
@@ -1453,6 +1455,40 @@ section h2 {
     border-color: var(--color-subtle-border);
 }
 
+/* Compact single-row gallery strip */
+.project-gallery--strip {
+    display: flex;
+    gap: 0.5rem;
+    overflow: hidden;
+    position: relative;
+    max-height: 100px;
+}
+
+.project-gallery--strip img,
+.project-gallery--strip video {
+    flex: 0 0 auto;
+    width: 140px;
+    height: 90px;
+    aspect-ratio: auto;
+    object-fit: cover;
+}
+
+.project-gallery--strip .gallery-more-indicator {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    background: linear-gradient(to right, transparent, var(--color-modal-bg));
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
 /* Tools list as pills with icons */
 .tools-list {
     display: flex;
@@ -1659,6 +1695,17 @@ section h2 {
         padding-top: 6rem;
     }
 
+    .pieces-section .section-title {
+        margin-left: 3%;
+    }
+
+    .projects-section .section-title {
+        margin-left: 3%;
+    }
+}
+
+/* Tablet / touch carousel breakpoint */
+@media (max-width: 1024px) {
     .projects-carousel {
         margin: 0 0;
         overflow: hidden;
@@ -1692,7 +1739,8 @@ section h2 {
         filter: brightness(0.35);
         opacity: 1;
         z-index: 1;
-        pointer-events: none;
+        pointer-events: auto;
+        cursor: pointer;
     }
 
     .carousel-track .project.carousel-active {
@@ -1708,7 +1756,8 @@ section h2 {
         filter: brightness(0.35);
         opacity: 1;
         z-index: 1;
-        pointer-events: none;
+        pointer-events: auto;
+        cursor: pointer;
     }
 
     .carousel-track .project .project-overlay {
@@ -1741,13 +1790,93 @@ section h2 {
     .carousel-dot.is-active {
         background: rgba(var(--color-overlay-white), 0.9);
     }
+}
 
-    .pieces-section .section-title {
-        margin-left: 3%;
+/* Touch-only devices (tablets in landscape, etc.) */
+@media (pointer: coarse) {
+    .projects-carousel {
+        margin: 0 0;
+        overflow: hidden;
     }
 
-    .projects-section .section-title {
-        margin-left: 3%;
+    .carousel-track {
+        position: relative;
+        height: clamp(250px, 55vw, 400px);
+        gap: 0;
+        touch-action: pan-y pinch-zoom;
+    }
+
+    .carousel-track .project {
+        position: absolute;
+        top: 0;
+        left: 10%;
+        width: 80%;
+        height: 100%;
+        filter: brightness(0.5);
+        transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                    filter 0.5s ease,
+                    opacity 0.5s ease;
+        transform: translateX(100%) scale(0.85);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .carousel-track .project.carousel-prev {
+        transform: translateX(-28%) scale(0.82);
+        filter: brightness(0.35);
+        opacity: 1;
+        z-index: 1;
+        pointer-events: auto;
+        cursor: pointer;
+    }
+
+    .carousel-track .project.carousel-active {
+        transform: translateX(0) scale(1);
+        filter: none;
+        opacity: 1;
+        z-index: 3;
+        pointer-events: auto;
+    }
+
+    .carousel-track .project.carousel-next {
+        transform: translateX(28%) scale(0.82);
+        filter: brightness(0.35);
+        opacity: 1;
+        z-index: 1;
+        pointer-events: auto;
+        cursor: pointer;
+    }
+
+    .carousel-track .project .project-overlay {
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .carousel-track .project.carousel-active .project-overlay {
+        opacity: 1;
+    }
+
+    .carousel-dots {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        padding: 1rem 0 0;
+    }
+
+    .carousel-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(var(--color-overlay-white), 0.3);
+        cursor: pointer;
+        padding: 0;
+        transition: background 0.3s ease;
+    }
+
+    .carousel-dot.is-active {
+        background: rgba(var(--color-overlay-white), 0.9);
     }
 }
 

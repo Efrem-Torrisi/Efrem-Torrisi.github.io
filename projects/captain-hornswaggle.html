@@ -26,7 +26,8 @@
 
             <div class="tech-breakdown-block">
                 <h3>Cel Shading &amp; Outline Shader</h3>
-                <p>Authored the HLSL shaders that define the game's signature stylised look, together with my discipline partner <a href="https://dawid-batkowski.github.io" target="_blank" rel="noopener">Dawid Batkowski</a>. The cel shading works by quantizing the standard PBR lighting model into discrete color bands, with stylised control over specular highlight color, size and shape. The outline shader runs a both depth and normals based edge detection to catch silhouettes as well as surface detail edges</p>
+                <p>Authored the HLSL shaders that define the game's signature stylised look, together with my discipline partner <a href="https://dawid-batkowski.github.io" target="_blank" rel="noopener">Dawid Batkowski</a>. The cel shading works by quantizing the standard PBR lighting model into discrete color bands, with stylised control over specular highlight color, size and shape.</p>
+                <p>The outline shader runs a both depth and normals based edge detection to catch silhouettes as well as surface detail edges</p>
                 <div class="contrib-media">
                     <figure class="contrib-media-item">
                         <img src="content/GameProjects/Hornswaggle/celshading.png" alt="Cel shading comparison" />
@@ -42,7 +43,8 @@
 
             <div class="tech-breakdown-block">
                 <h3>Post-Processing Shaders</h3>
-                <p>Built additional HLSL post-process shaders to complement the cel shaded look. The depth of field effect samples the scene color texture at increasing mip levels based on depth from the camera to control the blur falloff. Combined with a simple vignette shader, these effects help guide the player's eye toward the gameplay area and give the image a more polished, cinematic feel.</p>
+                <p>Built additional HLSL post-process shaders to complement the cel shaded look. The depth of field effect samples the scene color texture at increasing mip levels based on depth from the camera to control the blur falloff.</p>
+                <p>Combined with a simple vignette shader, these effects help guide the player's eye toward the gameplay area and give the image a more polished, cinematic feel.</p>
                 <div class="contrib-media">
                     <figure class="contrib-media-item contrib-media-item--contain">
                         <img src="content/GameProjects/Hornswaggle/vignette.png" alt="Vignette effect" />
@@ -87,7 +89,8 @@
 
             <div class="tech-breakdown-block">
                 <h3>VFX Flipbooks &amp; Flipbook Shader</h3>
-                <p>Created VFX flipbook spritesheets for the player jump, cannon shooting, cannon ball projectile and explosion effects. I first wrote the flipbook playback logic as a GPU shader, then later the logic was ported to CPU by the programming team so that they could more easily integrate the effects into gameplay systems.</p>
+                <p>Created VFX flipbook spritesheets for the player jump, cannon shooting, cannon ball projectile and explosion effects.</p>
+                <p>I first wrote the flipbook playback logic as a GPU shader, then later the logic was ported to CPU by the programming team so that they could more easily integrate the effects into gameplay systems.</p>
                 <div class="contrib-media">
                     <figure class="contrib-media-item">
                         <img src="content/GameProjects/Hornswaggle/image18.gif" alt="Cannon shot" />

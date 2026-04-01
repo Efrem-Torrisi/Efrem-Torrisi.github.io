@@ -314,8 +314,30 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
     var modalClose   = modalOverlay.querySelector('.modal-close');
     var modalBackdrop = modalOverlay.querySelector('.modal-backdrop');
     var contentCache  = {};
+    var pendingFetches = {}; // slug -> Promise<html> — deduplicates in-flight requests
     var originalTitle = document.title;
     var modalStack    = []; // stack of { html, scrollTop, slug, title }
+
+    // Shared fetch: returns cached HTML or reuses an in-flight request
+    function fetchProject(slug) {
+        if (contentCache[slug]) return Promise.resolve(contentCache[slug]);
+        if (pendingFetches[slug]) return pendingFetches[slug];
+        pendingFetches[slug] = fetch('projects/' + slug + '.html')
+            .then(function (res) {
+                if (!res.ok) throw new Error('Not found');
+                return res.text();
+            })
+            .then(function (html) {
+                contentCache[slug] = html;
+                delete pendingFetches[slug];
+                return html;
+            })
+            .catch(function (err) {
+                delete pendingFetches[slug];
+                throw err;
+            });
+        return pendingFetches[slug];
+    }
 
     function openModal(projectSlug) {
         history.pushState({ project: projectSlug }, '', '#project/' + projectSlug);
@@ -509,13 +531,8 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             modalContent.innerHTML = contentCache[projectSlug];
             initModalContent();
         } else {
-            fetch('projects/' + projectSlug + '.html')
-                .then(function (res) {
-                    if (!res.ok) throw new Error('Not found');
-                    return res.text();
-                })
+            fetchProject(projectSlug)
                 .then(function (html) {
-                    contentCache[projectSlug] = html;
                     if (modalOverlay.classList.contains('is-active')) {
                         modalContent.innerHTML = html;
                         initModalContent();
@@ -688,22 +705,19 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             });
         }
 
-        function fetchSequentially(i) {
-            if (i >= soloSlugs.length) return;
-            var slug = soloSlugs[i];
-            if (contentCache[slug]) { fetchSequentially(i + 1); return; }
-            fetch('projects/' + slug + '.html')
-                .then(function (res) { return res.ok ? res.text() : Promise.reject(); })
-                .then(function (html) {
-                    contentCache[slug] = html;
-                    prefetchMedia(html);
-                    fetchSequentially(i + 1);
-                })
-                .catch(function () { fetchSequentially(i + 1); });
-        }
-
-        // Start after intro animation (3.2s) + solo card videos settle
-        setTimeout(function () { fetchSequentially(0); }, 4000);
+        // Prefetch all solo project HTML in parallel (they're small text files).
+        // Uses shared fetchProject() so clicks never create duplicate requests.
+        // Media prefetch waits until all HTML is cached to avoid bandwidth contention.
+        setTimeout(function () {
+            var htmlPromises = soloSlugs.map(function (slug) {
+                return fetchProject(slug).catch(function () { return null; });
+            });
+            Promise.all(htmlPromises).then(function (results) {
+                results.forEach(function (html) {
+                    if (html) prefetchMedia(html);
+                });
+            });
+        }, 1500);
     })();
 
     // Dynamic copyright year

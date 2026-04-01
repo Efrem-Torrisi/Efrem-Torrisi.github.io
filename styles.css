@@ -1402,6 +1402,19 @@ section h2 {
     background: #000;
 }
 
+.contrib-media-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    grid-column: 1 / -1;
+}
+
+.contrib-media-pair + .contrib-media-item {
+    grid-column: 1 / -1;
+    max-width: 60%;
+    justify-self: center;
+}
+
 .contrib-media-item--contain img {
     object-fit: contain;
     background: #1a1a1a;

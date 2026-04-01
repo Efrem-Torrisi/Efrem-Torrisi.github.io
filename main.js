@@ -324,7 +324,10 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         var projectTitle = card ? card.dataset.title : projectSlug;
         document.title = projectTitle + ' | Efrem Torrisi';
 
-        modalContent.innerHTML = '<div class="modal-loading"><div class="modal-spinner"></div>Loading\u2026</div>';
+        // Only show loading spinner if content isn't already cached
+        if (!contentCache[projectSlug]) {
+            modalContent.innerHTML = '<div class="modal-loading"><div class="modal-spinner"></div>Loading\u2026</div>';
+        }
         document.body.classList.add('modal-open');
         modalOverlay.classList.add('is-active');
         modalOverlay.setAttribute('aria-hidden', 'false');
@@ -612,6 +615,53 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                 openModal(slug);
             });
         }
+    })();
+
+    /* ========================================
+       PREFETCH — Silently preload solo project
+       subpage HTML + hero media so modals open
+       instantly without a loading screen.
+       ======================================== */
+
+    (function prefetchSoloProjects() {
+        var soloSlugs = [];
+        document.querySelectorAll('.piece[data-project]').forEach(function (card) {
+            soloSlugs.push(card.dataset.project);
+        });
+        if (!soloSlugs.length) return;
+
+        function prefetchMedia(html) {
+            var doc = new DOMParser().parseFromString(html, 'text/html');
+
+            // Video poster images (shown immediately when modal opens)
+            doc.querySelectorAll('video[poster]').forEach(function (v) {
+                var poster = v.getAttribute('poster');
+                if (poster) new Image().src = poster;
+            });
+
+            // Gallery thumbnail strip (visible above the fold)
+            doc.querySelectorAll('.project-gallery img').forEach(function (img) {
+                var src = img.getAttribute('src');
+                if (src) new Image().src = src;
+            });
+        }
+
+        function fetchSequentially(i) {
+            if (i >= soloSlugs.length) return;
+            var slug = soloSlugs[i];
+            if (contentCache[slug]) { fetchSequentially(i + 1); return; }
+            fetch('projects/' + slug + '.html')
+                .then(function (res) { return res.ok ? res.text() : Promise.reject(); })
+                .then(function (html) {
+                    contentCache[slug] = html;
+                    prefetchMedia(html);
+                    fetchSequentially(i + 1);
+                })
+                .catch(function () { fetchSequentially(i + 1); });
+        }
+
+        // Start after intro animation (3.2s) + solo card videos settle
+        setTimeout(function () { fetchSequentially(0); }, 4000);
     })();
 
     // Dynamic copyright year

@@ -228,6 +228,11 @@ main {
     transform: translateX(12px);
 }
 
+[data-theme="light"] .piece-overlay,
+[data-theme="light"] .project-overlay {
+    color: #fff;
+}
+
 .nav-cv-btn:hover {
     background: var(--color-subtle-hover-bg);
     border-color: var(--color-subtle-hover-border);
@@ -261,6 +266,16 @@ main {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Hide content before JS adds data-reveal attrs, preventing FOUC flicker */
+body.is-intro .hero-content,
+body.is-intro .pieces-section .section-title,
+body.is-intro .piece,
+body.is-intro .piece-label,
+body.is-intro .projects-section .section-title,
+body.is-intro .projects-carousel {
+    opacity: 0;
 }
 
 /* Navbar slide in*/
@@ -501,7 +516,7 @@ body.is-intro .projects-carousel[data-reveal]                { animation-delay: 
 
 .piece-tag {
     font-size: 0.8rem;
-    color: var(--color-text-muted);
+    color: rgba(255, 255, 255, 0.7);
 }
 
 /* Label below piece card — visible by default, hidden on hover */
@@ -672,8 +687,8 @@ section h2 {
 
 .project-role {
     font-size: 0.7rem;
-    color: var(--color-text-muted);
-    background: rgba(var(--color-overlay-white), 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.1);
     padding: 0.15rem 0.5rem;
     border-radius: 3px;
     display: inline-block;

@@ -526,6 +526,7 @@ body.is-intro .projects-carousel[data-reveal]                { animation-delay: 
 .card-icons {
     position: absolute;
     justify-content: right;
+    align-items: flex-end;
     bottom: 0;
     left: 0;
     right: 0;
@@ -545,6 +546,26 @@ body.is-intro .projects-carousel[data-reveal]                { animation-delay: 
     opacity: 0.85;
     transition: opacity 0.3s ease;
     flex-shrink: 0;
+}
+
+.card-icon-logo {
+    margin-right: auto;
+    width: auto !important;
+    height: 20px !important;
+    object-fit: contain;
+    order: -1;
+}
+
+.card-icon-logo[src*="fullscreen_studios"] {
+    height: 36px !important;
+}
+
+.card-icon-logo[src*="uppsala-universitet"] {
+    height: 52px !important;
+}
+
+.piece:hover .card-icon-logo {
+    opacity: 0 !important;
 }
 
 .piece:hover .card-icons img,
@@ -627,14 +648,14 @@ section h2 {
 /* Title overlay — visible only when focused */
 .project-overlay {
     position: absolute;
-    bottom: 0;
+    top: 0;
     left: 0;
     right: 0;
-    padding: 2rem 2rem 1.5rem;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+    padding: 1.5rem 2rem 2rem;
+    background: linear-gradient(rgba(0, 0, 0, 0.85), transparent);
     opacity: 0;
     transition: opacity 0.4s ease 0.15s;
-    border-radius: 0 0 var(--card-radius) var(--card-radius);
+    border-radius: var(--card-radius) var(--card-radius) 0 0;
     pointer-events: none;
 }
 
@@ -993,6 +1014,7 @@ section h2 {
 .project-header-image {
     flex: 0 0 auto;
     max-width: 280px;
+    align-self: flex-end;
 }
 
 .project-header-image img {

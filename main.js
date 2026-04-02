@@ -540,9 +540,36 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             modalOverlay._videoObserver = videoObserver;
         }
 
+        function hideVideosUntilReady() {
+            modalContent.querySelectorAll('video').forEach(function (video) {
+                function onReady() {
+                    video.classList.add('is-ready');
+                }
+
+                if (video.hasAttribute('controls') && video.hasAttribute('poster')) {
+                    // Results showcase videos: autoplay muted, hide until ready
+                    video.muted = true;
+                    video.loop = true;
+                    video.autoplay = true;
+                    video.preload = 'auto';
+                    video.load();
+                    if (video.readyState >= 3) {
+                        onReady();
+                    } else {
+                        video.addEventListener('canplay', onReady, { once: true });
+                    }
+                } else if (video.readyState >= 3) {
+                    onReady();
+                } else {
+                    video.addEventListener('canplay', onReady, { once: true });
+                }
+            });
+        }
+
         function initModalContent() {
             modalContainer().scrollTop = 0;
             swapModalVideos();
+            hideVideosUntilReady();
             lazyLoadModalVideos();
             initCodeTabs();
             var isLight = document.documentElement.getAttribute('data-theme') === 'light';

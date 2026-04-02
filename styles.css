@@ -1091,6 +1091,16 @@ section h2 {
     background: #000;
 }
 
+/* Hide modal videos until ready to play — prevents flash of loading spinner */
+.modal-container video {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-container video.is-ready {
+    opacity: 1;
+}
+
 /* Body sections */
 .project-detail-body {
     padding: 2rem 3rem 3rem;

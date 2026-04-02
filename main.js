@@ -318,6 +318,104 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
     var originalTitle = document.title;
     var modalStack    = []; // stack of { html, scrollTop, slug, title }
 
+    /* ── Lazy Prism loader (shared across all modal opens) ── */
+    var _prismState = 'idle'; // idle | loading | ready
+    var _prismQueue = [];     // callbacks waiting for Prism
+    var _prismExtended = false;
+
+    function extendPrismLanguages() {
+        if (_prismExtended) return;
+        _prismExtended = true;
+
+        if (Prism.languages.hlsl) {
+            Prism.languages.insertBefore('hlsl', 'keyword', {
+                'hlsl-semantic': {
+                    pattern: /\b(?:SV_\w+|TEXCOORD\d*|COLOR\d*|POSITION\d*|NORMAL\d*|TANGENT\d*|BINORMAL\d*|BLENDWEIGHT\d*|BLENDINDICES\d*|PSIZE\d*|VFACE|VPOS|SV_DispatchThreadID|SV_GroupID|SV_GroupThreadID|SV_GroupIndex|SV_VertexID|SV_InstanceID|SV_PrimitiveID|SV_Target\d*|SV_Depth|SV_Position)\b/,
+                    alias: 'builtin'
+                },
+                'hlsl-attribute': {
+                    pattern: /\[(?:numthreads|maxvertexcount|domain|partitioning|outputtopology|outputcontrolpoints|patchconstantfunc|earlydepthstencil)\b[^\]]*\]/,
+                    alias: 'attr-name',
+                    inside: {
+                        'number': /\b\d+\b/,
+                        'punctuation': /[[\],()]/
+                    }
+                },
+                'hlsl-builtin': {
+                    pattern: /\b(?:saturate|lerp|step|smoothstep|clamp|abs|sign|floor|ceil|round|frac|fmod|pow|exp|exp2|log|log2|log10|sqrt|rsqrt|normalize|length|distance|dot|cross|reflect|refract|min|max|mul|transpose|determinant|sin|cos|tan|asin|acos|atan|atan2|sincos|radians|degrees|ddx|ddy|fwidth|clip|tex2D|tex2Dlod|Sample|SampleLevel|SampleGrad|SampleCmp|Load|GetDimensions|InterlockedAdd|InterlockedMin|InterlockedMax|InterlockedOr|InterlockedAnd|InterlockedXor|InterlockedCompareStore|InterlockedCompareExchange|InterlockedExchange|AllMemoryBarrier|AllMemoryBarrierWithGroupSync|GroupMemoryBarrier|GroupMemoryBarrierWithGroupSync|DeviceMemoryBarrier|DeviceMemoryBarrierWithGroupSync|asfloat|asint|asuint|countbits|firstbithigh|firstbitlow|reversebits|any|all|isnan|isinf|isfinite|mad|rcp|frexp|ldexp|trunc|modf)\b/,
+                    alias: 'function'
+                },
+                'hlsl-global': {
+                    pattern: /\b(?:Out\w+|In\w+|Num\w+|Max\w+|Spawn\w+|Camera\w+|LOD\w+|VertexCount\w+|Start\w+|bCircularShape)\b/,
+                    alias: 'variable'
+                },
+                'hlsl-member': {
+                    pattern: /\.(?:x|y|z|w|xy|xyz|xyzw|r|g|b|a|rgb|rgba|Position|Scale|Normal|Rotation|VertexCountPerInstance|StartVertexLocation|StartInstanceLocation|InstanceCount)\b/,
+                    alias: 'property'
+                }
+            });
+        }
+
+        if (Prism.languages.cpp) {
+            Prism.languages.insertBefore('cpp', 'keyword', {
+                'ue-type': {
+                    pattern: /\b(?:F[A-Z]\w+|U[A-Z]\w+|A[A-Z]\w+|E[A-Z]\w+|T[A-Z]\w+)\b/,
+                    alias: 'class-name'
+                },
+                'ue-function': {
+                    pattern: /\b(?:AddClearUAVPass|ExtractFrustumPlanes|RDG_EVENT_NAME|TEXT|DrawPrimitiveIndirect)\b/,
+                    alias: 'function'
+                },
+                'cpp-member': {
+                    pattern: /(?:->|\.)\s*([A-Z]\w+|[a-z]\w+)\s*(?=[=(])/,
+                    lookbehind: false,
+                    alias: 'function'
+                },
+                'cpp-scope': {
+                    pattern: /\b\w+(?=::)/,
+                    alias: 'class-name'
+                }
+            });
+        }
+    }
+
+    function loadPrism(callback) {
+        if (_prismState === 'ready') { callback(); return; }
+        _prismQueue.push(callback);
+        if (_prismState === 'loading') return;
+        _prismState = 'loading';
+
+        // CSS
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css';
+        document.head.appendChild(link);
+
+        // JS - load core, then language components in order
+        var scripts = [
+            'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-hlsl.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js'
+        ];
+        var i = 0;
+        function loadNext() {
+            if (i >= scripts.length) {
+                _prismState = 'ready';
+                extendPrismLanguages();
+                _prismQueue.forEach(function (cb) { cb(); });
+                _prismQueue = [];
+                return;
+            }
+            var s = document.createElement('script');
+            s.src = scripts[i++];
+            s.onload = loadNext;
+            s.onerror = loadNext;
+            document.head.appendChild(s);
+        }
+        loadNext();
+    }
+
     // Shared fetch: returns cached HTML or reuses an in-flight request
     function fetchProject(slug) {
         if (contentCache[slug]) return Promise.resolve(contentCache[slug]);
@@ -397,104 +495,6 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
             // Store observer so we can disconnect on modal close
             modalOverlay._videoObserver = videoObserver;
-        }
-
-        /* ── Lazy Prism loader ── */
-        var _prismState = 'idle'; // idle | loading | ready
-        var _prismQueue = [];     // callbacks waiting for Prism
-
-        function loadPrism(callback) {
-            if (_prismState === 'ready') { callback(); return; }
-            _prismQueue.push(callback);
-            if (_prismState === 'loading') return;
-            _prismState = 'loading';
-
-            // CSS
-            var link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css';
-            document.head.appendChild(link);
-
-            // JS — load core, then language components in order
-            var scripts = [
-                'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js',
-                'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js',
-                'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-hlsl.min.js',
-                'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js'
-            ];
-            var i = 0;
-            function loadNext() {
-                if (i >= scripts.length) {
-                    _prismState = 'ready';
-                    extendPrismLanguages();
-                    _prismQueue.forEach(function (cb) { cb(); });
-                    _prismQueue = [];
-                    return;
-                }
-                var s = document.createElement('script');
-                s.src = scripts[i++];
-                s.onload = loadNext;
-                s.onerror = loadNext;
-                document.head.appendChild(s);
-            }
-            loadNext();
-        }
-
-        var _prismExtended = false;
-        function extendPrismLanguages() {
-            if (_prismExtended) return;
-            _prismExtended = true;
-
-            if (Prism.languages.hlsl) {
-                Prism.languages.insertBefore('hlsl', 'keyword', {
-                    'hlsl-semantic': {
-                        pattern: /\b(?:SV_\w+|TEXCOORD\d*|COLOR\d*|POSITION\d*|NORMAL\d*|TANGENT\d*|BINORMAL\d*|BLENDWEIGHT\d*|BLENDINDICES\d*|PSIZE\d*|VFACE|VPOS|SV_DispatchThreadID|SV_GroupID|SV_GroupThreadID|SV_GroupIndex|SV_VertexID|SV_InstanceID|SV_PrimitiveID|SV_Target\d*|SV_Depth|SV_Position)\b/,
-                        alias: 'builtin'
-                    },
-                    'hlsl-attribute': {
-                        pattern: /\[(?:numthreads|maxvertexcount|domain|partitioning|outputtopology|outputcontrolpoints|patchconstantfunc|earlydepthstencil)\b[^\]]*\]/,
-                        alias: 'attr-name',
-                        inside: {
-                            'number': /\b\d+\b/,
-                            'punctuation': /[[\],()]/
-                        }
-                    },
-                    'hlsl-builtin': {
-                        pattern: /\b(?:saturate|lerp|step|smoothstep|clamp|abs|sign|floor|ceil|round|frac|fmod|pow|exp|exp2|log|log2|log10|sqrt|rsqrt|normalize|length|distance|dot|cross|reflect|refract|min|max|mul|transpose|determinant|sin|cos|tan|asin|acos|atan|atan2|sincos|radians|degrees|ddx|ddy|fwidth|clip|tex2D|tex2Dlod|Sample|SampleLevel|SampleGrad|SampleCmp|Load|GetDimensions|InterlockedAdd|InterlockedMin|InterlockedMax|InterlockedOr|InterlockedAnd|InterlockedXor|InterlockedCompareStore|InterlockedCompareExchange|InterlockedExchange|AllMemoryBarrier|AllMemoryBarrierWithGroupSync|GroupMemoryBarrier|GroupMemoryBarrierWithGroupSync|DeviceMemoryBarrier|DeviceMemoryBarrierWithGroupSync|asfloat|asint|asuint|countbits|firstbithigh|firstbitlow|reversebits|any|all|isnan|isinf|isfinite|mad|rcp|frexp|ldexp|trunc|modf)\b/,
-                        alias: 'function'
-                    },
-                    'hlsl-global': {
-                        pattern: /\b(?:Out\w+|In\w+|Num\w+|Max\w+|Spawn\w+|Camera\w+|LOD\w+|VertexCount\w+|Start\w+|bCircularShape)\b/,
-                        alias: 'variable'
-                    },
-                    'hlsl-member': {
-                        pattern: /\.(?:x|y|z|w|xy|xyz|xyzw|r|g|b|a|rgb|rgba|Position|Scale|Normal|Rotation|VertexCountPerInstance|StartVertexLocation|StartInstanceLocation|InstanceCount)\b/,
-                        alias: 'property'
-                    }
-                });
-            }
-
-            if (Prism.languages.cpp) {
-                Prism.languages.insertBefore('cpp', 'keyword', {
-                    'ue-type': {
-                        pattern: /\b(?:F[A-Z]\w+|U[A-Z]\w+|A[A-Z]\w+|E[A-Z]\w+|T[A-Z]\w+)\b/,
-                        alias: 'class-name'
-                    },
-                    'ue-function': {
-                        pattern: /\b(?:AddClearUAVPass|ExtractFrustumPlanes|RDG_EVENT_NAME|TEXT|DrawPrimitiveIndirect)\b/,
-                        alias: 'function'
-                    },
-                    'cpp-member': {
-                        pattern: /(?:->|\.)\s*([A-Z]\w+|[a-z]\w+)\s*(?=[=(])/,
-                        lookbehind: false,
-                        alias: 'function'
-                    },
-                    'cpp-scope': {
-                        pattern: /\b\w+(?=::)/,
-                        alias: 'class-name'
-                    }
-                });
-            }
         }
 
         function initModalContent() {
@@ -1381,7 +1381,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         alpha: true,
         antialias: false
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(1);
     renderer.setClearColor(0x000000, 0);
 
     // Scene & Camera
@@ -1485,13 +1485,39 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         mouse.targetY = -(e.clientY / window.innerHeight - 0.5) * 2;
     });
 
-    // Animation loop
+    // Animation loop with adaptive frame skipping
     var isVisible = true;
+    var lastFrameTime = 0;
+    var particlesPaused = false;
+    var slowFrameCount = 0;
 
-    function animate() {
-        if (!isVisible) {
-            requestAnimationFrame(animate);
-            return;
+    function animate(timestamp) {
+        requestAnimationFrame(animate);
+
+        if (!isVisible) return;
+
+        // Adaptive: if frames are taking > 50ms (< 20fps), skip particles
+        var delta = timestamp - lastFrameTime;
+        lastFrameTime = timestamp;
+
+        if (delta > 50) {
+            slowFrameCount++;
+            // After 10 consecutive slow frames, pause particles entirely
+            if (slowFrameCount > 10) {
+                if (!particlesPaused) {
+                    particlesPaused = true;
+                    canvas.style.display = 'none';
+                }
+                return;
+            }
+            // Skip every other frame when slow
+            if (slowFrameCount % 2 === 0) return;
+        } else {
+            slowFrameCount = 0;
+            if (particlesPaused) {
+                particlesPaused = false;
+                canvas.style.display = '';
+            }
         }
 
         var elapsed = clock.getElapsedTime();
@@ -1529,10 +1555,9 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         }
 
         renderer.render(scene, camera);
-        requestAnimationFrame(animate);
     }
 
-    animate();
+    requestAnimationFrame(animate);
 
     // Resize handler
     var resizeTimeout;

@@ -1226,6 +1226,21 @@ section h2 {
 }
 
 /* Compute section: text left, diagram + code right */
+.plugin-params-media {
+    grid-template-columns: auto auto;
+    justify-content: center;
+}
+
+.plugin-params-media .contrib-media-item {
+    max-height: 400px;
+}
+
+.plugin-params-media .contrib-media-item img {
+    height: 100%;
+    width: auto;
+    aspect-ratio: auto;
+}
+
 .compute-section {
     align-items: flex-start;
 }
@@ -1305,6 +1320,16 @@ section h2 {
     .compute-media-row .code-panel.active {
         flex: none;
         max-height: 380px;
+    }
+
+    .plugin-params-media {
+        grid-template-columns: 1fr !important;
+    }
+
+    .plugin-params-media .contrib-media-item img {
+        width: 100%;
+        height: auto;
+        aspect-ratio: auto;
     }
 }
 

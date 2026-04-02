@@ -230,19 +230,19 @@ RHICmdList.DrawPrimitiveIndirect(DrawParams->IndirectDrawArgs->GetRHI(), 0);</co
                         <img src="content/SoloProjects/Grass/performance1.webp" alt="Frametime with optimization" />
                     </figure>
                 </div>
-                <p class="media-note"> On the left: Grass field entirely in view, with optimization settings disabled. || On the right: Same exact grass field with a game realistic camera frame and optimization settings enabled. /p>
+                <p class="media-note"> Figure 1: Grass field entirely in view, with optimization settings disabled. || Figure 2: Same exact grass field with a game realistic camera frame and optimization settings enabled. </p>
                 <p class="media-note"> Screenshots taken with: 10 million blades, Development Editor with debugger attached, 1440p on a 3080 Ti.</p>
             </div>
 
             <div class="tech-breakdown-block">
                 <h3>Plugin and User Parameters</h3>
                 <p>A self-contained UE5 plugin. Users drop a GrassVolume actor and configure blade count, spawn radius, draw distance, height/width, bending, wind, colors, LOD distance, and dithering via exposed UProperties. Multiple independent volumes are supported, each dispatching its own compute and draw passes.</p>
-                <div class="contrib-media contrib-media--contain" style="grid-template-columns: auto auto; justify-content: center;">
-                    <figure class="contrib-media-item" style="max-height: 400px; aspect-ratio: auto;">
-                        <img src="content/SoloProjects/Grass/uproperties.webp" alt="GrassVolume exposed parameters" style="height: 100%; width: auto;" />
+                <div class="contrib-media contrib-media--contain plugin-params-media">
+                    <figure class="contrib-media-item">
+                        <img src="content/SoloProjects/Grass/uproperties.webp" alt="GrassVolume exposed parameters" />
                     </figure>
-                    <figure class="contrib-media-item" style="max-height: 400px; aspect-ratio: auto; align-self: start;">
-                        <img src="content/SoloProjects/Grass/pluginpackaged.png" alt="Plugin in UE5 plugin browser" style="height: auto; width: auto;" />
+                    <figure class="contrib-media-item" style="align-self: start;">
+                        <img src="content/SoloProjects/Grass/pluginpackaged.png" alt="Plugin in UE5 plugin browser" />
                     </figure>
                 </div>
             </div>

@@ -74,10 +74,10 @@
             <div class="tech-breakdown-row">
                 <div class="tech-breakdown-text">
                     <h3>Material Auto-Detection</h3>
-                    <p>In "Auto Detect Materials Mode", a Python SOP parses the incoming FBX's material and name attributes to identify each material zone. Each zone is then separated into its own processing stream and fractured according to its material type and user parameters.</p>
+                    <p>In "Auto Detect Materials Mode", a Python SOP parses the incoming FBX's material and name attributes to identify each material zone and is assigned attributes that will be useful downstream to mantain a organized hierarchy. Each zone is then separated into its own processing stream via blast nodes and fractured according to its material type and user parameters before being merged back together.</p>
                 </div>
                 <figure class="tech-breakdown-figure">
-                    <img src="content/SoloProjects/FractureToolSubpage/MaterialDetection.webp" alt="Material detection interface in Houdini" />
+                    <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/networks.webp" alt="Material detection network in Houdini" />
                 </figure>
             </div>
 

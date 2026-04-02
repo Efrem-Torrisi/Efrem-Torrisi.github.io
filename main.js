@@ -303,7 +303,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
     // letting the scroll-reveal system take over.
     setTimeout(function () {
         document.body.classList.remove('is-intro');
-    }, 3200);
+    }, 1600);
 
     /* ========================================
        MODAL SYSTEM
@@ -416,28 +416,71 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         loadNext();
     }
 
-    // Shared fetch: returns cached HTML or reuses an in-flight request
-    function fetchProject(slug) {
+    // Shared fetch: returns cached HTML or reuses an in-flight request.
+    // Includes a timeout so fetches never hang indefinitely.
+    // priority: true = user-initiated (abort any in-flight prefetch and restart fresh)
+    var pendingControllers = {}; // slug -> AbortController
+    var pendingPriority = {};    // slug -> boolean (true = user click, false = prefetch)
+
+    function fetchProject(slug, timeoutMs, priority) {
         if (contentCache[slug]) return Promise.resolve(contentCache[slug]);
+
+        // If a low-priority (prefetch) request is in-flight and a high-priority
+        // (user click) comes in, abort the prefetch and start fresh
+        if (pendingFetches[slug] && priority && !pendingPriority[slug]) {
+            if (pendingControllers[slug]) pendingControllers[slug].abort();
+            delete pendingFetches[slug];
+            delete pendingControllers[slug];
+            delete pendingPriority[slug];
+        }
+
         if (pendingFetches[slug]) return pendingFetches[slug];
-        pendingFetches[slug] = fetch('projects/' + slug + '.html')
+
+        var ms = timeoutMs || 8000;
+        var controller = window.AbortController ? new AbortController() : null;
+        pendingControllers[slug] = controller;
+        pendingPriority[slug] = !!priority;
+
+        var timer = setTimeout(function () {
+            if (controller) controller.abort();
+        }, ms);
+
+        var opts = controller ? { signal: controller.signal } : {};
+        // Capture reference to this specific promise so cleanup only
+        // removes its own entry (not a newer replacement after abort)
+        var promise = fetch('projects/' + slug + '.html', opts)
             .then(function (res) {
+                clearTimeout(timer);
                 if (!res.ok) throw new Error('Not found');
                 return res.text();
             })
             .then(function (html) {
                 contentCache[slug] = html;
-                delete pendingFetches[slug];
+                if (pendingFetches[slug] === promise) {
+                    delete pendingFetches[slug];
+                    delete pendingControllers[slug];
+                    delete pendingPriority[slug];
+                }
                 return html;
             })
             .catch(function (err) {
-                delete pendingFetches[slug];
+                clearTimeout(timer);
+                // Only clean up if this is still the active fetch for this slug
+                if (pendingFetches[slug] === promise) {
+                    delete pendingFetches[slug];
+                    delete pendingControllers[slug];
+                    delete pendingPriority[slug];
+                }
                 throw err;
             });
-        return pendingFetches[slug];
+        pendingFetches[slug] = promise;
+        return promise;
     }
 
+    var activeModalSlug = null; // tracks which project the modal is currently showing
+
     function openModal(projectSlug) {
+        activeModalSlug = projectSlug;
         history.pushState({ project: projectSlug }, '', '#project/' + projectSlug);
 
         var card = document.querySelector('[data-project="' + projectSlug + '"]');
@@ -531,18 +574,26 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             modalContent.innerHTML = contentCache[projectSlug];
             initModalContent();
         } else {
-            fetchProject(projectSlug)
-                .then(function (html) {
-                    if (modalOverlay.classList.contains('is-active')) {
-                        modalContent.innerHTML = html;
-                        initModalContent();
-                    }
-                })
+            function renderIfActive(html) {
+                if (modalOverlay.classList.contains('is-active') && activeModalSlug === projectSlug) {
+                    modalContent.innerHTML = html;
+                    initModalContent();
+                }
+            }
+            fetchProject(projectSlug, 6000, true)
+                .then(renderIfActive)
                 .catch(function () {
-                    modalContent.innerHTML =
-                        '<div class="modal-error">' +
-                        '<p>Could not load project content.</p>' +
-                        '</div>';
+                    // Retry once on timeout/failure with longer timeout
+                    fetchProject(projectSlug, 10000, true)
+                        .then(renderIfActive)
+                        .catch(function () {
+                            if (modalOverlay.classList.contains('is-active') && activeModalSlug === projectSlug) {
+                                modalContent.innerHTML =
+                                    '<div class="modal-error">' +
+                                    '<p>Could not load project content. Please try again.</p>' +
+                                    '</div>';
+                            }
+                        });
                 });
         }
     }
@@ -560,6 +611,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         // If there's a stacked modal, pop back to it instead of closing
         if (modalStack.length > 0) {
             var prev = modalStack.pop();
+            activeModalSlug = prev.slug;
             modalContent.innerHTML = prev.html;
             history.pushState({ project: prev.slug }, '', '#project/' + prev.slug);
             document.title = prev.title;
@@ -569,6 +621,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             return;
         }
 
+        activeModalSlug = null;
         modalOverlay.classList.remove('is-active');
         modalOverlay.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('modal-open');
@@ -650,6 +703,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             var slug = hash.replace('#project/', '');
             openModal(slug);
         } else if (modalOverlay.classList.contains('is-active')) {
+            activeModalSlug = null;
             modalOverlay.classList.remove('is-active');
             modalOverlay.setAttribute('aria-hidden', 'true');
             document.body.classList.remove('modal-open');
@@ -705,16 +759,24 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             });
         }
 
-        // Prefetch all solo project HTML in parallel (they're small text files).
+        // Prefetch solo project HTML with staggered starts to avoid
+        // saturating the browser's connection pool on page load.
         // Uses shared fetchProject() so clicks never create duplicate requests.
-        // Each file's poster/thumbnail media prefetches as soon as its HTML is cached.
         setTimeout(function () {
-            soloSlugs.forEach(function (slug) {
-                fetchProject(slug)
+            var i = 0;
+            function prefetchNext() {
+                if (i >= soloSlugs.length) return;
+                var slug = soloSlugs[i++];
+                fetchProject(slug, 10000, false)
                     .then(function (html) { if (html) prefetchMedia(html); })
-                    .catch(function () {});
-            });
-        }, 1500);
+                    .catch(function () {})
+                    .then(function () {
+                        // Stagger: wait 300ms before starting the next prefetch
+                        setTimeout(prefetchNext, 300);
+                    });
+            }
+            prefetchNext();
+        }, 2500);
     })();
 
     // Dynamic copyright year

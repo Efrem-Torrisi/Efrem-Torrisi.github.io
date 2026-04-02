@@ -280,7 +280,7 @@ body.is-intro .projects-carousel {
 
 /* Navbar slide in*/
 body.is-intro .navbar {
-    animation: introFadeDown 0.7s cubic-bezier(0.23, 1, 0.32, 1) 0.1s both;
+    animation: introFadeDown 0.35s cubic-bezier(0.23, 1, 0.32, 1) 0.05s both;
 }
 
 /* intro hero container  */
@@ -293,38 +293,38 @@ body.is-intro .hero-content[data-reveal] {
 /* Hero children stagger in */
 body.is-intro .hero-content > * {
     opacity: 0;
-    animation: introFadeUp 0.9s cubic-bezier(0.23, 1, 0.32, 1) both;
+    animation: introFadeUp 0.45s cubic-bezier(0.23, 1, 0.32, 1) both;
 }
-body.is-intro .hero-content h1              { animation-delay: 0.25s; }
-body.is-intro .hero-content .hero-subtitle  { animation-delay: 0.45s; }
-body.is-intro .hero-content .hero-description { animation-delay: 0.6s; }
-body.is-intro .hero-content .btn            { animation-delay: 0.8s; }
+body.is-intro .hero-content h1              { animation-delay: 0.12s; }
+body.is-intro .hero-content .hero-subtitle  { animation-delay: 0.22s; }
+body.is-intro .hero-content .hero-description { animation-delay: 0.3s; }
+body.is-intro .hero-content .btn            { animation-delay: 0.4s; }
 
 /* Section title + cards: override data-reveal during intro */
 body.is-intro .pieces-section .section-title[data-reveal],
 body.is-intro .piece[data-reveal],
 body.is-intro .piece-label {
     transition: none !important;
-    animation: introFadeUp 0.9s cubic-bezier(0.23, 1, 0.32, 1) both;
+    animation: introFadeUp 0.45s cubic-bezier(0.23, 1, 0.32, 1) both;
 }
-body.is-intro .pieces-section .section-title[data-reveal] { animation-delay: 1.0s; }
+body.is-intro .pieces-section .section-title[data-reveal] { animation-delay: 0.5s; }
 body.is-intro .piece-wrapper:nth-child(1) .piece[data-reveal],
-body.is-intro .piece-wrapper:nth-child(1) .piece-label { animation-delay: 1.2s; }
+body.is-intro .piece-wrapper:nth-child(1) .piece-label { animation-delay: 0.6s; }
 body.is-intro .piece-wrapper:nth-child(2) .piece[data-reveal],
-body.is-intro .piece-wrapper:nth-child(2) .piece-label { animation-delay: 1.3s; }
+body.is-intro .piece-wrapper:nth-child(2) .piece-label { animation-delay: 0.65s; }
 body.is-intro .piece-wrapper:nth-child(3) .piece[data-reveal],
-body.is-intro .piece-wrapper:nth-child(3) .piece-label { animation-delay: 1.4s; }
+body.is-intro .piece-wrapper:nth-child(3) .piece-label { animation-delay: 0.7s; }
 body.is-intro .piece-wrapper:nth-child(4) .piece[data-reveal],
-body.is-intro .piece-wrapper:nth-child(4) .piece-label { animation-delay: 1.5s; }
+body.is-intro .piece-wrapper:nth-child(4) .piece-label { animation-delay: 0.75s; }
 
 /* Group projects section: title then carousel */
 body.is-intro .projects-section .section-title[data-reveal],
 body.is-intro .projects-carousel[data-reveal] {
     transition: none !important;
-    animation: introFadeUp 0.9s cubic-bezier(0.23, 1, 0.32, 1) both;
+    animation: introFadeUp 0.45s cubic-bezier(0.23, 1, 0.32, 1) both;
 }
-body.is-intro .projects-section .section-title[data-reveal] { animation-delay: 1.7s; }
-body.is-intro .projects-carousel[data-reveal]                { animation-delay: 1.9s; }
+body.is-intro .projects-section .section-title[data-reveal] { animation-delay: 0.85s; }
+body.is-intro .projects-carousel[data-reveal]                { animation-delay: 0.95s; }
 
 /* ============================================
    HERO SECTION

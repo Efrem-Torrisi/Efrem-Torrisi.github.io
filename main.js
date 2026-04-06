@@ -509,7 +509,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         }
 
         function lazyLoadModalVideos() {
-            var videos = modalContent.querySelectorAll('.contrib-media-item video, .tech-breakdown-figure video');
+            var videos = modalContent.querySelectorAll('.contrib-media-item video, .tech-breakdown-figure video, .project-detail-trailer--inline video');
             if (!videos.length) return;
 
             var container = modalContainer();
@@ -519,6 +519,8 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                     if (entry.isIntersecting) {
                         if (video.preload === 'none') {
                             video.preload = 'auto';
+                            video.muted = true;
+                            video.loop = true;
                             video.load();
                         }
                         video.play().catch(function () {});
@@ -533,6 +535,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                 video.removeAttribute('autoplay');
                 video.disablePictureInPicture = true;
                 video.setAttribute('controlslist', 'nodownload nofullscreen noremoteplayback noplaybackrate');
+                video.setAttribute('data-lazy-managed', '');
                 videoObserver.observe(video);
             });
 
@@ -540,13 +543,37 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             modalOverlay._videoObserver = videoObserver;
         }
 
+        function addVideoStallRecovery(video) {
+            var retries = 0;
+            var maxRetries = 3;
+            function retryLoad() {
+                if (retries >= maxRetries) return;
+                retries++;
+                var savedTime = video.currentTime;
+                video.load();
+                video.addEventListener('loadeddata', function () {
+                    if (savedTime > 0) video.currentTime = savedTime;
+                    video.play().catch(function () {});
+                }, { once: true });
+            }
+            video.addEventListener('stalled', retryLoad);
+            video.addEventListener('error', function () {
+                setTimeout(retryLoad, 1000);
+            });
+        }
+
         function hideVideosUntilReady() {
             modalContent.querySelectorAll('video').forEach(function (video) {
+                addVideoStallRecovery(video);
+
                 function onReady() {
                     video.classList.add('is-ready');
                 }
 
-                if (video.hasAttribute('controls') && video.hasAttribute('poster')) {
+                if (video.hasAttribute('data-lazy-managed')) {
+                    // Managed by IntersectionObserver — skip eager loading
+                    onReady();
+                } else if (video.hasAttribute('controls') && video.hasAttribute('poster')) {
                     // Results showcase videos: autoplay muted, hide until ready
                     video.muted = true;
                     video.loop = true;
@@ -569,8 +596,8 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         function initModalContent() {
             modalContainer().scrollTop = 0;
             swapModalVideos();
-            hideVideosUntilReady();
             lazyLoadModalVideos();
+            hideVideosUntilReady();
             initCodeTabs();
             var isLight = document.documentElement.getAttribute('data-theme') === 'light';
             window.swapIcons(isLight);

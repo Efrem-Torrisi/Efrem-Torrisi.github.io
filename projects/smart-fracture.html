@@ -5,7 +5,7 @@
             <p class="project-detail-subtitle">Automated per-material mesh pre-fracturing for Houdini</p>
             <div class="project-detail-meta">
                 <span class="meta-item"><strong>Role:</strong> Solo Developer</span>
-                <span class="meta-item"><strong>Tools:</strong> Houdini, Python, Unreal Engine 5</span>
+                <span class="meta-item"><strong>Tools:</strong> Houdini, Python, UE5, RHE, Jolt</span>
                 <span class="meta-item"><strong>Type:</strong> 3D Pipeline Tool</span>
             </div>
         </div>
@@ -74,7 +74,7 @@
             <div class="tech-breakdown-row">
                 <div class="tech-breakdown-text">
                     <h3>Material Auto-Detection</h3>
-                    <p>In "Auto Detect Materials Mode", a Python SOP parses the incoming FBX's material and name attributes to identify each material zone and is assigned attributes that will be useful downstream to mantain a organized hierarchy. Each zone is then separated into its own processing stream via blast nodes and fractured according to its material type and user parameters before being merged back together.</p>
+                    <p>The tool can be used in both "Auto Detect Materials" and a "Manual" mode. In  auto mode, a Python SOP parses the incoming FBX's material and name attributes to identify each material zone and is assigned attributes that will be useful downstream to mantain a organized hierarchy. Each zone is then separated into its own processing stream via blast nodes and fractured according to its material type and user parameters before being merged back together.</p>
                 </div>
                 <figure class="tech-breakdown-figure">
                     <img src="content/SoloProjects/FractureToolSubpage/additionalscreenshots/networks.webp" alt="Material detection network in Houdini" />
@@ -143,7 +143,7 @@
 
             <div class="tech-breakdown-block">
                 <h3>Destruction Demo in Custom Engine (Jolt Physics)</h3>
-                <p>The tool's exports were also used in a custom DX11 engine with Jolt physics. The engine reads piece positions and dimensions from the JSON to generate collision boxes, and on impact swaps the intact mesh for the physics-enabled pieces.</p>
+                <p>The tool's exports were also used in a custom DX11 engine with Jolt physics for the <a href="#project/bot-ops" class="inline-link">Bot Ops</a> game project. The engine reads piece positions and dimensions from the JSON to generate collision boxes, and on impact swaps the intact mesh for the physics-enabled pieces.</p>
                 <div class="contrib-media contrib-media--contain" style="max-width: 50%">
                     <figure class="contrib-media-item">
                         <video src="content/SoloProjects/FractureToolSubpage/rhe_demo.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
@@ -158,7 +158,10 @@
             <ul class="tools-list">
                 <li><img src="content/icons/houdini_badge_flat.svg" alt="Houdini" class="tool-icon" /> Houdini</li>
                 <li><img src="content/icons/python.svg" alt="Python" class="tool-icon" /> Python</li>
+                <li><img src="content/icons/jolt.png" alt="Jolt" class="tool-icon" /> Jolt Physics</li>
                 <li><img src="content/icons/UE-Icon-2023-White.svg" data-dark-src="content/icons/UE-Icon-2023-White.svg" data-light-src="content/icons/UE-Icon-2023-Black.svg" alt="UE5" class="tool-icon" /> Unreal Engine 5</li>
+                <li><img src="content/icons/rhe_white.svg" data-dark-src="content/icons/rhe_white.svg" data-light-src="content/icons/rhe.svg" alt="RHE" class="tool-icon" /> Rabbit Hole Engine</li>
+           
             </ul>
         </section>
     </div>

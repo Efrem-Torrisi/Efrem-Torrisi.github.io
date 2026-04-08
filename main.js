@@ -1175,11 +1175,12 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                         var wasInView = carouselInView;
                         carouselInView = entry.isIntersecting;
                         if (!carouselInView && wasInView) {
-                            // Left focus — stop all videos and cancel pending timers, allow auto-swipe
+                            // Left focus — stop all videos, cancel pending timers, stop auto-swipe
                             stopCarouselVideos();
-                            resetAutoPlay();
+                            stopAutoPlay();
                         } else if (carouselInView && !wasInView) {
-                            // Entered focus — start the delayed video play
+                            // Entered focus — start auto-scroll and the delayed video play
+                            resetAutoPlay();
                             mobileCarouselVideo(cards[currentIndex]);
                         }
                     });
@@ -1280,8 +1281,9 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
         function resetAutoPlay() {
             if (!useDesktopCarousel()) {
-                // Don't auto-swipe if a video preview is playing
+                // Don't auto-swipe if a video preview is playing or carousel is offscreen
                 if (carouselVideoPlaying) return;
+                if (!carouselInView) return;
                 startAutoPlay();
             }
         }
@@ -1458,11 +1460,11 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             resetAutoPlay();
         });
 
-        // Start auto-play on mobile
+        // Start auto-play on mobile (only if in view)
         function handleResize() {
             if (!useDesktopCarousel()) {
                 goToSlide(currentIndex);
-                startAutoPlay();
+                if (carouselInView) startAutoPlay();
             } else {
                 cards.forEach(function (card) {
                     card.classList.remove('carousel-prev', 'carousel-active', 'carousel-next');

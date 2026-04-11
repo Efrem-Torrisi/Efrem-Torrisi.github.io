@@ -1819,11 +1819,18 @@ section h2 {
 }
 
 /* Tablet / touch carousel breakpoint */
-@media (max-width: 1280px) {
+@media (max-width: 1400px) {
     .pieces-grid {
         grid-template-columns: repeat(2, 1fr);
-        margin: 0 3%;
+        margin: 0 10%;
         gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .pieces-grid {
+        grid-template-columns: 1fr;
+        margin: 0 5%;
     }
 }
 
@@ -2040,8 +2047,8 @@ section h2 {
     }
 
     .pieces-grid {
-        grid-template-columns: 1fr;
         margin: 0 2%;
+        grid-template-columns: 1fr;
     }
 
     .projects-carousel {

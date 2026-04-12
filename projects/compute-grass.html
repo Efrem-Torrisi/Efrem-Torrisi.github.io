@@ -157,7 +157,7 @@ FRDGBufferDesc InstanceDesc = FRDGBufferDesc::CreateStructuredDesc(
 FRDGBufferRef InstancesLOD0 = GraphBuilder.CreateBuffer(InstanceDesc, TEXT("GrassInstancesLOD0"));
 FRDGBufferRef InstancesLOD1 = GraphBuilder.CreateBuffer(InstanceDesc, TEXT("GrassInstancesLOD1"));
 
-// These hold the draw args - the compute shader fills in how many to draw
+// These hold the draw args. The compute shader fills in how many to draw
 FRDGBufferDesc ArgsDesc = FRDGBufferDesc::CreateStructuredDesc(
     sizeof(FGrassDrawIndirectArgsGPU), 1);
 ArgsDesc.Usage |= EBufferUsageFlags::DrawIndirect;
@@ -185,7 +185,7 @@ PassParams->OutGrassInstancesLOD1 = GraphBuilder.CreateUAV(InstancesLOD1);
 PassParams->OutDrawArgsLOD0       = GraphBuilder.CreateUAV(ArgsLOD0);
 PassParams->OutDrawArgsLOD1       = GraphBuilder.CreateUAV(ArgsLOD1);
 
-// Kick off the compute shader - one thread per blade
+// Kick off the compute shader, one thread per blade
 const uint32 GroupSize   = 64;
 const uint32 GroupCount  = FMath::DivideAndRoundUp(MaxInstances, GroupSize);
 
@@ -197,7 +197,7 @@ FComputeShaderUtils::AddPass(
 
 // ... VS/PS setup, pipeline state init ...
 
-// Draw with indirect args - the GPU already knows how many blades there are
+// Draw with indirect args
 RHICmdList.DrawPrimitiveIndirect(DrawParams->IndirectDrawArgs->GetRHI(), 0);</code></pre>
                     </div>
                     </div>

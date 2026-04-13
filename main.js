@@ -858,6 +858,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
         var prevBtn = overlay.querySelector('.lightbox-prev');
         var nextBtn = overlay.querySelector('.lightbox-next');
         var currentMedia = null;
+        var currentCaption = null;
         var galleryItems = [];
         var galleryIndex = -1;
 
@@ -866,6 +867,10 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                 if (currentMedia.tagName === 'VIDEO') currentMedia.pause();
                 currentMedia.remove();
                 currentMedia = null;
+            }
+            if (currentCaption) {
+                currentCaption.remove();
+                currentCaption = null;
             }
 
             var el;
@@ -886,6 +891,15 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             el.className = 'lightbox-content';
             currentMedia = el;
             overlay.appendChild(el);
+
+            var captionText = sourceEl.getAttribute('data-caption');
+            if (captionText) {
+                var caption = document.createElement('div');
+                caption.className = 'lightbox-caption';
+                caption.textContent = captionText;
+                currentCaption = caption;
+                overlay.appendChild(caption);
+            }
         }
 
         function updateArrows() {
@@ -922,9 +936,15 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                 currentMedia.pause();
             }
             setTimeout(function () {
-                if (!overlay.classList.contains('is-active') && currentMedia) {
-                    currentMedia.remove();
-                    currentMedia = null;
+                if (!overlay.classList.contains('is-active')) {
+                    if (currentMedia) {
+                        currentMedia.remove();
+                        currentMedia = null;
+                    }
+                    if (currentCaption) {
+                        currentCaption.remove();
+                        currentCaption = null;
+                    }
                 }
                 galleryItems = [];
                 galleryIndex = -1;

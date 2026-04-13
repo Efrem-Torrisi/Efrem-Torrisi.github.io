@@ -1558,9 +1558,10 @@ section h2 {
 .project-gallery--strip {
     display: flex;
     gap: 0.5rem;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
     position: relative;
-    max-height: 100px;
+    padding-bottom: 0.5rem;
 }
 
 .project-gallery--strip img,
@@ -1570,6 +1571,23 @@ section h2 {
     height: 90px;
     aspect-ratio: auto;
     object-fit: cover;
+}
+
+.project-gallery--strip::-webkit-scrollbar {
+    height: 6px;
+}
+
+.project-gallery--strip::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.project-gallery--strip::-webkit-scrollbar-thumb {
+    background: rgba(var(--color-overlay-white), 0.12);
+    border-radius: 3px;
+}
+
+.project-gallery--strip::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--color-overlay-white), 0.2);
 }
 
 @media (max-width: 768px) {
@@ -2142,6 +2160,25 @@ section h2 {
     right: 1rem;
 }
 
+.lightbox-caption {
+    position: absolute;
+    left: 50%;
+    bottom: 2rem;
+    transform: translateX(-50%);
+    max-width: 80vw;
+    background: rgba(30, 30, 30, 0.75);
+    color: #fff;
+    padding: 0.6rem 1.1rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    text-align: center;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    pointer-events: none;
+    z-index: 1;
+}
+
 .contrib-media-item img,
 .contrib-media-item video {
     cursor: pointer;
@@ -2168,6 +2205,13 @@ section h2 {
     .lightbox-arrow {
         font-size: 2.5rem;
         padding: 0.75rem;
+    }
+
+    .lightbox-caption {
+        bottom: 1rem;
+        max-width: 90vw;
+        font-size: 0.85rem;
+        padding: 0.5rem 0.85rem;
     }
 
     .lightbox-prev {

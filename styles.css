@@ -1192,6 +1192,48 @@ section h2 {
     flex-direction: row-reverse;
 }
 
+.tech-breakdown-inner-row {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.tech-breakdown-inner-row--reverse {
+    flex-direction: row-reverse;
+}
+
+.tech-breakdown-inner-row > .tech-breakdown-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.tech-breakdown-inner-row > .tech-breakdown-text h3 {
+    margin-top: 0;
+}
+
+.tech-breakdown-inner-row > .tech-breakdown-figure {
+    flex: 0 0 45%;
+    max-width: 45%;
+    min-width: 0;
+    margin: 0;
+}
+
+.tech-breakdown-block > .project-gallery--strip {
+    margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+    .tech-breakdown-inner-row,
+    .tech-breakdown-inner-row--reverse {
+        flex-direction: column;
+    }
+
+    .tech-breakdown-inner-row > .tech-breakdown-figure {
+        flex: none;
+        max-width: 100%;
+    }
+}
+
 .tech-breakdown-row .tech-breakdown-text {
     flex: 1;
     min-width: 0;

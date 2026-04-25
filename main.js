@@ -880,12 +880,13 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             }
 
             var el;
-            if (sourceEl.tagName === 'VIDEO') {
+            var fullVideo = sourceEl.getAttribute && sourceEl.getAttribute('data-full-video');
+            if (sourceEl.tagName === 'VIDEO' || fullVideo) {
                 el = document.createElement('video');
-                el.src = sourceEl.src;
+                el.src = fullVideo || sourceEl.src;
                 el.autoplay = true;
                 el.loop = true;
-                el.muted = sourceEl.muted;
+                el.muted = sourceEl.tagName === 'VIDEO' ? sourceEl.muted : false;
                 el.controls = true;
                 el.playsInline = true;
             } else {

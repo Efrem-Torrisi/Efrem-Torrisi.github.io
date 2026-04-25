@@ -28,146 +28,149 @@
 <article class="project-detail">
     <header class="project-detail-header">
         <div class="project-header-info">
-            <h1 class="project-detail-title">Planet Generator</h1>
-            <p class="project-detail-subtitle">Batch LOD and Convex Collision Mesh Generator shelf tool in Houdini</p>
+            <h1 class="project-detail-title">Procedural Planet Generator</h1>
+            <p class="project-detail-subtitle">Blender add-on for procedural planet generation, rendering, and game-ready export</p>
             <div class="project-detail-meta">
                 <span class="meta-item"><strong>Role:</strong> Solo Developer</span>
-                <span class="meta-item"><strong>Tools:</strong> Houdini, Python, Unreal Engine 5</span>
+                <span class="meta-item"><strong>Tools:</strong> Blender, Python</span>
                 <span class="meta-item"><strong>Type:</strong> 3D Pipeline Tool</span>
             </div>
         </div>
         <div class="project-header-image">
-            <img src="content/icons/TGA_Logo.png" data-dark-src="content/icons/TGA_Logo.png" data-light-src="content/icons/TGA_Logo_black.png" alt="The Game Assembly" />
+            <img src="content/SoloProjects/Planet/poster.webp" alt="Procedural planet render" />
         </div>
     </header>
 
     <div class="project-detail-body">
 
         <section class="project-detail-section">
-        <div  class="project-detail-trailer project-detail-trailer--inline">
-            <h3> Results showcase</h3>
-            <video
-                src="content/SoloProjects/LOD/autoLOD_demo.mp4"
-                controls
-                playsinline
-                preload="metadata"
-                poster="content/SoloProjects/AutoLOD.webp"
-            ></video>
-        </div>
-    
-
-    <!-- Screenshots -->
+            <div class="project-detail-trailer project-detail-trailer--inline">
+                <h3>Results showcase</h3>
+                <video
+                    src="content/SoloProjects/Planet/showcase_compressed.mp4"
+                    controls
+                    playsinline
+                    preload="metadata"
+                    poster="content/SoloProjects/Planet/poster.webp"
+                ></video>
+            </div>
 
             <h3>Screenshots</h3>
             <div class="project-gallery project-gallery--strip">
-                <img src="content/SoloProjects/LOD/screenshots/thumbs/Result.jpg" data-full-src="content/SoloProjects/LOD/screenshots/Result.webp" alt="LOD Chaint" />
-                <img src="content/SoloProjects/LOD/screenshots/thumbs/complex_mesh.jpg" data-full-src="content/SoloProjects/LOD/screenshots/complex_mesh.webp" alt="complex_ucx_mesh" />
-                <img src="content/SoloProjects/LOD/screenshots/thumbs/simple_mesh.jpg" data-full-src="content/SoloProjects/LOD/screenshots/simple_mesh.webp" alt="simple_ucx_mesh" />
-                <img src="content/SoloProjects/LOD/screenshots/thumbs/still1.jpg" data-full-src="content/SoloProjects/LOD/screenshots/still1.webp" alt="Tool_UI" />      <span class="gallery-more-indicator"></span>
+                <img src="content/SoloProjects/Planet/screenshots/thumbs/earth.jpg" data-full-video="content/SoloProjects/Planet/screenshots/earth.mp4" alt="Earth-like planet" />
+                <img src="content/SoloProjects/Planet/screenshots/thumbs/alien.jpg" data-full-video="content/SoloProjects/Planet/screenshots/alien.mp4" alt="Alien planet" />
+                <img src="content/SoloProjects/Planet/screenshots/thumbs/mars.jpg" data-full-video="content/SoloProjects/Planet/screenshots/mars.mp4" alt="Mars-like planet" />
+                <img src="content/SoloProjects/Planet/screenshots/thumbs/ice.jpg" data-full-video="content/SoloProjects/Planet/screenshots/ice.mp4" alt="Ice planet" />
+                <img src="content/SoloProjects/Planet/screenshots/thumbs/mercury.jpg" data-full-video="content/SoloProjects/Planet/screenshots/mercury.mp4" alt="Mercury-like planet" />
+                <img src="content/SoloProjects/Planet/screenshots/thumbs/sandstorm.jpg" data-full-video="content/SoloProjects/Planet/screenshots/sandstorm.mp4" alt="Sandstorm planet" />
+                <span class="gallery-more-indicator"></span>
             </div>
         </section>
 
-        <!-- Overview -->
         <section class="project-detail-section">
             <h2>Overview & Technical Breakdown</h2>
-            <p>A Houdini shelf tool that automates LOD mesh generation and convex collision geometry from a source FBX. The tool produces LOD0 through LOD3 at user-defined reduction percentages and optionally generates UCX collision meshes in simple or complex mode.</p>
-            <p>PolyReduce preserves UVs where possible, with a UV Transfer fallback for cases where reduction distorts them. Everything is exported as a single FBX with naming conventions that engines like Unreal Engine automatically recognize on import.</p>
+            <p>A Blender add-on tool that procedurally builds terrestrial planets from a sidebar panel. Each planet is generated as its own collection of spheres (planet, clouds, atmosphere) along with a Sun light and a tracking camera for rendering. Multiple planets can exist in the same scene and be edited independently through the side panel.</p>
+            <p>All three materials are made with the shader nodes that have important values wired to the addon UI and update in real-time. The tool also exports meshes as FBX and can bakes albedo, roughness, normal, and a packed cloud albedo+alpha via the Cycles renderer for game-ready use.</p>
         </section>
 
         <!-- Demo Video -->
         <div class="project-detail-trailer project-detail-trailer--inline">
-            <h3> Workflow Demo</h3>
+            <h3>Workflow Demo</h3>
             <video
-                src="content/SoloProjects/LOD/lodV.mp4"
+                src="content/SoloProjects/Planet/workflow_compressed.mp4"
                 controls
                 playsinline
                 preload="metadata"
-                poster="content/SoloProjects/AutoLOD.webp"
+                poster="content/SoloProjects/Planet/poster.webp"
             ></video>
         </div>
 
-        <!-- Technical Breakdown -->
         <section class="project-detail-section">
-            <div class="tech-breakdown-row">
-                <div class="tech-breakdown-text">
-                    <h3>Network Overview</h3>
-                    <p>When executed, the tool creates organized 'obj' and 'out' node chains. The top-level network contains the source FBX, a LODS subnetwork for LOD generation, and a UCX subnetwork for collision mesh generation.</p>
-                </div>
-                <figure class="tech-breakdown-figure">
-                    <img src="content/SoloProjects/LOD/Subnetwork1.png" alt="Top-level Houdini network showing source_file, LODS subnetwork, UCX subnetwork, and complex collision temp node" />
-                </figure>
-            </div>
+            <div class="tech-breakdown-block">
+                <h3>Material Graphs</h3>
 
-            <div class="tech-breakdown-row tech-breakdown-row--reverse">
-                <div class="tech-breakdown-text">
-                    <h3>LOD Generation</h3>
-                    <p>Four geometry networks generate the LOD chain, each applying PolyReduce at a user-defined target percentage (defaults: 100%, 50%, 25%, 15%). Settings for preserving quads and recomputing normals are configurable per run.</p>
-                    <p>Each output is named with the correct convention (e.g. meshname_LOD0, meshname_LOD1) for automatic engine recognition on import.</p>
+                <div class="tech-breakdown-row">
+                    <div class="tech-breakdown-text">
+                        <h4>Planet Surface</h4>
+                        <p>Two FBM noises feeding each other, then ramps turn the result into color, roughness, and normals.</p>
+                    </div>
+                    <figure class="tech-breakdown-figure">
+                        <img src="content/SoloProjects/Planet/Planet_Graph.webp" alt="Planet surface shader graph" />
+                    </figure>
                 </div>
-                <figure class="tech-breakdown-figure">
-                    <img src="content/SoloProjects/LOD/LOD_Subnet.png" alt="LODS subnetwork containing four LOD geometry nodes" />
-                </figure>
+
+                <div class="tech-breakdown-row tech-breakdown-row--reverse">
+                    <div class="tech-breakdown-text">
+                        <h4>Clouds</h4>
+                        <p>Two noises: one drives the alpha for cloud shape, the other drives the color, so shape and color can be tuned independently.</p>
+                    </div>
+                    <figure class="tech-breakdown-figure">
+                        <img src="content/SoloProjects/Planet/Clouds_Graph.webp" alt="Cloud shader graph" />
+                    </figure>
+                </div>
+
+                <div class="tech-breakdown-row">
+                    <div class="tech-breakdown-text">
+                        <h4>Atmosphere</h4>
+                        <p>A thin volume shader for the outer shell with controls for denisty via the color ramp, and color.</p>
+                    </div>
+                    <figure class="tech-breakdown-figure">
+                        <img src="content/SoloProjects/Planet/Atmosphere_Graph.webp" alt="Atmosphere shader graph" />
+                    </figure>
+                </div>
             </div>
 
             <div class="tech-breakdown-block">
-                <h3>Inside an LOD Node</h3>
-                <p>Each LOD node follows the same pipeline: Object Merge brings in the source mesh, PolyReduce reduces to the target percentage, and a Null marks the output. This structure is replicated across all four levels with only the reduction settings changing.</p>
-                <figure class="tech-breakdown-figure">
-                    <img src="content/SoloProjects/LOD/LOD_Network.png" alt="Inside an LOD node: merge_in, poly_reduce, and OUT null" />
-                </figure>
+                <h3>Game-Ready Export & Bake</h3>
+                <p>Mesh export writes the active planet's icospheres to an FBX in a single click. Texture bakes run on Cycles at a the selected resolution and format (PNG or TGA), producing albedo, roughness, and normal maps for the surface, with an optional spherical UV reproject for meshes that don't already have these UVs.</p>
+                <p>Cloud baking is a two-step process: a standard DIFFUSE bake captures the cloud color, then the shader graph is temporarily rewired so the cloud alpha ramp drives an Emission shader that gets baked as the opacity pass. The two results are merged in-memory into a single RGBA PNG (color in RGB, opacity packed into A) so the cloud sphere can be reused in real-time engines as one transparent texture.</p>
+                <div class="project-detail-trailer project-detail-trailer--inline">
+                    <video
+                        src="content/SoloProjects/Planet/export_compressed.mp4"
+                        controls
+                        playsinline
+                        preload="metadata"
+                        poster="content/SoloProjects/Planet/poster.webp"
+                    ></video>
+                </div>
             </div>
 
             <div class="tech-breakdown-block">
-                <h3>Collision Generation: Simple Mode</h3>
-                <p>Simple mode generates a single convex hull via Shrinkwrap around the LOD0 mesh. Fast and well-suited for roughly convex shapes or where one collision volume is sufficient. Named with the UCX_ prefix for automatic engine recognition.</p>
+                <h3>Variant Showcase</h3>
+                <p>The same node setup driven by different parameter presets yields a wide range of planet types. Each render below uses the shared surface, atmosphere, and cloud graphs with only input values changed.</p>
                 <div class="contrib-media contrib-media--contain">
                     <figure class="contrib-media-item">
-                        <img src="content/SoloProjects/LOD/simple_temp.png" alt="Simple collision pipeline: merge_in from LOD0, Shrinkwrap convex_hull, OUT null" />
+                        <video src="content/SoloProjects/Planet/screenshots/earth.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                        <figcaption>Earth-like</figcaption>
                     </figure>
                     <figure class="contrib-media-item">
-                        <img src="content/SoloProjects/LOD/simple_mesh.webp" alt="Simple convex hull collision mesh result" />
+                        <video src="content/SoloProjects/Planet/screenshots/alien.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                        <figcaption>Alien</figcaption>
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <video src="content/SoloProjects/Planet/screenshots/mars.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                        <figcaption>Mars-like</figcaption>
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <video src="content/SoloProjects/Planet/screenshots/ice.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                        <figcaption>Ice</figcaption>
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <video src="content/SoloProjects/Planet/screenshots/mercury.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                        <figcaption>Mercury-like</figcaption>
+                    </figure>
+                    <figure class="contrib-media-item">
+                        <video src="content/SoloProjects/Planet/screenshots/sandstorm.mp4" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback></video>
+                        <figcaption>Sandstorm</figcaption>
                     </figure>
                 </div>
-            </div>
-
-            <div class="tech-breakdown-block">
-                <h3>Collision Generation: Complex Mode</h3>
-                <p>For concave or intricate shapes, complex mode uses Convex Decomposition to split the mesh into multiple convex pieces. A maximum convexity parameter controls the accuracy-to-count tradeoff. Each piece is named sequentially (e.g. UCX_meshname_00, UCX_meshname_01) following the UE5 convention.</p>
-                <div class="contrib-media contrib-media--contain">
-                    <figure class="contrib-media-item">
-                        <img src="content/SoloProjects/LOD/complex_temp.png" alt="Complex collision temp node: merge_in from LOD0, Convex Decomposition" />
-                    </figure>
-                    <figure class="contrib-media-item">
-                        <img src="content/SoloProjects/LOD/UCX_Mesh.webp" alt="Inside a UCX collision node: merge_in, convex_decomp, isolate_segment, OUT" />
-                    </figure>
-                    <figure class="contrib-media-item">
-                        <img src="content/SoloProjects/LOD/complex_mesh.webp" alt="Complex collision mesh result with multiple convex pieces" />
-                    </figure>
-                </div>
-            </div>
-
-            <div class="tech-breakdown-block">
-                <h3>UCX Subnetwork</h3>
-                <p>Each convex piece gets its own geometry node inside the UCX subnetwork, following the same pipeline: merge in the decomposed result, isolate the segment, and output with its UCX_ name. All pieces are included in the final FBX alongside the LOD chain.</p>
-                <figure class="tech-breakdown-figure">
-                    <img src="content/SoloProjects/LOD/UCX_subnetwork.webp" alt="UCX subnetwork containing multiple collision geometry nodes" />
-                </figure>
-            </div>
-
-            <div class="tech-breakdown-block">
-                <h3>Result & Export</h3>
-                <p>The final output is a single FBX containing the full LOD chain, source mesh, and all UCX collision meshes with automatic naming conventions for engine import.</p>
-                <figure class="tech-breakdown-figure">
-                    <img src="content/SoloProjects/LOD/Result.webp" alt="Final result showing LOD0-3 with polygon counts, simple and complex UCX collisions, and the naming convention hierarchy" />
-                </figure>
             </div>
         </section>
 
-        <!-- Tools & Technologies -->
         <section class="project-detail-section">
             <h2>Tools & Technologies used</h2>
             <ul class="tools-list">
-                <li><img src="content/icons/houdini_badge_flat.svg" alt="Houdini" class="tool-icon" /> Houdini</li>
+                <li><img src="content/icons/blender.svg" alt="Blender" class="tool-icon" /> Blender</li>
                 <li><img src="content/icons/python.svg" alt="Python" class="tool-icon" /> Python</li>
             </ul>
         </section>

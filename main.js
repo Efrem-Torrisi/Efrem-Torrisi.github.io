@@ -455,6 +455,12 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                 return res.text();
             })
             .then(function (html) {
+                // If a full HTML page was returned, extract just the article fragment
+                if (/^\s*<!DOCTYPE/i.test(html) || /^\s*<html/i.test(html)) {
+                    var doc = new DOMParser().parseFromString(html, 'text/html');
+                    var article = doc.querySelector('article.project-detail');
+                    if (article) html = article.outerHTML;
+                }
                 contentCache[slug] = html;
                 if (pendingFetches[slug] === promise) {
                     delete pendingFetches[slug];

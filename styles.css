@@ -316,6 +316,10 @@ body.is-intro .piece-wrapper:nth-child(3) .piece[data-reveal],
 body.is-intro .piece-wrapper:nth-child(3) .piece-label { animation-delay: 0.7s; }
 body.is-intro .piece-wrapper:nth-child(4) .piece[data-reveal],
 body.is-intro .piece-wrapper:nth-child(4) .piece-label { animation-delay: 0.75s; }
+body.is-intro .piece-wrapper:nth-child(5) .piece[data-reveal],
+body.is-intro .piece-wrapper:nth-child(5) .piece-label { animation-delay: 0.8s; }
+body.is-intro .piece-wrapper:nth-child(6) .piece[data-reveal],
+body.is-intro .piece-wrapper:nth-child(6) .piece-label { animation-delay: 0.85s; }
 
 /* Group projects section: title then carousel */
 body.is-intro .projects-section .section-title[data-reveal],
@@ -431,10 +435,18 @@ body.is-intro .projects-carousel[data-reveal]                { animation-delay: 
 }
 
 .pieces-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    --pieces-gap: clamp(1rem, 3%, 2rem);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     margin: 0 5%;
-    gap: clamp(1rem, 3%, 2rem);
+    gap: var(--pieces-gap);
+}
+
+.pieces-grid > .piece-wrapper {
+    flex: 0 0 calc((100% - 2 * var(--pieces-gap)) / 3);
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .piece {
@@ -1881,9 +1893,14 @@ section h2 {
 /* Tablet / touch carousel breakpoint */
 @media (max-width: 1400px) {
     .pieces-grid {
+        display: grid;
         grid-template-columns: repeat(2, 1fr);
+        justify-content: stretch;
         margin: 0 10%;
         gap: 1rem;
+    }
+    .pieces-grid > .piece-wrapper {
+        flex: initial;
     }
 }
 

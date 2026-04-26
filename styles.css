@@ -2003,6 +2003,13 @@ section h2 {
         padding-right: 1rem;
     }
 
+    /* iOS Safari: suppress the lingering "start playback" / overlay button on inline videos */
+    video::-webkit-media-controls-start-playback-button,
+    video::-webkit-media-controls-overlay-play-button {
+        display: none !important;
+        -webkit-appearance: none !important;
+    }
+
     .about-grid {
         grid-template-columns: 1fr;
         gap: 2rem;

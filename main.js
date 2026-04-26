@@ -601,12 +601,12 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
         function initModalContent() {
             modalContainer().scrollTop = 0;
+            initMobileVideoControls();
             swapModalVideos();
             lazyLoadModalVideos();
             hideVideosUntilReady();
             initCodeTabs();
             initReadMore();
-            initMobileVideoControls();
             var isLight = document.documentElement.getAttribute('data-theme') === 'light';
             window.swapIcons(isLight);
 
@@ -620,17 +620,23 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
 
         function initMobileVideoControls() {
             if (!window.matchMedia('(max-width: 768px)').matches) return;
-            modalContent.querySelectorAll('video[controls]').forEach(function (video) {
+            modalContent.querySelectorAll('video').forEach(function (video) {
+                var hadControls = video.hasAttribute('controls');
+                video.controls = false;
                 video.removeAttribute('controls');
+                if (!hadControls) return;
                 var hideTimer;
                 function showControls() {
+                    video.controls = true;
                     video.setAttribute('controls', '');
                     clearTimeout(hideTimer);
                     hideTimer = setTimeout(function () {
+                        video.controls = false;
                         video.removeAttribute('controls');
                     }, 3000);
                 }
                 video.addEventListener('pointerdown', showControls);
+                video.addEventListener('click', showControls);
             });
         }
 

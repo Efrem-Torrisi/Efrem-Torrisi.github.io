@@ -605,6 +605,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             lazyLoadModalVideos();
             hideVideosUntilReady();
             initCodeTabs();
+            initReadMore();
             var isLight = document.documentElement.getAttribute('data-theme') === 'light';
             window.swapIcons(isLight);
 
@@ -614,6 +615,72 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                     Prism.highlightAllUnder(modalContent);
                 });
             }
+        }
+
+        function initReadMore() {
+            function applyReadMore(text) {
+                if (text.querySelector('.read-more-toggle')) return;
+                var inner = document.createElement('div');
+                inner.className = 'tech-breakdown-text-inner';
+                while (text.firstChild) inner.appendChild(text.firstChild);
+                text.appendChild(inner);
+
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'read-more-toggle';
+                btn.textContent = 'Read more';
+                btn.setAttribute('aria-expanded', 'false');
+                btn.addEventListener('click', function () {
+                    var expanded = text.classList.toggle('is-expanded');
+                    btn.textContent = expanded ? 'Read less' : 'Read more';
+                    btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+                });
+                text.appendChild(btn);
+                text.classList.add('is-collapsible');
+            }
+
+            // Case 1: existing .tech-breakdown-text paired with a media sibling
+            modalContent.querySelectorAll('.tech-breakdown-text').forEach(function (text) {
+                var parent = text.parentElement;
+                if (!parent) return;
+                var hasMedia = parent.querySelector('.tech-breakdown-figure, .compute-diagram, .code-embed, .compute-media-row, .contrib-media, video');
+                if (!hasMedia) return;
+                applyReadMore(text);
+            });
+
+            // Case 2: .tech-breakdown-block with direct <p> children + any media
+            modalContent.querySelectorAll('.tech-breakdown-block').forEach(function (block) {
+                var hasMedia = block.querySelector('.tech-breakdown-figure, .project-detail-trailer, .contrib-media, video');
+                if (!hasMedia) return;
+                var ps = [];
+                for (var i = 0; i < block.children.length; i++) {
+                    if (block.children[i].tagName === 'P') ps.push(block.children[i]);
+                }
+                if (!ps.length) return;
+                var totalLen = ps.reduce(function (sum, p) { return sum + p.textContent.length; }, 0);
+                if (totalLen < 140) return;
+                var wrap = document.createElement('div');
+                wrap.className = 'tech-breakdown-text';
+                block.insertBefore(wrap, ps[0]);
+                ps.forEach(function (p) { wrap.appendChild(p); });
+                applyReadMore(wrap);
+            });
+
+            // Case 3: .project-detail-section with 2+ direct <p> children (e.g. Overview)
+            modalContent.querySelectorAll('.project-detail-section').forEach(function (section) {
+                var ps = [];
+                for (var i = 0; i < section.children.length; i++) {
+                    if (section.children[i].tagName === 'P') ps.push(section.children[i]);
+                }
+                if (!ps.length) return;
+                var totalLen = ps.reduce(function (sum, p) { return sum + p.textContent.length; }, 0);
+                if (totalLen < 140) return;
+                var wrap = document.createElement('div');
+                wrap.className = 'tech-breakdown-text';
+                section.insertBefore(wrap, ps[0]);
+                ps.forEach(function (p) { wrap.appendChild(p); });
+                applyReadMore(wrap);
+            });
         }
 
         function initCodeTabs() {

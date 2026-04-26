@@ -1234,6 +1234,10 @@ section h2 {
     margin-top: 1rem;
 }
 
+.read-more-toggle {
+    display: none;
+}
+
 @media (max-width: 768px) {
     .tech-breakdown-inner-row,
     .tech-breakdown-inner-row--reverse {
@@ -1243,6 +1247,65 @@ section h2 {
     .tech-breakdown-inner-row > .tech-breakdown-figure {
         flex: none;
         max-width: 100%;
+    }
+
+    .tech-breakdown-figure {
+        max-width: 100%;
+    }
+
+    .tech-breakdown-block .tech-breakdown-row,
+    .tech-breakdown-block .tech-breakdown-row--reverse {
+        padding: 0;
+        background: transparent;
+        margin-bottom: 1rem;
+    }
+
+    .tech-breakdown-block .tech-breakdown-row:last-child,
+    .tech-breakdown-block .tech-breakdown-row--reverse:last-child {
+        margin-bottom: 0;
+    }
+
+    .tech-breakdown-text.is-collapsible .tech-breakdown-text-inner {
+        position: relative;
+        max-height: 7em;
+        overflow: hidden;
+    }
+
+    .tech-breakdown-text.is-collapsible .tech-breakdown-text-inner::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 3.5em;
+        background: linear-gradient(to bottom, transparent, var(--color-modal-bg));
+        pointer-events: none;
+    }
+
+    .tech-breakdown-text.is-collapsible.is-expanded .tech-breakdown-text-inner {
+        max-height: none;
+    }
+
+    .tech-breakdown-text.is-collapsible.is-expanded .tech-breakdown-text-inner::after {
+        display: none;
+    }
+
+    .tech-breakdown-text.is-collapsible .read-more-toggle {
+        display: inline-block;
+        margin-top: 0.75rem;
+        background: transparent;
+        border: 1px solid var(--color-border);
+        color: var(--color-text);
+        padding: 0.4rem 0.9rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        font-family: inherit;
+        cursor: pointer;
+    }
+
+    .tech-breakdown-text.is-collapsible .read-more-toggle:hover {
+        background: var(--color-bg-elevated);
     }
 }
 
@@ -1828,24 +1891,31 @@ section h2 {
         padding: 0.75rem 1rem;
         flex-direction: row;
         position: relative; /* Not sticky on mobile — let it scroll away */
-        gap: 1rem;
+        gap: 0.75rem;
+        align-items: center;
     }
 
     .project-header-image {
-        max-width: 80px;
+        display: none;
     }
 
     .project-detail-title {
         font-size: 1.1rem;
-    }
-
-    .project-detail-subtitle {
-        font-size: 0.85rem;
         margin-bottom: 0.25rem;
     }
 
-    .project-detail-meta {
+    .project-detail-subtitle {
         font-size: 0.8rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .project-detail-meta {
+        gap: 0.25rem 0.75rem;
+        font-size: 0.7rem;
+    }
+
+    .meta-item {
+        font-size: 0.7rem;
     }
 
     .project-detail-trailer,
@@ -1859,7 +1929,78 @@ section h2 {
     }
 
     .project-detail-body {
-        padding: 1.5rem;
+        padding: 1.5rem 0;
+    }
+
+    /* ArtStation-style mobile: edge-to-edge media, text stays padded */
+    .project-detail-section > h2,
+    .project-detail-section > h3,
+    .project-detail-section > h4,
+    .project-detail-section > p,
+    .project-detail-section > ul,
+    .project-detail-section > .project-detail-trailer > h3,
+    .tech-breakdown-block > h3,
+    .tech-breakdown-block > h4,
+    .tech-breakdown-block > p,
+    .tech-breakdown-text {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .tech-breakdown-row,
+    .tech-breakdown-row--reverse,
+    .tech-breakdown-block {
+        background: transparent;
+        padding: 0;
+        margin-bottom: 1.5rem;
+    }
+
+    .tech-breakdown-block .tech-breakdown-row,
+    .tech-breakdown-block .tech-breakdown-row--reverse {
+        margin-bottom: 1rem;
+    }
+
+    .tech-breakdown-figure,
+    .tech-breakdown-block .tech-breakdown-figure {
+        margin: 0;
+    }
+
+    .tech-breakdown-figure img,
+    .tech-breakdown-figure video {
+        border-radius: 0;
+        border: none;
+    }
+
+    .contrib-media-item img,
+    .contrib-media-item video {
+        border-radius: 0;
+    }
+
+    .contrib-media,
+    .contrib-media-pair {
+        grid-template-columns: 1fr;
+        max-width: 100% !important;
+        gap: 0.5rem;
+    }
+
+    .contrib-media-pair + .contrib-media-item {
+        max-width: 100%;
+    }
+
+    .contrib-media-item {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .project-detail-trailer--inline video,
+    .project-detail-trailer--inline iframe {
+        border-radius: 0;
+    }
+
+    .project-gallery--strip {
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 
     .about-grid {

@@ -606,6 +606,7 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
             hideVideosUntilReady();
             initCodeTabs();
             initReadMore();
+            initMobileVideoControls();
             var isLight = document.documentElement.getAttribute('data-theme') === 'light';
             window.swapIcons(isLight);
 
@@ -615,6 +616,22 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                     Prism.highlightAllUnder(modalContent);
                 });
             }
+        }
+
+        function initMobileVideoControls() {
+            if (!window.matchMedia('(max-width: 768px)').matches) return;
+            modalContent.querySelectorAll('video[controls]').forEach(function (video) {
+                video.removeAttribute('controls');
+                var hideTimer;
+                function showControls() {
+                    video.setAttribute('controls', '');
+                    clearTimeout(hideTimer);
+                    hideTimer = setTimeout(function () {
+                        video.removeAttribute('controls');
+                    }, 3000);
+                }
+                video.addEventListener('pointerdown', showControls);
+            });
         }
 
         function initReadMore() {

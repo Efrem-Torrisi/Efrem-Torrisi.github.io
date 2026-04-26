@@ -1942,6 +1942,11 @@ section h2 {
         padding: 0;
     }
 
+    .skills-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+    }
+
     /* ArtStation-style mobile: edge-to-edge media, text stays padded */
     .project-detail-section > h2,
     .project-detail-section > h3,

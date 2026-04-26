@@ -1938,6 +1938,10 @@ section h2 {
         padding: 1.5rem 0;
     }
 
+    .project-detail-section {
+        padding: 0;
+    }
+
     /* ArtStation-style mobile: edge-to-edge media, text stays padded */
     .project-detail-section > h2,
     .project-detail-section > h3,

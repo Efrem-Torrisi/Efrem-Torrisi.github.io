@@ -635,7 +635,6 @@ if (WIP_MODE && !sessionStorage.getItem('wip_unlocked')) {
                         video.removeAttribute('controls');
                     }, 3000);
                 }
-                video.addEventListener('pointerdown', showControls);
                 video.addEventListener('click', showControls);
             });
         }

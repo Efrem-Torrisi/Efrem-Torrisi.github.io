@@ -1921,7 +1921,13 @@ section h2 {
     .project-detail-trailer,
     .project-detail-trailer--inline {
         width: 100%;
-        padding: 0.5rem 1rem;
+        padding: 0.5rem 0;
+    }
+
+    .project-detail-trailer > h3,
+    .project-detail-trailer--inline > h3 {
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 
     .tech-breakdown-figure {

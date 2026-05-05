@@ -122,8 +122,8 @@
 
             <div class="tech-breakdown-block">
                 <h3>Game-Ready Export & Bake</h3>
-                <p>Mesh export writes the active planet's icospheres to an FBX in a single click. Texture bakes run on Cycles at a the selected resolution and format (PNG or TGA), producing albedo, roughness, and normal maps for the surface, with an optional spherical UV reproject for meshes that don't already have these UVs.</p>
-                <p>Cloud baking is a two-step process: a standard DIFFUSE bake captures the cloud color, then the shader graph is temporarily rewired so the cloud alpha ramp drives an Emission shader that gets baked as the opacity pass. The two results are merged in-memory into a single RGBA PNG (color in RGB, opacity packed into A) so the cloud sphere can be reused in real-time engines as one transparent texture.</p>
+                <p>Mesh export writes the active planet's icospheres to an FBX/Obj. Texture bakes run on Cycles at a the selected resolution and format (PNG or TGA), producing albedo, roughness, and normal maps for the surface, with an optional spherical UV reproject for meshes that don't already have these UVs.</p>
+                <p>Cloud albedo texture is exported as RGBA PNG (color in RGB, opacity packed into A) so the cloud sphere can be reused in real-time engines as one transparent texture.</p>
                 <div class="project-detail-trailer project-detail-trailer--inline">
                     <video
                         src="content/SoloProjects/Planet/export_compressed.mp4"

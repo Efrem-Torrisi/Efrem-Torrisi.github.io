@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(winget install *)",
+      "PowerShell(Get-ChildItem *)",
+      "Bash(sort -k5 -n)",
+      "PowerShell($ffmpeg = \"C:\\\\Users\\\\Efrem.Torrisi\\\\AppData\\\\Local\\\\Microsoft\\\\WinGet\\\\Packages\\\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\\\ffmpeg-8.1.1-full_build\\\\bin\\\\ffmpeg.exe\"; & $ffmpeg -hide_banner -loglevel warning -stats -i \"FractureToolV2.mp4\" -c:v libx264 -crf 23 -preset slow -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart -y \"FractureToolV2_compressed.mp4\")"
+    ]
+  }
+}
